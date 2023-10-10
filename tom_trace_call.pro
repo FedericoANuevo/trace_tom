@@ -1,0 +1,55 @@
+pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
+
+  fl_dir  = '/data1/DATA/fieldlines_judit/'
+  fl_list = 'list.txt'
+ 
+  
+  if keyword_set(demt) then begin
+     instr    = 'aia'
+     tom_dir  = '/data1/DATA/ldem_files/'
+     tom_file = 'CR2082_HOLLOW_compound2.dat'
+     nr       = 30
+     nt       = 90
+     np       = 2*nt
+     rmin     = 1.0
+     rmax     = 1.3
+     Irmin    = 1.02
+     Irmax    = 1.25
+  endif
+
+
+  if keyword_set(lasco) then begin
+     instr    = 'lascoc2'
+     tom_dir  = '/data1/tomography/bindata/'
+     tom_file = 'x_LascoC2pB_CR2099_shifted_std-grid_Rmin2.5_Rmax8.5_IRmin2.5_IRmax6.0_60x60x120_BF4_L6.e-6'
+     nr       = 60
+     nt       = 60
+     np       = 2*nt
+     rmin     = 2.5
+     rmax     = 8.5
+     Irmin    = 2.5
+     Irmax    = 6.5
+  endif
+
+
+  if keyword_set(mlso) then begin
+     instr    = 'mk4'
+     tom_dir  = '/data1/tomography/bindata/'
+     tom_file = 'x_Mk4_CR2099_shifted_Rmin1.15_Rmax1.85_IRmin1.15_IRmax1.50_70x90x180_BF2_L5.e-6'
+     nr       = 70
+     nt       = 90
+     np       = 2*nt
+     rmin     = 1.15
+     rmax     = 1.85
+     Irmin    = 1.15
+     Irmax    = 1.50
+  endif
+
+
+  
+  tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_list=fl_list,$
+            nr=nr,nt=nt,np=np,rmin=rmin,rmax=rmax,Irmin=Irmin,Irmax=Irmax
+  
+  
+  return
+end
