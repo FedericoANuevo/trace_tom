@@ -1,8 +1,18 @@
-pro cart_to_sphcoord,V,sphcoord
+;
+; PURPOSE: This code takes in a 3D cartesian positio vector
+; V (1D 3-element array) 
+;
+; HISTORY: V1.0 FAN & AMV, CLaSP, October 2023.
+;
+
+
 ; Esta rutina da las coordenas esféricas de un vector V en cartesianas
 ; V=(x,y,z) > SPHCOORD=(r,th,ph)
 ; V es un vector (de entrada)  de 3 componentes x, y, z [Rsun]  
 ; sphcoord es el vector salida de 3 componentes r[Rsun], th [RAD], ph [RAD]
+
+
+pro cart_to_sphcoord,V,sphcoord
   x=V[0]*1d
   y=V[1]*1d
   z=V[2]*1d

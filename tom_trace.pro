@@ -1,3 +1,13 @@
+;
+; PURPOSE: This code reads into memory tomographic producs for eiter
+;          VL tomography (N_e) or EUV tomography (N_e, T_e).
+;          It then loops across AWSoM fieldline files and, for each one,
+;          it calls the routine that actually reads each fieldline
+;          file and it traces the tomographic producs along them.
+;
+; HISTORY: V1.0 FAN & AMV, CLaSP, October 2023.
+;
+
 pro tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_list=fl_list,$
               nr=nr,nt=nt,np=np,rmin=rmin,rmax=rmax,Irmin=Irmin,Irmax=Irmax
 

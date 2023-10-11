@@ -1,3 +1,12 @@
+;
+; PURPOSE: This code reads a single AWSoM fieldline tracing file,
+;          traces th VL-SRT 3D N_e along it,
+;          and produces an expanded fieldline tracing file including
+;          the tomographic electron density as a new column.
+;
+; HISTORY: V1.0 FAN & AMV, CLaSP, October 2023.
+;
+
 pro read_fieldline_and_trace_vlsrt,instr,dir,file,rad,lat,lon,nr,nt,np,N_e
 ; Define name of output file
   outfile = file+'_'+instr+'.out'  

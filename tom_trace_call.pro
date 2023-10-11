@@ -1,3 +1,11 @@
+;
+; PURPOSE: This code is the main routine, where the AWSoM fieldline
+; files are provided, as well as all the needed parameters and files
+; to read the tomographic producs to be traced.
+;
+; HISTORY: V1.0 FAN & AMV, CLaSP, October 2023.
+;
+
 pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
 
   fl_dir  = '/data1/DATA/fieldlines_judit/'
