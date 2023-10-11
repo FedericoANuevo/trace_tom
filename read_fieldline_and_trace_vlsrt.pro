@@ -23,7 +23,7 @@ pro read_fieldline_and_trace_vlsrt,instr,dir,file,rad,lat,lon,nr,nt,np,N_e
      r0  = sphcoord[0]
      th0 = sphcoord[1]
      ph0 = sphcoord[1]
-     determindex2,r0,th0,ph0,irad,ilat,ilon,rad,lat,lon
+     determindex,r0,th0,ph0,irad,ilat,ilon,rad,lat,lon
      if irad ne -1 and ilat ne -1 and ilon ne -1 then begin
         Ne_l (i) =  N_e (irad,ilat,ilon)
         ind_l(i) =  irad + nr*ilat + nr*nt*ilon

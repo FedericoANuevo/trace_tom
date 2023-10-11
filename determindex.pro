@@ -1,4 +1,4 @@
-pro determindex2,r0,th0,ph0,irad,ilat,ilon,rad,lat,lon
+pro determindex,r0,th0,ph0,irad,ilat,ilon,rad,lat,lon
 ; Purpose: Given the position vector coordinates (r0,th0,ph0)
 ; find the 3 1D-indexes of the tomographic grid cell that 
 ; contains that position.
