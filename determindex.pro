@@ -1,6 +1,6 @@
 pro determindex,r0,th0,ph0,irad,ilat,ilon,rad,lat,lon
 ; Purpose: Given a position vector spherical coordinates (r0,th0,ph0),
-;          and a spherical grid (rad,lon,phi),
+;          and a spherical grid (rad,lat,phi),
 ;          find the 3 1D-indexes of the grid cell that contains
 ;          that position.
   drad = rad(1) - rad (0)
