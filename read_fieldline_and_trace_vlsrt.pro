@@ -20,8 +20,7 @@ pro read_fieldline_and_trace_vlsrt,instr,dir,file,rad,lat,lon,nr,nt,np,N_e
   ph_l = dblarr(N)
 ; Define the fieldline tomographic variables arrays
   Ne_l  = fltarr(N)  
-  Te_l  = fltarr(N)
-  ind_l = lonarr(N)*0L
+  ind_l = lonarr(N)
 ; Trace tomographic products along the fieldline  
   for i = 0,N-1 do begin
      x = x_l(i)
@@ -29,9 +28,9 @@ pro read_fieldline_and_trace_vlsrt,instr,dir,file,rad,lat,lon,nr,nt,np,N_e
      z = z_l(i)
      V = [x,y,z]
      cart_to_sphcoord,V,sphcoord
-     r0  = sphcoord[0]
-     th0 = sphcoord[1]
-     ph0 = sphcoord[1]
+     r0  = sphcoord[0] & r_l (i) = r0
+     th0 = sphcoord[1] & th_l(i) = th0
+     ph0 = sphcoord[1] & ph_l(i) = ph0
      determindex,r0,th0,ph0,irad,ilat,ilon,rad,lat,lon
      if irad ne -1 and ilat ne -1 and ilon ne -1 then begin
         Ne_l (i) =  N_e (irad,ilat,ilon)
@@ -43,10 +42,10 @@ pro read_fieldline_and_trace_vlsrt,instr,dir,file,rad,lat,lon,nr,nt,np,N_e
   endfor
 ; Write output file
   openw,2,dir+outfile
-  printf,2,'  X [Rs]            Y [Rs]            Z [Rs]            Ne [cm^ -3]           Cell-3D-index'
+      printf,2,'  X [Rs]            Y [Rs]            Z [Rs]                  r [Rs]        lat [deg]          lon [deg]        Ne [cm^ -3]        Cell-3D-index'
   for i = 0,N-1 do begin
-     printf,2,x_l(i),y_l(i),z_l(i), Ne_l(i),ind_l(i),$
-            FORMAT = '(4(E18.10)," ",I9)' 
+     printf,2,x_l(i),y_l(i),z_l(i),r_l(i),90. -th_l(i)/!dtor, ph_l(i)/!dtor, Ne_l(i),ind_l(i),$
+            FORMAT = '(7(E18.10)," ",I9)' 
   endfor
   close,2
   return
