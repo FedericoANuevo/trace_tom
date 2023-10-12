@@ -11,7 +11,7 @@ pro read_fieldline_and_trace_demt,instr,dir,file,rad,lat,lon,nr,nt,np,N_e,T_e
 ; Define name of output file
   outfile = file+'_'+instr+'.out'  
 ; Read the ASCII fieldline file with readcol (SolarSoft)  
-  readcol,dir+file,x_l,y_l,z_l,FORMAT='D'  
+  readcol,dir+file,x_l,y_l,z_l,FORMAT='D,D,D'  
 ; elements of 1D vector with field-line coord. 
   N    = n_elements(x_l)
 ; Define the fieldline spherical coordinate arrays  
@@ -31,7 +31,7 @@ pro read_fieldline_and_trace_demt,instr,dir,file,rad,lat,lon,nr,nt,np,N_e,T_e
      cart_to_sphcoord,V,sphcoord
      r0  = sphcoord[0] & r_l (i) = r0
      th0 = sphcoord[1] & th_l(i) = th0
-     ph0 = sphcoord[1] & ph_l(i) = ph0
+     ph0 = sphcoord[2] & ph_l(i) = ph0
      determindex,r0,th0,ph0,irad,ilat,ilon,rad,lat,lon
      if irad ne -1 and ilat ne -1 and ilon ne -1 then begin
         Ne_l (i) =  N_e (irad,ilat,ilon)
