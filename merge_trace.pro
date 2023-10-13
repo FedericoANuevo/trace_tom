@@ -1,6 +1,6 @@
 ;
 ; PURPOSE: This code merges the tracing of tomographic products based
-; on data from different instruments along the same fieldline.
+; on data from different instruments along given AWSoM fieldlines.
 ;
 ; INPUTS:
 ; fir_fl and fl_list: STRINGS. directory where field lines are
@@ -35,7 +35,7 @@ pro merge_trace, dir_fl = dir_fl, fl_list = fl_list, $
         readcol,dir_fl+file_aia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_aia_l  ,Tm_aia_l  ,index_aia_l  ,FORMAT='D,D,D,D,D,D'
         if initialized eq 'no' then begin
            initialized = 'yes'
-           output_columns = [[x_l],[y_l],[z_l],[rad_l],[lat_l],[lon_l],[Ne_aia_l],[Tm_aia_l],[index_aia_l]]
+           output_columns = [[x_l],[y_l],[z_l],[rad_l],[lat_l],[lon_l],[Ne_aia_l],[Tm_aia_l],[index_aia_l+1234567]]
            header_str = '  X [Rs]            Y [Rs]            Z [Rs]            RAD [Rs]          LAT [deg]         LON [deg]         Ne [AIA, cm^-3]   Tm [AIA, K]        AIA-3Dind'
            output_format = '(8(E18.10)," ",I9'
         endif
@@ -120,7 +120,7 @@ pro merge_trace, dir_fl = dir_fl, fl_list = fl_list, $
         readcol,dir_fl+file_kcor,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_kcor_l           ,index_kcor_l ,FORMAT='D,D,D,D,D,D'
         if initialized eq 'yes' then begin
            output_columns = [[[output_columns]],[Ne_kcor_l],[index_kcor_l]] 
-           header_str = header_str +'  Ne [KCOR, cm^-3]     KCOR-3Dind'
+           header_str = header_str +'  Ne [KCOR, cm^-3]    KCOR-3Dind'
            output_format = output_format + ',"  ",E18.10,"  ",I9'
         endif
         if initialized eq 'no' then begin
@@ -138,7 +138,7 @@ pro merge_trace, dir_fl = dir_fl, fl_list = fl_list, $
         readcol,dir_fl+file_c2 ,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_c2_l              ,index_c2_l   ,FORMAT='D,D,D,D,D,D'
         if initialized eq 'yes' then begin
            output_columns = [[[output_columns]],[Ne_c2_l],[index_c2_l]] 
-           header_str = header_str +'  Ne [C2, cm^-3]     C2-3Dind'
+           header_str = header_str +'  Ne [C2, cm^-3]      C2-3Dind'
            output_format = output_format + ',"  ",E18.10,"  ",I9'
         endif
         if initialized eq 'no' then begin
