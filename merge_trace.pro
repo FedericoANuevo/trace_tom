@@ -158,7 +158,7 @@ pro merge_trace, dir_fl = dir_fl, fl_list = fl_list, $
    ; Write output file
       openw,2,dir_fl+outfile
      printf,2,header_str
-     for i = 0,n_elements(x_l)-1 do printf,2,output_columns(*,i),FORMAT = output_format
+     for i = 0,n_elements(x_l)-1 do printf,2,output_columns(*,i),FORMAT=output_format
      close,2
   endfor
      close,1
