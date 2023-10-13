@@ -150,16 +150,15 @@ pro merge_trace, dir_fl = dir_fl, fl_list = fl_list, $
      endif
 
    ; Close output filename
-     outfile       = outfile + '.out'
+     outfile = outfile + '.out'
    ; Close output format string
      output_format = output_format + ')'
    ; Transpose output_columns array
      output_columns = transpose(output_columns)
    ; Write output file
-     openw,2,dir_fl+outfile
+      openw,2,dir_fl+outfile
      printf,2,header_str
-     N = n_elements(x_l)
-     for i = 0,N-1 do printf,2,output_columns(*,i),FORMAT = output_format
+     for i = 0,n_elements(x_l)-1 do printf,2,output_columns(*,i),FORMAT = output_format
      close,2
   endfor
      close,1
