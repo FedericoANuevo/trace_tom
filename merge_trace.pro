@@ -108,7 +108,7 @@ pro merge_trace, dir_fl = dir_fl, fl_list = fl_list, $
         if initialized eq 'no' then begin
            initialized = 'yes'
            output_columns = [[x_l],[y_l],[z_l],[rad_l],[lat_l],[lon_l],[Ne_mk4_l],[index_mk4_l]]
-           header_str = '  X [Rs]            Y [Rs]            Z [Rs]            RAD [Rs]          LAT [deg]         LON [deg]         Ne [Mk4, cm^-3]     Mk4-3Dind'
+           header_str = '  X [Rs]            Y [Rs]            Z [Rs]            RAD [Rs]          LAT [deg]         LON [deg]         Ne [Mk4, cm^-3]    Mk4-3Dind'
            output_format = '(7(E18.10)," ",I9'
         endif        
      endif
@@ -126,7 +126,7 @@ pro merge_trace, dir_fl = dir_fl, fl_list = fl_list, $
         if initialized eq 'no' then begin
            initialized = 'yes'
            output_columns = [[x_l],[y_l],[z_l],[rad_l],[lat_l],[lon_l],[Ne_kcor_l],[index_kcor_l]]
-           header_str = '  X [Rs]            Y [Rs]            Z [Rs]            RAD [Rs]          LAT [deg]         LON [deg]         Ne [KCOR, cm^-3]     KCOR-3Dind'
+           header_str = '  X [Rs]            Y [Rs]            Z [Rs]            RAD [Rs]          LAT [deg]         LON [deg]         Ne [KCOR, cm^-3]   KCOR-3Dind'
            output_format = '(7(E18.10)," ",I9'
         endif
      endif
