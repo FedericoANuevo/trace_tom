@@ -35,7 +35,7 @@ pro merge_trace, dir_fl = dir_fl, fl_list = fl_list, $
         readcol,dir_fl+file_aia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_aia_l  ,Tm_aia_l  ,index_aia_l  ,FORMAT='D,D,D,D,D,D'
         if initialized eq 'no' then begin
            initialized = 'yes'
-           output_columns = [[x_l],[y_l],[z_l],[rad_l],[lat_l],[lon_l],[Ne_aia_l],[Tm_aia_l],[index_aia_l+1234567]]
+           output_columns = [[x_l],[y_l],[z_l],[rad_l],[lat_l],[lon_l],[Ne_aia_l],[Tm_aia_l],[index_aia_l]]
            header_str = '  X [Rs]            Y [Rs]            Z [Rs]            RAD [Rs]          LAT [deg]         LON [deg]         Ne [AIA, cm^-3]   Tm [AIA, K]        AIA-3Dind'
            output_format = '(8(E18.10)," ",I9'
         endif
