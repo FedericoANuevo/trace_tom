@@ -7,10 +7,10 @@
 ; located, and filename of list of names of field lines filenames.
 ;
 ; FLAGS: one per allowed instrument, use those for which you want to
-; merge results, in any order.
+; merge results, provided in any order.
 ;
 ; HISTORY: V1.0 AMV & FAN, CLaSP, October 2023.
-;
+; 
 
 pro merge_trace, dir_fl = dir_fl, fl_list = fl_list, $
                  aia = aia, euvia = euvia, euvib = euvib, eit = eit, $
