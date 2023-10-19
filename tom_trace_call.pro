@@ -8,15 +8,17 @@
 
 pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
 
-  fl_dir  = '/data1/DATA/fieldlines_judit/'
-  fl_list = 'list_synth.txt'
+  root_dir = '/data1/DATA/fieldlines_judit/'
+; dir      = 'CR2082_old_fieldlines/' 
+  dir      = 'CR2082_new_fieldlines/'
+  fl_dir   = root_dir + dir
+  fl_list  = 'list.txt'
  
   
   if keyword_set(demt) then begin
-     instr    = 'aia'
      tom_dir  = '/data1/DATA/ldem_files/'
-;    tom_file = 'CR2082_HOLLOW_compound2.dat'
-     tom_file = 'LDEM._CR2082_euvi.A_Hollow_3Bands_gauss1_lin_Norm-median_singlStart'
+     tom_file = 'CR2082_HOLLOW_compound2.dat' & instr = 'euvi'
+    ;tom_file = 'CR2099_AIA_compound1.dat'    & instr = 'aia'
      nr       = 30
      nt       = 90
      np       = 2*nt
