@@ -16,7 +16,7 @@ pro merge_trace, dir_fl = dir_fl, fl_list = fl_list, $
                  aia = aia, euvia = euvia, euvib = euvib, eit = eit, $
                  mk4 = mk4, kcor = kcor, lascoc2 = lascoc2
 
-  if not keyword_set(fl_list) or not keyword_set(fl_list) then STOP
+  if not keyword_set(dir_fl) or not keyword_set(fl_list) then STOP
   
   ; Read the list with the field-lines  
   N_fl     = 0
