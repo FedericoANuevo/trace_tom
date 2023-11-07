@@ -86,9 +86,10 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
            N_l         = n_elements(x_l)
            Npt_v(i_fl) = N_l
            initialized = 'yes'
-           output_columns = [[x_l],[y_l],[z_l],[rad_l],[lat_l],[lon_l],[Ne_aia_l],[Tm_aia_l],[index_aia_l]]
-           header_str = '  X [Rs]            Y [Rs]            Z [Rs]            RAD [Rs]          LAT [deg]         LON [deg]         Ne [AIA, cm^-3]   Tm [AIA, K]        AIA-3Dind'
-           output_format = '(8(E18.10)," ",I9'
+           sample_fl, Ne_l=Ne_aia_l, index_l=index_aia_l, index_sampling_l=index_sampling_l
+           output_columns = [[x_l],[y_l],[z_l],[rad_l],[lat_l],[lon_l],[Ne_aia_l],[Tm_aia_l],[index_aia_l],[index_sampling_l]]
+           header_str = '  X [Rs]            Y [Rs]            Z [Rs]            RAD [Rs]          LAT [deg]         LON [deg]         Ne [AIA, cm^-3]   Tm [AIA, K]        AIA-3Dind       AIA-Samp'
+           output_format = '(8(E18.10)," ",2(I9)'
            x_A   (i_fl,*) = x_l
            y_A   (i_fl,*) = y_l
            z_A   (i_fl,*) = z_l
@@ -96,10 +97,9 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
            lat_A (i_fl,*) = lat_l
            lon_A (i_fl,*) = lon_l
         endif
-        Ne_aia_A   (i_fl,*) = Ne_aia_l
-        Tm_aia_A   (i_fl,*) = Tm_aia_l
-        index_aia_A(i_fl,*) = index_aia_l
-        sample_fl, Ne_l=Ne_aia_l, index_l=index_aia_l, index_sampling_l=index_sampling_l
+        Ne_aia_A   (i_fl,*)          = Ne_aia_l
+        Tm_aia_A   (i_fl,*)          = Tm_aia_l
+        index_aia_A(i_fl,*)          = index_aia_l
         index_sampling_aia_A(i_fl,*) = index_sampling_l
      endif
 
