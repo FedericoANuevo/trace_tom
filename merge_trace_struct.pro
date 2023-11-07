@@ -114,16 +114,12 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
            output_format = output_format + ',"  ",2(E18.10),"  ",I9' 
         endif
         if initialized eq 'no' then begin
-            ; si no esta inicializado el archivo, calcula el numero de puntos de la linea 
-         ; y lo guarda en el vector Npt_v
            N_l         = n_elements(x_l)
            Npt_v(i_fl) = N_l
            initialized = 'yes'
            output_columns = [[x_l],[y_l],[z_l],[rad_l],[lat_l],[lon_l],[Ne_euvia_l],[Tm_euvia_l],[index_euvia_l]]
            header_str = '  X [Rs]            Y [Rs]            Z [Rs]            RAD [Rs]          LAT [deg]         LON [deg]         Ne [EUVIA, cm^-3] Tm [EUVIA, K]    EUVIA-3Dind'
            output_format = '(8(E18.10)," ",I9'
-         ; si no esta inicializado, guarda las
-         ; coordenadas x, y, z, rad, lat y lon
            x_A   (i_fl,*) = x_l
            y_A   (i_fl,*) = y_l
            z_A   (i_fl,*) = z_l
@@ -147,16 +143,12 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
            output_format = output_format + ',"  ",2(E18.10),"  ",I9'
         endif
         if initialized eq 'no' then begin
-         ; si no esta inicializado el archivo, calcula el numero de puntos de la linea 
-         ; y lo guarda en el vector Npt_v
            N_l         = n_elements(x_l)
            Npt_v(i_fl) = N_l
            initialized = 'yes'
            output_columns = [[x_l],[y_l],[z_l],[rad_l],[lat_l],[lon_l],[Ne_euvib_l],[Tm_euvib_l],[index_euvib_l]]
            header_str = '  X [Rs]            Y [Rs]            Z [Rs]            RAD [Rs]          LAT [deg]         LON [deg]         Ne [EUVIB, cm^-3] Tm [EUVIB, K]    EUVIB-3Dind'
            output_format = '(8(E18.10)," ",I9'
-         ; si no esta inicializado, guarda las
-         ; coordenadas x, y, z, rad, lat y lon
            x_A   (i_fl,*) = x_l
            y_A   (i_fl,*) = y_l
            z_A   (i_fl,*) = z_l
@@ -180,16 +172,12 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
            output_format = output_format + ',"  ",2(E18.10),"  ",I9'
         endif
         if initialized eq 'no' then begin
-         ; si no esta inicializado el archivo, calcula el numero de puntos de la linea 
-         ; y lo guarda en el vector Npt_v
            N_l         = n_elements(x_l)
            Npt_v(i_fl) = N_l  
            initialized = 'yes'
            output_columns = [[x_l],[y_l],[z_l],[rad_l],[lat_l],[lon_l],[Ne_eit_l],[Tm_eit_l],[index_eit_l]]
            header_str = '  X [Rs]            Y [Rs]            Z [Rs]            RAD [Rs]          LAT [deg]         LON [deg]         Ne [EIT, cm^-3]   Tm [EIT, K]        EIT-3Dind'
            output_format = '(8(E18.10)," ",I9'
-         ; si no esta inicializado, guarda las
-         ; coordenadas x, y, z, rad, lat y lon
            x_A   (i_fl,*) = x_l
            y_A   (i_fl,*) = y_l
            z_A   (i_fl,*) = z_l
@@ -213,8 +201,6 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
            output_format = output_format + ',"  ",E18.10,"  ",I9'
         endif
         if initialized eq 'no' then begin
-         ; si no esta inicializado el archivo, calcula el numero de puntos de la linea 
-         ; y lo guarda en el vector Npt_v
            N_l         = n_elements(x_l)
            Npt_v(i_fl) = N_l  
            initialized = 'yes'
@@ -243,8 +229,6 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
            output_format = output_format + ',"  ",E18.10,"  ",I9'
         endif
         if initialized eq 'no' then begin
-         ; si no esta inicializado el archivo, calcula el numero de puntos de la linea 
-         ; y lo guarda en el vector Npt_v
            N_l         = n_elements(x_l)
            Npt_v(i_fl) = N_l  
            initialized = 'yes'
@@ -259,8 +243,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
            lon_A (i_fl,*) = lon_l  
         endif
         Ne_kcor_A   (i_fl,*) = Ne_kcor_l
-        index_kcor_A(i_fl,*) = index_kcor_l
-        
+        index_kcor_A(i_fl,*) = index_kcor_l        
      endif
 
    ; LASCO-C2
@@ -274,8 +257,6 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
            output_format = output_format + ',"  ",E18.10,"  ",I9'
         endif
         if initialized eq 'no' then begin
-         ; si no esta inicializado el archivo, calcula el numero de puntos de la linea 
-         ; y lo guarda en el vector Npt_v
            N_l         = n_elements(x_l)
            Npt_v(i_fl) = N_l  
            initialized = 'yes'
@@ -290,8 +271,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
            lon_A (i_fl,*) = lon_l  
         endif
         Ne_c2_A   (i_fl,*) = Ne_c2_l
-        index_c2_A(i_fl,*) = index_c2_l
-    
+        index_c2_A(i_fl,*) = index_c2_l    
      endif
 
    ; Close output filename
@@ -323,12 +303,15 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
                         Ne_euvia:    ptr_new()                              ,$
                         Tm_euvia:    ptr_new()                              ,$
                         index_euvia: ptr_new()                              ,$
+                        index_sampling_euvia: ptr_new()                     ,$
                         Ne_euvib:    ptr_new()                              ,$
                         Tm_euvib:    ptr_new()                              ,$
                         index_euvib: ptr_new()                              ,$
+                        index_sampling_euvib: ptr_new()                     ,$
                         Ne_eit:      ptr_new()                              ,$
                         Tm_eit:      ptr_new()                              ,$
-                        index_eit:   ptr_new()                              }
+                        index_eit:   ptr_new()                              ,$
+                        index_sampling_eit: ptr_new()                       }                        
 
 ; Store traced data
   if keyword_set(aia) then begin
