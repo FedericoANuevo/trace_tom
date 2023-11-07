@@ -29,11 +29,7 @@ pro tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_lis
      if instr eq 'lascoc2' or instr eq 'mk4' or instr eq 'kcor' then $
         read_fieldline_and_trace_vlsrt,instr,fl_dir,filename,rad,lat,lon,nr,nt,np,N_e
   endfor
-     close,1
-
-
-  
-
+  close,1
   
   return
 end

@@ -13,8 +13,7 @@ pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
 ; dir      = 'CR2082_new_fieldlines/'
   dir      = 'radial_synth_fieldlines/'
   fl_dir   = base_dir + dir
-  fl_list  = 'list.txt'
- 
+  fl_list  = 'list_synth.txt' 
   
   if keyword_set(demt) then begin
      tom_dir  = '/data1/DATA/ldem_files/'
@@ -29,7 +28,6 @@ pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
      Irmax    = 1.25
   endif
 
-
   if keyword_set(lasco) then begin
      instr    = 'lascoc2'
      tom_dir  = '/data1/tomography/bindata/'
@@ -42,7 +40,6 @@ pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
      Irmin    = 2.5
      Irmax    = 6.5
   endif
-
 
   if keyword_set(mlso) then begin
      instr    = 'mk4'
@@ -57,11 +54,8 @@ pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
      Irmax    = 1.50
   endif
 
-
-  
   tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_list=fl_list,$
             nr=nr,nt=nt,np=np,rmin=rmin,rmax=rmax,Irmin=Irmin,Irmax=Irmax
-  
   
   return
 end

@@ -11,7 +11,7 @@
 ; merge results, provided in any order.
 ;
 ; HISTORY: V1.0 AMV & FAN, CLaSP, October 2023.
-; 
+;          V1.1 AMV, IAFE, November 2023. Added Sampling. Overall polishing.
 
 pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
                         aia = aia, euvia = euvia, euvib = euvib, eit = eit, $
@@ -26,11 +26,11 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
   readf,1,N_fl
 
 ; Maximum number of point along the fieldline  
-  Npt_max = 15000      ; hay que encontrar un valor adecuado...
-; default value
+  Npt_max = 15000 ; Ask JUDIT for an optimal value.
+; Default value in all arrays.
   default = -678.
   
-; Aca se crean varios arrays 
+; Define needed arrays:
   x_A   = dblarr(N_fl,Npt_max) + default
   y_A   = dblarr(N_fl,Npt_max) + default
   z_A   = dblarr(N_fl,Npt_max) + default
@@ -42,6 +42,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      Ne_aia_A    = fltarr(N_fl,Npt_max) + default
      Tm_aia_A    = fltarr(N_fl,Npt_max) + default
      index_aia_A = intarr(N_fl,Npt_max) + default
+     index_sampling_aia_A = intarr(N_fl,Npt_max) + default
   endif
   if keyword_set(euvia) then begin
      Ne_euvia_A    = fltarr(N_fl,Npt_max) + default
@@ -71,8 +72,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      index_c2_A = intarr(N_fl,Npt_max) + default
   endif
 
-  
-  for i_fl = 0,N_fl-1 do begin
+  for i_fl = 0,N_fl-1 do begin ; Start loop in fieldlines  
      initialized = 'no'
      readf,1,filename
      outfile       = filename + '_merge'
@@ -83,26 +83,24 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
         outfile    = outfile +'_aia'
         readcol,dir_fl+file_aia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_aia_l  ,Tm_aia_l  ,index_aia_l  ,FORMAT='D,D,D,D,D,D'
         if initialized eq 'no' then begin
-         ; si no esta inicializado el archivo, calcula el numero de puntos de la linea 
-         ; y lo guarda en el vector Npt_v
            N_l         = n_elements(x_l)
            Npt_v(i_fl) = N_l
            initialized = 'yes'
            output_columns = [[x_l],[y_l],[z_l],[rad_l],[lat_l],[lon_l],[Ne_aia_l],[Tm_aia_l],[index_aia_l]]
            header_str = '  X [Rs]            Y [Rs]            Z [Rs]            RAD [Rs]          LAT [deg]         LON [deg]         Ne [AIA, cm^-3]   Tm [AIA, K]        AIA-3Dind'
            output_format = '(8(E18.10)," ",I9'
-         ; si no esta inicializado, guarda las
-         ; coordenadas x, y, z, rad, lat y lon
-           x_A   (i_fl,0:N_l-1) = x_l
-           y_A   (i_fl,0:N_l-1) = y_l
-           z_A   (i_fl,0:N_l-1) = z_l
-           rad_A (i_fl,0:N_l-1) = rad_l
-           lat_A (i_fl,0:N_l-1) = lat_l
-           lon_A (i_fl,0:N_l-1) = lon_l
+           x_A   (i_fl,*) = x_l
+           y_A   (i_fl,*) = y_l
+           z_A   (i_fl,*) = z_l
+           rad_A (i_fl,*) = rad_l
+           lat_A (i_fl,*) = lat_l
+           lon_A (i_fl,*) = lon_l
         endif
-        Ne_aia_A   (i_fl,0:N_l-1) = Ne_aia_l
-        Tm_aia_A   (i_fl,0:N_l-1) = Tm_aia_l
-        index_aia_A(i_fl,0:N_l-1) = index_aia_l
+        Ne_aia_A   (i_fl,*) = Ne_aia_l
+        Tm_aia_A   (i_fl,*) = Tm_aia_l
+        index_aia_A(i_fl,*) = index_aia_l
+        sample_fl, Ne_l=Ne_aia_l, index_l=index_aia_l, index_sampling_l=index_sampling_l
+        index_sampling_aia_A(i_fl,*) = index_sampling_l
      endif
 
    ; EUVI-A
@@ -126,17 +124,16 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
            output_format = '(8(E18.10)," ",I9'
          ; si no esta inicializado, guarda las
          ; coordenadas x, y, z, rad, lat y lon
-           x_A   (i_fl,0:N_l-1) = x_l
-           y_A   (i_fl,0:N_l-1) = y_l
-           z_A   (i_fl,0:N_l-1) = z_l
-           rad_A (i_fl,0:N_l-1) = rad_l
-           lat_A (i_fl,0:N_l-1) = lat_l
-           lon_A (i_fl,0:N_l-1) = lon_l
+           x_A   (i_fl,*) = x_l
+           y_A   (i_fl,*) = y_l
+           z_A   (i_fl,*) = z_l
+           rad_A (i_fl,*) = rad_l
+           lat_A (i_fl,*) = lat_l
+           lon_A (i_fl,*) = lon_l
         endif
-        Ne_euvia_A   (i_fl,0:N_l-1) = Ne_euvia_l
-        Tm_euvia_A   (i_fl,0:N_l-1) = Tm_euvia_l
-        index_euvia_A(i_fl,0:N_l-1) = index_euvia_l
-    
+        Ne_euvia_A   (i_fl,*) = Ne_euvia_l
+        Tm_euvia_A   (i_fl,*) = Tm_euvia_l
+        index_euvia_A(i_fl,*) = index_euvia_l    
      endif
 
    ; EUVI-B
@@ -160,16 +157,16 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
            output_format = '(8(E18.10)," ",I9'
          ; si no esta inicializado, guarda las
          ; coordenadas x, y, z, rad, lat y lon
-           x_A   (i_fl,0:N_l-1) = x_l
-           y_A   (i_fl,0:N_l-1) = y_l
-           z_A   (i_fl,0:N_l-1) = z_l
-           rad_A (i_fl,0:N_l-1) = rad_l
-           lat_A (i_fl,0:N_l-1) = lat_l
-           lon_A (i_fl,0:N_l-1) = lon_l
+           x_A   (i_fl,*) = x_l
+           y_A   (i_fl,*) = y_l
+           z_A   (i_fl,*) = z_l
+           rad_A (i_fl,*) = rad_l
+           lat_A (i_fl,*) = lat_l
+           lon_A (i_fl,*) = lon_l
         endif
-        Ne_euvib_A   (i_fl,0:N_l-1) = Ne_euvib_l
-        Tm_euviB_A   (i_fl,0:N_l-1) = Tm_euvib_l
-        index_euvib_A(i_fl,0:N_l-1) = index_euvib_l
+        Ne_euvib_A   (i_fl,*) = Ne_euvib_l
+        Tm_euviB_A   (i_fl,*) = Tm_euvib_l
+        index_euvib_A(i_fl,*) = index_euvib_l
      endif
 
    ; EIT
@@ -193,16 +190,16 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
            output_format = '(8(E18.10)," ",I9'
          ; si no esta inicializado, guarda las
          ; coordenadas x, y, z, rad, lat y lon
-           x_A   (i_fl,0:N_l-1) = x_l
-           y_A   (i_fl,0:N_l-1) = y_l
-           z_A   (i_fl,0:N_l-1) = z_l
-           rad_A (i_fl,0:N_l-1) = rad_l
-           lat_A (i_fl,0:N_l-1) = lat_l
-           lon_A (i_fl,0:N_l-1) = lon_l  
+           x_A   (i_fl,*) = x_l
+           y_A   (i_fl,*) = y_l
+           z_A   (i_fl,*) = z_l
+           rad_A (i_fl,*) = rad_l
+           lat_A (i_fl,*) = lat_l
+           lon_A (i_fl,*) = lon_l  
         endif
-        Ne_eit_A   (i_fl,0:N_l-1) = Ne_eit_l
-        Tm_eit_A   (i_fl,0:N_l-1) = Tm_eit_l
-        index_eit_A(i_fl,0:N_l-1) = index_eit_l
+        Ne_eit_A   (i_fl,*) = Ne_eit_l
+        Tm_eit_A   (i_fl,*) = Tm_eit_l
+        index_eit_A(i_fl,*) = index_eit_l
      endif
 
    ; Mk4
@@ -224,15 +221,15 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
            output_columns = [[x_l],[y_l],[z_l],[rad_l],[lat_l],[lon_l],[Ne_mk4_l],[index_mk4_l]]
            header_str = '  X [Rs]            Y [Rs]            Z [Rs]            RAD [Rs]          LAT [deg]         LON [deg]         Ne [Mk4, cm^-3]    Mk4-3Dind'
            output_format = '(7(E18.10)," ",I9'
-           x_A   (i_fl,0:N_l-1) = x_l
-           y_A   (i_fl,0:N_l-1) = y_l
-           z_A   (i_fl,0:N_l-1) = z_l
-           rad_A (i_fl,0:N_l-1) = rad_l
-           lat_A (i_fl,0:N_l-1) = lat_l
-           lon_A (i_fl,0:N_l-1) = lon_l
+           x_A   (i_fl,*) = x_l
+           y_A   (i_fl,*) = y_l
+           z_A   (i_fl,*) = z_l
+           rad_A (i_fl,*) = rad_l
+           lat_A (i_fl,*) = lat_l
+           lon_A (i_fl,*) = lon_l
         endif
-        Ne_mk4_A   (i_fl,0:N_l-1) = Ne_mk4_l
-        index_mk4_A(i_fl,0:N_l-1) = index_mk4_l
+        Ne_mk4_A   (i_fl,*) = Ne_mk4_l
+        index_mk4_A(i_fl,*) = index_mk4_l
      endif
 
    ; KCOR
@@ -254,15 +251,15 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
            output_columns = [[x_l],[y_l],[z_l],[rad_l],[lat_l],[lon_l],[Ne_kcor_l],[index_kcor_l]]
            header_str = '  X [Rs]            Y [Rs]            Z [Rs]            RAD [Rs]          LAT [deg]         LON [deg]         Ne [KCOR, cm^-3]   KCOR-3Dind'
            output_format = '(7(E18.10)," ",I9'
-           x_A   (i_fl,0:N_l-1) = x_l
-           y_A   (i_fl,0:N_l-1) = y_l
-           z_A   (i_fl,0:N_l-1) = z_l
-           rad_A (i_fl,0:N_l-1) = rad_l
-           lat_A (i_fl,0:N_l-1) = lat_l
-           lon_A (i_fl,0:N_l-1) = lon_l  
+           x_A   (i_fl,*) = x_l
+           y_A   (i_fl,*) = y_l
+           z_A   (i_fl,*) = z_l
+           rad_A (i_fl,*) = rad_l
+           lat_A (i_fl,*) = lat_l
+           lon_A (i_fl,*) = lon_l  
         endif
-        Ne_kcor_A   (i_fl,0:N_l-1) = Ne_kcor_l
-        index_kcor_A(i_fl,0:N_l-1) = index_kcor_l
+        Ne_kcor_A   (i_fl,*) = Ne_kcor_l
+        index_kcor_A(i_fl,*) = index_kcor_l
         
      endif
 
@@ -285,15 +282,15 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
            output_columns = [[x_l],[y_l],[z_l],[rad_l],[lat_l],[lon_l],[Ne_c2_l],[index_c2_l]]
            header_str = '  X [Rs]            Y [Rs]            Z [Rs]            RAD [Rs]          LAT [deg]         LON [deg]         Ne [C2, cm^-3]     C2-3Dind'
            output_format = '(7(E18.10)," ",I9'
-           x_A   (i_fl,0:N_l-1) = x_l
-           y_A   (i_fl,0:N_l-1) = y_l
-           z_A   (i_fl,0:N_l-1) = z_l
-           rad_A (i_fl,0:N_l-1) = rad_l
-           lat_A (i_fl,0:N_l-1) = lat_l
-           lon_A (i_fl,0:N_l-1) = lon_l  
+           x_A   (i_fl,*) = x_l
+           y_A   (i_fl,*) = y_l
+           z_A   (i_fl,*) = z_l
+           rad_A (i_fl,*) = rad_l
+           lat_A (i_fl,*) = lat_l
+           lon_A (i_fl,*) = lon_l  
         endif
-        Ne_c2_A   (i_fl,0:N_l-1) = Ne_c2_l
-        index_c2_A(i_fl,0:N_l-1) = index_c2_l
+        Ne_c2_A   (i_fl,*) = Ne_c2_l
+        index_c2_A(i_fl,*) = index_c2_l
     
      endif
 
@@ -308,10 +305,11 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      printf,2,header_str
      for i = 0,n_elements(x_l)-1 do printf,2,output_columns(*,i),FORMAT=output_format
      close,2
-  endfor
+  endfor  ; End loop in fieldlines    
   close,1
 
-; Create a pointer structure with ALL information  
+
+; Create a pointer structure to store traced information  
   trace_data = {        x:         ptr_new( x_A)                            ,$
                         y:         ptr_new( y_A)                            ,$
                         z:         ptr_new( z_A)                            ,$
@@ -321,6 +319,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
                         Ne_aia:    ptr_new()                                ,$
                         Tm_aia:    ptr_new()                                ,$
                         index_aia: ptr_new()                                ,$
+                        index_sampling_aia: ptr_new()                       ,$
                         Ne_euvia:    ptr_new()                              ,$
                         Tm_euvia:    ptr_new()                              ,$
                         index_euvia: ptr_new()                              ,$
@@ -331,12 +330,14 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
                         Tm_eit:      ptr_new()                              ,$
                         index_eit:   ptr_new()                              }
 
+; Store traced data
   if keyword_set(aia) then begin
      trace_data.Ne_aia     = ptr_new(    Ne_aia_A)
      trace_data.Tm_aia     = ptr_new(    Tm_aia_A)
      trace_data.index_aia  = ptr_new( index_aia_A)
+     trace_data.index_sampling_aia = ptr_new(index_sampling_aia_A)
   endif
-
+  
   STOP
   return
 end
