@@ -48,28 +48,34 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      Ne_euvia_A    = fltarr(N_fl,Npt_max) + default
      Tm_euvia_A    = fltarr(N_fl,Npt_max) + default
      index_euvia_A = intarr(N_fl,Npt_max) + default
+     index_sampling_euvia_A = intarr(N_fl,Npt_max) + default
   endif
   if keyword_set(euvib) then begin
      Ne_euvib_A    = fltarr(N_fl,Npt_max) + default
      Tm_euvib_A    = fltarr(N_fl,Npt_max) + default
      index_euvib_A = intarr(N_fl,Npt_max) + default
+     index_sampling_euvib_A = intarr(N_fl,Npt_max) + default
   endif
   if keyword_set(eit) then begin
      Ne_eit_A    = fltarr(N_fl,Npt_max) + default
      Tm_eit_A    = fltarr(N_fl,Npt_max) + default
      index_eit_A = intarr(N_fl,Npt_max) + default
+     index_sampling_eit_A = intarr(N_fl,Npt_max) + default
   endif
   if keyword_set(mk4) then begin
      Ne_mk4_A    = fltarr(N_fl,Npt_max) + default
      index_mk4_A = intarr(N_fl,Npt_max) + default
+     index_sampling_mk4_A = intarr(N_fl,Npt_max) + default
   endif
   if keyword_set(kcor) then begin
      Ne_kcor_A    = fltarr(N_fl,Npt_max) + default
      index_kcor_A = intarr(N_fl,Npt_max) + default
+     index_sampling_kcor_A = intarr(N_fl,Npt_max) + default
   endif
   if keyword_set(lascoc2) then begin
      Ne_c2_A    = fltarr(N_fl,Npt_max) + default
      index_c2_A = intarr(N_fl,Npt_max) + default
+     index_sampling_c2_A = intarr(N_fl,Npt_max) + default
   endif
 
   for i_fl = 0,N_fl-1 do begin ; Start loop in fieldlines  
@@ -82,11 +88,11 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
         file_aia   = filename+'_aia.out'
         outfile    = outfile +'_aia'
         readcol,dir_fl+file_aia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_aia_l  ,Tm_aia_l  ,index_aia_l  ,FORMAT='D,D,D,D,D,D'
+        sample_fl, Ne_l=Ne_aia_l, index_l=index_aia_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
            N_l         = n_elements(x_l)
            Npt_v(i_fl) = N_l
            initialized = 'yes'
-           sample_fl, Ne_l=Ne_aia_l, index_l=index_aia_l, index_sampling_l=index_sampling_l
            output_columns = [[x_l],[y_l],[z_l],[rad_l],[lat_l],[lon_l],[Ne_aia_l],[Tm_aia_l],[index_aia_l],[index_sampling_l]]
            header_str = '  X [Rs]            Y [Rs]            Z [Rs]            RAD [Rs]          LAT [deg]         LON [deg]         Ne [AIA, cm^-3]   Tm [AIA, K]        AIA-3Dind       AIA-Samp'
            output_format = '(8(E18.10)," ",2(I9)'
@@ -108,18 +114,19 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
         file_euvia = filename+'_euvia.out'
         outfile   =  outfile +'_euvia'
         readcol,dir_fl+file_aia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_euvia_l,Tm_euvia_l,index_euvia_l,FORMAT='D,D,D,D,D,D'
+        sample_fl, Ne_l=Ne_euvia_l, index_l=index_euvia_l, index_sampling_l=index_sampling_l
         if initialized eq 'yes' then begin
            output_columns = [[[output_columns]],[Ne_euvia_l],[Tm_euvia_l],[index_euvia_l]]
-           header_str = header_str +'         Ne [EUVIA, cm^-3]  Tm [EUVIA, K]     EUVIA-3Dind'
-           output_format = output_format + ',"  ",2(E18.10),"  ",I9' 
+           header_str = header_str +'         Ne [EUVIA, cm^-3]  Tm [EUVIA, K]     EUVIA-3Dind      EUVIA-Samp'
+           output_format = output_format + ',"  ",2(E18.10),"  ",2(I9)' 
         endif
         if initialized eq 'no' then begin
            N_l         = n_elements(x_l)
            Npt_v(i_fl) = N_l
            initialized = 'yes'
            output_columns = [[x_l],[y_l],[z_l],[rad_l],[lat_l],[lon_l],[Ne_euvia_l],[Tm_euvia_l],[index_euvia_l]]
-           header_str = '  X [Rs]            Y [Rs]            Z [Rs]            RAD [Rs]          LAT [deg]         LON [deg]         Ne [EUVIA, cm^-3] Tm [EUVIA, K]    EUVIA-3Dind'
-           output_format = '(8(E18.10)," ",I9'
+           header_str = '  X [Rs]            Y [Rs]            Z [Rs]            RAD [Rs]          LAT [deg]         LON [deg]         Ne [EUVIA, cm^-3] Tm [EUVIA, K]    EUVIA-3Dind      EUVIA-Samp'
+           output_format = '(8(E18.10)," ",2(I9)'
            x_A   (i_fl,*) = x_l
            y_A   (i_fl,*) = y_l
            z_A   (i_fl,*) = z_l
@@ -130,6 +137,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
         Ne_euvia_A   (i_fl,*) = Ne_euvia_l
         Tm_euvia_A   (i_fl,*) = Tm_euvia_l
         index_euvia_A(i_fl,*) = index_euvia_l    
+        index_sampling_euvia_A(i_fl,*) = index_sampling_l
      endif
 
    ; EUVI-B
@@ -137,18 +145,19 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
         file_euvib = filename+'_euvib.out'
         outfile    = outfile +'_euvib'
         readcol,dir_fl+file_aia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_euvib_l,Tm_euvib_l,index_euvib_l,FORMAT='D,D,D,D,D,D'
+        sample_fl, Ne_l=Ne_euvib_l, index_l=index_euvib_l, index_sampling_l=index_sampling_l
         if initialized eq 'yes' then begin
            output_columns = [[[output_columns]],[Ne_euvib_l],[Tm_euvib_l],[index_euvib_l]]
-           header_str = header_str +'         Ne [EUVIB, cm^-3]  Tm [EUVIB, K]     EUVIB-3Dind'
-           output_format = output_format + ',"  ",2(E18.10),"  ",I9'
+           header_str = header_str +'         Ne [EUVIB, cm^-3]  Tm [EUVIB, K]     EUVIB-3Dind      EUVIB-Samp'
+           output_format = output_format + ',"  ",2(E18.10),"  ",2(I9)'
         endif
         if initialized eq 'no' then begin
            N_l         = n_elements(x_l)
            Npt_v(i_fl) = N_l
            initialized = 'yes'
            output_columns = [[x_l],[y_l],[z_l],[rad_l],[lat_l],[lon_l],[Ne_euvib_l],[Tm_euvib_l],[index_euvib_l]]
-           header_str = '  X [Rs]            Y [Rs]            Z [Rs]            RAD [Rs]          LAT [deg]         LON [deg]         Ne [EUVIB, cm^-3] Tm [EUVIB, K]    EUVIB-3Dind'
-           output_format = '(8(E18.10)," ",I9'
+           header_str = '  X [Rs]            Y [Rs]            Z [Rs]            RAD [Rs]          LAT [deg]         LON [deg]         Ne [EUVIB, cm^-3] Tm [EUVIB, K]    EUVIB-3Dind      EUVIB-Samp'
+           output_format = '(8(E18.10)," ",2(I9)'
            x_A   (i_fl,*) = x_l
            y_A   (i_fl,*) = y_l
            z_A   (i_fl,*) = z_l
@@ -159,6 +168,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
         Ne_euvib_A   (i_fl,*) = Ne_euvib_l
         Tm_euviB_A   (i_fl,*) = Tm_euvib_l
         index_euvib_A(i_fl,*) = index_euvib_l
+        index_sampling_euvib_A(i_fl,*) = index_sampling_l
      endif
 
    ; EIT
@@ -166,18 +176,19 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
         file_euvib = filename+'_eit.out'
         outfile    = outfile +'_eit'
         readcol,dir_fl+file_aia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_eit_l,Tm_eit_l,index_eit_l,FORMAT='D,D,D,D,D,D'
+        sample_fl, Ne_l=Ne_eit_l, index_l=index_eit_l, index_sampling_l=index_sampling_l
         if initialized eq 'yes' then begin
            output_columns = [[[output_columns]],[Ne_eit_l],[Tm_eit_l],[index_eit_l]]
-           header_str = header_str +'         Ne [EIT, cm^-3]  Tm [EIT, K]     EIT-3Dind'
-           output_format = output_format + ',"  ",2(E18.10),"  ",I9'
+           header_str = header_str +'         Ne [EIT, cm^-3]  Tm [EIT, K]     EIT-3Dind      EIT-Samp'
+           output_format = output_format + ',"  ",2(E18.10),"  ",2(I9)'
         endif
         if initialized eq 'no' then begin
            N_l         = n_elements(x_l)
            Npt_v(i_fl) = N_l  
            initialized = 'yes'
            output_columns = [[x_l],[y_l],[z_l],[rad_l],[lat_l],[lon_l],[Ne_eit_l],[Tm_eit_l],[index_eit_l]]
-           header_str = '  X [Rs]            Y [Rs]            Z [Rs]            RAD [Rs]          LAT [deg]         LON [deg]         Ne [EIT, cm^-3]   Tm [EIT, K]        EIT-3Dind'
-           output_format = '(8(E18.10)," ",I9'
+           header_str = '  X [Rs]            Y [Rs]            Z [Rs]            RAD [Rs]          LAT [deg]         LON [deg]         Ne [EIT, cm^-3]   Tm [EIT, K]        EIT-3Dind      EIT-Samp'
+           output_format = '(8(E18.10)," ",2(I9)'
            x_A   (i_fl,*) = x_l
            y_A   (i_fl,*) = y_l
            z_A   (i_fl,*) = z_l
@@ -188,6 +199,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
         Ne_eit_A   (i_fl,*) = Ne_eit_l
         Tm_eit_A   (i_fl,*) = Tm_eit_l
         index_eit_A(i_fl,*) = index_eit_l
+        index_sampling_eit_A(i_fl,*) = index_sampling_l
      endif
 
    ; Mk4
@@ -195,18 +207,19 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
         file_mk4   = filename+'_mk4.out'
         outfile    = outfile +'_mk4'
         readcol,dir_fl+file_mk4,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_mk4_l             ,index_mk4_l  ,FORMAT='D,D,D,D,D,D'
+        sample_fl, Ne_l=Ne_mk4_l, index_l=index_mk4_l, index_sampling_l=index_sampling_l
         if initialized eq 'yes' then begin
            output_columns = [[[output_columns]],[Ne_mk4_l],[index_mk4_l]] 
-           header_str = header_str +'  Ne [Mk4, cm^-3]     Mk4-3Dind'
-           output_format = output_format + ',"  ",E18.10,"  ",I9'
+           header_str = header_str +'  Ne [Mk4, cm^-3]     Mk4-3Dind      Mk4-Samp'
+           output_format = output_format + ',"  ",E18.10,"  ",2(I9)'
         endif
         if initialized eq 'no' then begin
            N_l         = n_elements(x_l)
            Npt_v(i_fl) = N_l  
            initialized = 'yes'
            output_columns = [[x_l],[y_l],[z_l],[rad_l],[lat_l],[lon_l],[Ne_mk4_l],[index_mk4_l]]
-           header_str = '  X [Rs]            Y [Rs]            Z [Rs]            RAD [Rs]          LAT [deg]         LON [deg]         Ne [Mk4, cm^-3]    Mk4-3Dind'
-           output_format = '(7(E18.10)," ",I9'
+           header_str = '  X [Rs]            Y [Rs]            Z [Rs]            RAD [Rs]          LAT [deg]         LON [deg]         Ne [Mk4, cm^-3]    Mk4-3Dind      Mk4-Samp'
+           output_format = '(7(E18.10)," ",2(I9)'
            x_A   (i_fl,*) = x_l
            y_A   (i_fl,*) = y_l
            z_A   (i_fl,*) = z_l
@@ -216,6 +229,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
         endif
         Ne_mk4_A   (i_fl,*) = Ne_mk4_l
         index_mk4_A(i_fl,*) = index_mk4_l
+        index_sampling_mk4_A(i_fl,*) = index_sampling_l
      endif
 
    ; KCOR
@@ -223,18 +237,19 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
         file_kcor   = filename+'_kcor.out'
         outfile     = outfile +'_kcor'
         readcol,dir_fl+file_kcor,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_kcor_l           ,index_kcor_l ,FORMAT='D,D,D,D,D,D'
+        sample_fl, Ne_l=Ne_kcor_l, index_l=index_kcor_l, index_sampling_l=index_sampling_l
         if initialized eq 'yes' then begin
            output_columns = [[[output_columns]],[Ne_kcor_l],[index_kcor_l]] 
-           header_str = header_str +'  Ne [KCOR, cm^-3]    KCOR-3Dind'
-           output_format = output_format + ',"  ",E18.10,"  ",I9'
+           header_str = header_str +'  Ne [KCOR, cm^-3]    KCOR-3Dind     KCOR-Samp'
+           output_format = output_format + ',"  ",E18.10,"  ",2(I9)'
         endif
         if initialized eq 'no' then begin
            N_l         = n_elements(x_l)
            Npt_v(i_fl) = N_l  
            initialized = 'yes'
            output_columns = [[x_l],[y_l],[z_l],[rad_l],[lat_l],[lon_l],[Ne_kcor_l],[index_kcor_l]]
-           header_str = '  X [Rs]            Y [Rs]            Z [Rs]            RAD [Rs]          LAT [deg]         LON [deg]         Ne [KCOR, cm^-3]   KCOR-3Dind'
-           output_format = '(7(E18.10)," ",I9'
+           header_str = '  X [Rs]            Y [Rs]            Z [Rs]            RAD [Rs]          LAT [deg]         LON [deg]         Ne [KCOR, cm^-3]   KCOR-3Dind      KCOR-Samp'
+           output_format = '(7(E18.10)," ",2(I9)'
            x_A   (i_fl,*) = x_l
            y_A   (i_fl,*) = y_l
            z_A   (i_fl,*) = z_l
@@ -244,6 +259,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
         endif
         Ne_kcor_A   (i_fl,*) = Ne_kcor_l
         index_kcor_A(i_fl,*) = index_kcor_l        
+        index_sampling_kcor_A(i_fl,*) = index_sampling_l
      endif
 
    ; LASCO-C2
@@ -251,18 +267,19 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
         file_c2    = filename+'_lascoc2.out'
         outfile    = outfile +'_lascoc2'
         readcol,dir_fl+file_c2 ,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_c2_l              ,index_c2_l   ,FORMAT='D,D,D,D,D,D'
+        sample_fl, Ne_l=Ne_c2_l, index_l=index_c2_l, index_sampling_l=index_sampling_l
         if initialized eq 'yes' then begin
            output_columns = [[[output_columns]],[Ne_c2_l],[index_c2_l]] 
-           header_str = header_str +'  Ne [C2, cm^-3]      C2-3Dind'
-           output_format = output_format + ',"  ",E18.10,"  ",I9'
+           header_str = header_str +'  Ne [C2, cm^-3]      C2-3Dind      C2-Samp'
+           output_format = output_format + ',"  ",E18.10,"  ",2(I9)'
         endif
         if initialized eq 'no' then begin
            N_l         = n_elements(x_l)
            Npt_v(i_fl) = N_l  
            initialized = 'yes'
            output_columns = [[x_l],[y_l],[z_l],[rad_l],[lat_l],[lon_l],[Ne_c2_l],[index_c2_l]]
-           header_str = '  X [Rs]            Y [Rs]            Z [Rs]            RAD [Rs]          LAT [deg]         LON [deg]         Ne [C2, cm^-3]     C2-3Dind'
-           output_format = '(7(E18.10)," ",I9'
+           header_str = '  X [Rs]            Y [Rs]            Z [Rs]            RAD [Rs]          LAT [deg]         LON [deg]         Ne [C2, cm^-3]     C2-3Dind      C2-Samp'
+           output_format = '(7(E18.10)," ",2(I9)'
            x_A   (i_fl,*) = x_l
            y_A   (i_fl,*) = y_l
            z_A   (i_fl,*) = z_l
@@ -272,6 +289,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
         endif
         Ne_c2_A   (i_fl,*) = Ne_c2_l
         index_c2_A(i_fl,*) = index_c2_l    
+        index_sampling_c2_A(i_fl,*) = index_sampling_l
      endif
 
    ; Close output filename
@@ -311,7 +329,16 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
                         Ne_eit:      ptr_new()                              ,$
                         Tm_eit:      ptr_new()                              ,$
                         index_eit:   ptr_new()                              ,$
-                        index_sampling_eit: ptr_new()                       }                        
+                        index_sampling_eit: ptr_new()                       ,$
+                        Ne_mk4:      ptr_new()                              ,$
+                        index_mk4:   ptr_new()                              ,$
+                        index_sampling_mk4: ptr_new()                       ,$
+                        Ne_kcor:     ptr_new()                              ,$
+                        index_kcor:  ptr_new()                              ,$
+                        index_sampling_kcor: ptr_new()                      ,$
+                        Ne_c2:       ptr_new()                              ,$
+                        index_c2:    ptr_new()                              ,$
+                        index_sampling_c2: ptr_new()                        }
 
 ; Store traced data
   if keyword_set(aia) then begin
@@ -319,6 +346,42 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      trace_data.Tm_aia     = ptr_new(    Tm_aia_A)
      trace_data.index_aia  = ptr_new( index_aia_A)
      trace_data.index_sampling_aia = ptr_new(index_sampling_aia_A)
+  endif
+  if keyword_set(euvia) then begin
+     trace_data.Ne_euvia     = ptr_new(    Ne_euvia_A)
+     trace_data.Tm_euvia     = ptr_new(    Tm_euvia_A)
+     trace_data.index_euvia  = ptr_new( index_euvia_A)
+     trace_data.index_sampling_euvia = ptr_new(index_sampling_aia_A)
+  endif
+  if keyword_set(euvib) then begin
+     trace_data.Ne_euvib     = ptr_new(    Ne_euvib_A)
+     trace_data.Tm_euvib     = ptr_new(    Tm_euvib_A)
+     trace_data.index_euvib  = ptr_new( index_euvib_A)
+     trace_data.index_sampling_euvib = ptr_new(index_sampling_euvib_A)
+  endif
+  if keyword_set(eit) then begin
+     trace_data.Ne_eit     = ptr_new(    Ne_eit_A)
+     trace_data.Tm_eit     = ptr_new(    Tm_eit_A)
+     trace_data.index_eit  = ptr_new( index_eit_A)
+     trace_data.index_sampling_eit = ptr_new(index_sampling_eit_A)
+  endif
+  if keyword_set(mk4) then begin
+     trace_data.Ne_mk4     = ptr_new(    Ne_mk4_A)
+     trace_data.Tm_mk4     = ptr_new(    Tm_mk4_A)
+     trace_data.index_mk4  = ptr_new( index_mk4_A)
+     trace_data.index_sampling_mk4 = ptr_new(index_sampling_mk4_A)
+  endif
+  if keyword_set(kcor) then begin
+     trace_data.Ne_kcor     = ptr_new(    Ne_kcor_A)
+     trace_data.Tm_kcor     = ptr_new(    Tm_kcor_A)
+     trace_data.index_kcor  = ptr_new( index_kcor_A)
+     trace_data.index_sampling_kcor = ptr_new(index_sampling_kcor_A)
+  endif
+  if keyword_set(c2) then begin
+     trace_data.Ne_c2     = ptr_new(    Ne_c2_A)
+     trace_data.Tm_c2     = ptr_new(    Tm_c2_A)
+     trace_data.index_c2  = ptr_new( index_c2_A)
+     trace_data.index_sampling_c2 = ptr_new(index_sampling_c2_A)
   endif
   
   STOP
