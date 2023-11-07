@@ -377,7 +377,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      trace_data.index_kcor  = ptr_new( index_kcor_A)
      trace_data.index_sampling_kcor = ptr_new(index_sampling_kcor_A)
   endif
-  if keyword_set(c2) then begin
+  if keyword_set(lascoc2) then begin
      trace_data.Ne_c2     = ptr_new(    Ne_c2_A)
      trace_data.Tm_c2     = ptr_new(    Tm_c2_A)
      trace_data.index_c2  = ptr_new( index_c2_A)
