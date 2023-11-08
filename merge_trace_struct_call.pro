@@ -11,7 +11,7 @@ pro merge_trace_struct_call
   dir_fl  = '/data1/DATA/fieldlines_judit/radial_synth_fieldlines/'
   fl_list = 'list_synth.txt'
 
-  merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, /aia ;, /mk4, /lascoc2
+  merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list,/aia, /mk4, /lascoc2
   
   return
 end

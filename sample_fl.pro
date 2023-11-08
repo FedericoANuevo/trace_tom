@@ -5,9 +5,8 @@
 ;
 ; HISTORY: V1.0 AMV, IAFE, November-2023.
 ;
-pro sample_fl, Ne_l=Ne_aia_l, index_l=index_aia_l, index_sampling_l=index_sampling_l
-;
-  index_sampling_l = lonarray(n_elements(index_l)) - 1
+pro sample_fl, Ne_l=Ne_l, index_l=index_l, index_sampling_l=index_sampling_l
+  index_sampling_l = lonarr(n_elements(index_l)) - 1
   il_range   = where(index_l ne -1)
   il_min     = min(il_range)
   il_max     = max(il_range)
@@ -20,6 +19,5 @@ pro sample_fl, Ne_l=Ne_aia_l, index_l=index_aia_l, index_sampling_l=index_sampli
      index_sampling_l(ind_sampling_cell) = +1
      il = il2+1
   endwhile
-; 
   return
 end

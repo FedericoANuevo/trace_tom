@@ -26,6 +26,8 @@ pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
      rmax     = 1.3
      Irmin    = 1.02
      Irmax    = 1.25
+     tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_list=fl_list,$
+               nr=nr,nt=nt,np=np,rmin=rmin,rmax=rmax,Irmin=Irmin,Irmax=Irmax
   endif
 
   if keyword_set(lasco) then begin
@@ -39,6 +41,8 @@ pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
      rmax     = 8.5
      Irmin    = 2.5
      Irmax    = 6.5
+     tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_list=fl_list,$
+               nr=nr,nt=nt,np=np,rmin=rmin,rmax=rmax,Irmin=Irmin,Irmax=Irmax
   endif
 
   if keyword_set(mlso) then begin
@@ -52,10 +56,9 @@ pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
      rmax     = 1.85
      Irmin    = 1.15
      Irmax    = 1.50
+     tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_list=fl_list,$
+               nr=nr,nt=nt,np=np,rmin=rmin,rmax=rmax,Irmin=Irmin,Irmax=Irmax
   endif
-
-  tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_list=fl_list,$
-            nr=nr,nt=nt,np=np,rmin=rmin,rmax=rmax,Irmin=Irmin,Irmax=Irmax
   
   return
 end
