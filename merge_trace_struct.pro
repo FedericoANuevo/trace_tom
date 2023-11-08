@@ -321,37 +321,39 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
 
 
 ; Create a pointer structure to store traced information  
-  trace_data = {        x:           ptr_new(x_A)                           ,$
-                        y:           ptr_new(y_A)                           ,$
-                        z:           ptr_new(z_A)                           ,$
-                        rad:         ptr_new(rad_A)                         ,$
-                        lat:         ptr_new(lat_A)                         ,$
-                        lon:         ptr_new(lon_A)                         ,$
-                        Ne_aia:      ptr_new()                              ,$
-                        Tm_aia:      ptr_new()                              ,$
-                        index_aia:   ptr_new()                              ,$
-                        Ne_euvia:    ptr_new()                              ,$
-                        Tm_euvia:    ptr_new()                              ,$
-                        index_euvia: ptr_new()                              ,$
-                        Ne_euvib:    ptr_new()                              ,$
-                        Tm_euvib:    ptr_new()                              ,$
-                        index_euvib: ptr_new()                              ,$
-                        Ne_eit:      ptr_new()                              ,$
-                        Tm_eit:      ptr_new()                              ,$
-                        index_eit:   ptr_new()                              ,$
-                        Ne_mk4:      ptr_new()                              ,$
-                        index_mk4:   ptr_new()                              ,$
-                        Ne_kcor:     ptr_new()                              ,$
-                        index_kcor:  ptr_new()                              ,$
-                        Ne_c2:       ptr_new()                              ,$
-                        index_c2:    ptr_new()                              ,$
-                        index_sampling_aia:   ptr_new()                     ,$
-                        index_sampling_euvia: ptr_new()                     ,$
-                        index_sampling_euvib: ptr_new()                     ,$
-                        index_sampling_eit:   ptr_new()                     ,$
-                        index_sampling_mk4:   ptr_new()                     ,$                        
-                        index_sampling_kcor:  ptr_new()                     ,$
-                        index_sampling_c2:    ptr_new()                      }
+  trace_data = { N_fl:        ptr_new(N_fl)                          ,$
+                 Npt_max:     ptr_new(Npt_max)                       ,$
+                 x:           ptr_new(x_A)                           ,$
+                 y:           ptr_new(y_A)                           ,$
+                 z:           ptr_new(z_A)                           ,$
+                 rad:         ptr_new(rad_A)                         ,$
+                 lat:         ptr_new(lat_A)                         ,$
+                 lon:         ptr_new(lon_A)                         ,$
+                 Ne_aia:      ptr_new()                              ,$
+                 Tm_aia:      ptr_new()                              ,$
+                 index_aia:   ptr_new()                              ,$
+                 Ne_euvia:    ptr_new()                              ,$
+                 Tm_euvia:    ptr_new()                              ,$
+                 index_euvia: ptr_new()                              ,$
+                 Ne_euvib:    ptr_new()                              ,$
+                 Tm_euvib:    ptr_new()                              ,$
+                 index_euvib: ptr_new()                              ,$
+                 Ne_eit:      ptr_new()                              ,$
+                 Tm_eit:      ptr_new()                              ,$
+                 index_eit:   ptr_new()                              ,$
+                 Ne_mk4:      ptr_new()                              ,$
+                 index_mk4:   ptr_new()                              ,$
+                 Ne_kcor:     ptr_new()                              ,$
+                 index_kcor:  ptr_new()                              ,$
+                 Ne_c2:       ptr_new()                              ,$
+                 index_c2:    ptr_new()                              ,$
+                 index_sampling_aia:   ptr_new()                     ,$
+                 index_sampling_euvia: ptr_new()                     ,$
+                 index_sampling_euvib: ptr_new()                     ,$
+                 index_sampling_eit:   ptr_new()                     ,$
+                 index_sampling_mk4:   ptr_new()                     ,$                        
+                 index_sampling_kcor:  ptr_new()                     ,$
+                 index_sampling_c2:    ptr_new()                      }
 
 ; Store traced data
   if keyword_set(aia) then begin
