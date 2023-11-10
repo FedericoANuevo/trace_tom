@@ -1,5 +1,6 @@
 ;
-; PURPOSE: This routine loads into memory a specified traced-data structure.
+; PURPOSE: This routine loads into memory a specified traced-data
+; structure, and convenientely puts its contents back into arrays.
 ;
 ; INPUTS:
 ; dir and structure_filename: STRINGS; dir where the SAV file is
@@ -8,6 +9,7 @@
 ; OUTPUTS:
 ; trace_data: STRUCTURE; containing the tracing of tomographic
 ; products along field lines, as well as their geometry.
+; several arrays and variables: all listed in COMMON BLOCK 'DATA'.
 ;
 ; FLAGS:
 ; /aia,.../lascoc2, set them to define in memory arrays with results
@@ -29,6 +31,7 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
      Ne_lascoc2_A, index_lascoc2_A, index_sampling_lascoc2_A
   
   restore, filename = dir + structure_filename
+
   N_fl    = *trace_data.N_fl
   Npt_max = *trace_data.Npt_max
   x_A     = *trace_data.x
