@@ -19,7 +19,7 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
                                 aia = aia, euvia = euvia, euvib = euvib, eit = eit, $
                                 mk4 = mk4, kcor = kcor, lascoc2 = lascoc2
   
-  common data, N_fl, Npt_max,$
+  common data, N_fl, Npt_max, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, index_aia_A, index_sampling_aia_A,$
      Ne_euvia_A, Tm_euvia_A, index_euvia_A, index_sampling_euvia_A,$
      Ne_euvib_A, Tm_euvib_A, index_euvib_A, index_sampling_euvib_A,$
@@ -31,6 +31,12 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
   restore, filename = dir + structure_filename
   N_fl    = *trace_data.N_fl
   Npt_max = *trace_data.Npt_max
+  x_A     = *trace_data.x
+  y_A     = *trace_data.y
+  z_A     = *trace_data.z
+  rad_A   = *trace_data.rad
+  lat_A   = *trace_data.lat
+  lon_A   = *trace_data.lon
   if keyword_set(aia) then begin
                 Ne_aia_A = *trace_data.Ne_aia 
                 Tm_aia_A = *trace_data.Tm_aia

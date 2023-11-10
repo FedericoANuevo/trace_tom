@@ -2,7 +2,7 @@ pro plot_lines, dir=dir, structure_filename=structure_filename, $
                 aia = aia, euvia = euvia, euvib = euvib, eit = eit, $
                 mk4 = mk4, kcor = kcor, lascoc2 = lascoc2
 
-  common data, N_fl, Npt_max,$
+  common data, N_fl, Npt_max, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, index_aia_A, index_sampling_aia_A,$
      Ne_euvia_A, Tm_euvia_A, index_euvia_A, index_sampling_euvia_A,$
      Ne_euvib_A, Tm_euvib_A, index_euvib_A, index_sampling_euvib_A,$
@@ -27,19 +27,17 @@ pro plot_lines, dir=dir, structure_filename=structure_filename, $
      for ifl=0,N_fl-1 do begin
         ind_samp = reform( INDEX_SAMPLING_AIA_A(ifl,*) )
         ind_samp = where(ind_samp eq 1)
-        oplot,((*trace_data.rad)(ifl,*))(ind_samp),((*trace_data.Ne_AIA)(ifl,*))(ind_samp)
-        interpol_fl,xv=((*trace_data.rad)(ifl,*))(ind_samp),yv=((*trace_data.Ne_AIA)(ifl,*))(ind_samp),xi=xi,yi=yi,/aia
+        oplot,(rad_A(ifl,*))(ind_samp),(Ne_AIA_A(ifl,*))(ind_samp)
+        interpol_fl,xv=(rad_A(ifl,*))(ind_samp),yv=(Ne_AIA_A(ifl,*))(ind_samp),xi=xi,yi=yi,/aia
         oplot,xi,yi
-        if ifl eq 0 then yi_avg = yi
-        if ifl gt 0 then yi_avg = yi_avg + yi
+        if ifl eq 0 then yi_avg =          yi/float(N_fl)
+        if ifl gt 0 then yi_avg = yi_avg + yi/float(N_fl)
      endfor
-     yi_avg = yi_avg / float(N_fl)
      loadct,12
      oplot,xi,yi_avg,th=8,color=100
      loadct,0
      ps2
   endif
-  
   stop
   return
 end
