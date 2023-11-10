@@ -21,7 +21,17 @@ pro interpol_fl, xv=xv, yv=yv, xi=xi, yi=yi, $
      xi_max = 1.25
      Nxi    = 50
   endif
-
+  if keyword_set(mk4) then begin
+     xi_min = 1.15
+     xi_max = 1.50
+     Nxi    = 100
+  endif
+  if keyword_set(lascoc2) then begin
+     xi_min = 2.50
+     xi_max = 6.00
+     Nxi    = 450
+  endif
+  
 ; Set-up fine common grid:
   dxi = (xi_max-xi_min)/Nxi  
   xi  = xi_min + dxi/2. + dxi * findgen(Nxi)
