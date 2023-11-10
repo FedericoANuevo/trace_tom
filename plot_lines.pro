@@ -40,49 +40,53 @@ pro plot_lines, dir=dir, structure_filename=structure_filename, $
         if NOT keyword_set(rangeN) then rangeN = rangeN_c2 else $
         if     keyword_set(rangeN) then rangeN = [min([rangeN(0),rangeN_c2(0)]),max([rangeN(1),rangeN_c2(1)])]
      endif
-
+     if NOT keyword_set(log) then rangeN(0)=0.
+     
 ; Ne(r) for all lines and instruments, and their averaged profile.
-     ps1, dir+structure_filename+'_Ne(r).eps',0
+     inst_suffix = ''
+     if keyword_set(aia)     then inst_suffix = inst_suffix + '-aia'
+     if keyword_set(mk4)     then inst_suffix = inst_suffix + '-mk4'
+     if keyword_set(lascoc2) then inst_suffix = inst_suffix + '-c2'
+     scale_suffix = '_lin' & if keyword_set(log) then scale_suffix = '_log'     
+     ps1, dir+structure_filename+inst_suffix+'-Ne(r)'+scale_suffix+'.eps',0
      if NOT keyword_set(log) then $
      plot,[0,1],[0,1],/nodata ,xr = ranger,xstyle=1,yr = rangeN,ystyle=1,charsize=1,font=0,$
-          xtitle = 'r [R!Dsun!N]', title='Ne [cm!U-3!N]'
+          xtitle = 'r [R!Dsun!N]', title=inst_suffix+' Ne [cm!U-3!N]'
      if     keyword_set(log) then $
      plot,[0,1],[0,1],/nodata ,xr = ranger,xstyle=1,yr = rangeN,ystyle=1,charsize=1,font=0,$
-          xtitle = 'r [R!Dsun!N]', title='Ne [cm!U-3!N]',/ylog
-     
+          xtitle = 'r [R!Dsun!N]', title=inst_suffix+' Ne [cm!U-3!N]',/ylog
+     loadct,12
      for ifl=0,N_fl-1 do begin
         if keyword_set(aia) then begin
+           color_aia = 30
            tmp = reform(index_sampling_aia_A(ifl,*)) & ind_samp = where(tmp eq 1)
-           oplot,(rad_A(ifl,*))(ind_samp),(Ne_AIA_A(ifl,*))(ind_samp)
+           oplot,(rad_A(ifl,*))(ind_samp),(Ne_AIA_A(ifl,*))(ind_samp), color = colot_aia
            interpol_fl,xv=(rad_A(ifl,*))(ind_samp),yv=(Ne_AIA_A(ifl,*))(ind_samp),xi=xi_aia,yi=yi,/aia
-           oplot,xi_aia,yi
            if ifl eq 0 then yi_aia_avg =              yi/float(N_fl)
            if ifl gt 0 then yi_aia_avg = yi_aia_avg + yi/float(N_fl)
         endif
         if keyword_set(mk4) then begin
+           color_mk4 = 100
            tmp = reform(index_sampling_mk4_A(ifl,*)) & ind_samp = where(tmp eq 1)
-           oplot,(rad_A(ifl,*))(ind_samp),(Ne_mk4_A(ifl,*))(ind_samp)
+           oplot,(rad_A(ifl,*))(ind_samp),(Ne_mk4_A(ifl,*))(ind_samp), color = colot_mk4
            interpol_fl,xv=(rad_A(ifl,*))(ind_samp),yv=(Ne_mk4_A(ifl,*))(ind_samp),xi=xi_mk4,yi=yi,/mk4
-           oplot,xi_mk4,yi
            if ifl eq 0 then yi_mk4_avg =              yi/float(N_fl)
            if ifl gt 0 then yi_mk4_avg = yi_mk4_avg + yi/float(N_fl)
         endif
         if keyword_set(lascoc2) then begin
+           color_c2 = 200
            tmp = reform(index_sampling_c2_A(ifl,*)) & ind_samp = where(tmp eq 1)
-           oplot,(rad_A(ifl,*))(ind_samp),(Ne_c2_A(ifl,*))(ind_samp)
+           oplot,(rad_A(ifl,*))(ind_samp),(Ne_c2_A(ifl,*))(ind_samp), color = colot_c2
            interpol_fl,xv=(rad_A(ifl,*))(ind_samp),yv=(Ne_c2_A(ifl,*))(ind_samp),xi=xi_c2,yi=yi,/lascoc2
-           oplot,xi_c2,yi
-           if ifl eq 0 then yi_c2_avg =              yi/float(N_fl)
+           if ifl eq 0 then yi_c2_avg =             yi/float(N_fl)
            if ifl gt 0 then yi_c2_avg = yi_c2_avg + yi/float(N_fl)
         endif
      endfor
-     loadct,12
-     if keyword_set(aia)     then oplot,xi_aia,yi_aia_avg,th=8,color=100
-     if keyword_set(mk4)     then oplot,xi_mk4,yi_mk4_avg,th=8,color=100
-     if keyword_set(lascoc2) then oplot,xi_c2 ,yi_c2_avg ,th=8,color=100
+     if keyword_set(aia)     then oplot,xi_aia,yi_aia_avg,th=8,color=color_aia
+     if keyword_set(mk4)     then oplot,xi_mk4,yi_mk4_avg,th=8,color=color_mk4
+     if keyword_set(lascoc2) then oplot,xi_c2 ,yi_c2_avg ,th=8,color=color_c2
      loadct,0
      ps2
-     
-  stop
+
   return
 end

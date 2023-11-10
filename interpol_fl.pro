@@ -37,7 +37,7 @@ pro interpol_fl, xv=xv, yv=yv, xi=xi, yi=yi, $
   xi  = xi_min + dxi/2. + dxi * findgen(Nxi)
 
 ; Interpol into fine common grid:
-  yi  = INTERPOL( yv, xv, xi, /spline )
+  yi  = INTERPOL( yv, xv, xi , /spline)
 
   return
 end
