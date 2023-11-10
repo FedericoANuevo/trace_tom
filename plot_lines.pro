@@ -1,3 +1,18 @@
+;
+; PURPOSE: This code plots tomographic traced results along
+; fieldlines, in any combination of instruments. 
+;
+; INPUTS:
+; dir, structure_filename: STRINGS; the dir where the structure is
+; located, and is filename.
+;
+; FLAGS: instruments whose data us to be plotted, and set /log for log scale.
+;
+; OUTPUT: EPS plot. Filename includes a suffix per instrument and
+; log/lin scale.
+;
+; HISTORY: V 1.0. AMV, November 2023, IAFE.
+;
 pro plot_lines, dir=dir, structure_filename=structure_filename, $
                 aia = aia, euvia = euvia, euvib = euvib, eit = eit, $
                 mk4 = mk4, kcor = kcor, lascoc2 = lascoc2, $
