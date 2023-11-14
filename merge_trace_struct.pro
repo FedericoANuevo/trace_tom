@@ -32,7 +32,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
   readf,1,N_fl
 
 ; Maximum number of point along the fieldline  
-  Npt_max = 10055 ; Ask JUDIT for an optimal value.
+  Npt_max = 10100 ; Ask JUDIT for an optimal value.
 ; Default value in all arrays.
   default = -678.
   
@@ -93,7 +93,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      if keyword_set(aia)   then begin
         file_aia   = filename+'_aia.out'
         outfile    = outfile +'_aia'
-        structure_filename = structure_filename + '_aia'
+        if i_fl eq 0 then structure_filename = structure_filename + '_aia'
         readcol,dir_fl+file_aia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_aia_l  ,Tm_aia_l  ,index_aia_l  ,FORMAT='D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_aia_l, index_l=index_aia_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
@@ -120,7 +120,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      if keyword_set(euvia)  then begin
         file_euvia = filename+'_euvia.out'
         outfile   =  outfile +'_euvia'
-        structure_filename = structure_filename + '_euvia'
+        if i_fl eq 0 then structure_filename = structure_filename + '_euvia'
         readcol,dir_fl+file_aia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_euvia_l,Tm_euvia_l,index_euvia_l,FORMAT='D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_euvia_l, index_l=index_euvia_l, index_sampling_l=index_sampling_l
         if initialized eq 'yes' then begin
@@ -152,7 +152,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      if keyword_set(euvib)  then begin
         file_euvib = filename+'_euvib.out'
         outfile    = outfile +'_euvib'
-        structure_filename = structure_filename + '_euvib'
+        if i_fl eq 0 then structure_filename = structure_filename + '_euvib'
         readcol,dir_fl+file_aia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_euvib_l,Tm_euvib_l,index_euvib_l,FORMAT='D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_euvib_l, index_l=index_euvib_l, index_sampling_l=index_sampling_l
         if initialized eq 'yes' then begin
@@ -184,7 +184,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      if keyword_set(eit)    then begin
         file_euvib = filename+'_eit.out'
         outfile    = outfile +'_eit'
-        structure_filename = structure_filename + '_eit'
+        if i_fl eq 0 then structure_filename = structure_filename + '_eit'
         readcol,dir_fl+file_aia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_eit_l,Tm_eit_l,index_eit_l,FORMAT='D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_eit_l, index_l=index_eit_l, index_sampling_l=index_sampling_l
         if initialized eq 'yes' then begin
@@ -216,7 +216,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      if keyword_set(mk4)    then begin
         file_mk4   = filename+'_mk4.out'
         outfile    = outfile +'_mk4'
-        structure_filename = structure_filename + '_mk4'
+        if i_fl eq 0 then structure_filename = structure_filename + '_mk4'
         readcol,dir_fl+file_mk4,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_mk4_l             ,index_mk4_l  ,FORMAT='D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_mk4_l, index_l=index_mk4_l, index_sampling_l=index_sampling_l
         if initialized eq 'yes' then begin
@@ -247,7 +247,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      if keyword_set(kcor)    then begin
         file_kcor   = filename+'_kcor.out'
         outfile     = outfile +'_kcor'
-        structure_filename = structure_filename + '_kcor'
+        if i_fl eq 0 then structure_filename = structure_filename + '_kcor'
         readcol,dir_fl+file_kcor,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_kcor_l           ,index_kcor_l ,FORMAT='D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_kcor_l, index_l=index_kcor_l, index_sampling_l=index_sampling_l
         if initialized eq 'yes' then begin
@@ -278,7 +278,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      if keyword_set(lascoc2) then begin
         file_c2    = filename+'_lascoc2.out'
         outfile    = outfile +'_lascoc2'
-        structure_filename = structure_filename + '_lascoc2'
+        if i_fl eq 0 then structure_filename = structure_filename + '_lascoc2'
         readcol,dir_fl+file_c2 ,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_c2_l              ,index_c2_l   ,FORMAT='D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_c2_l, index_l=index_c2_l, index_sampling_l=index_sampling_l
         if initialized eq 'yes' then begin
@@ -323,7 +323,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
 ; Create a pointer structure to store traced information  
   trace_data = { N_fl:        ptr_new(N_fl)                          ,$
                  Npt_max:     ptr_new(Npt_max)                       ,$
-                 Npt_v:       ptr_new(Npt_v)
+                 Npt_v:       ptr_new(Npt_v)                         ,$
                  x:           ptr_new(x_A)                           ,$
                  y:           ptr_new(y_A)                           ,$
                  z:           ptr_new(z_A)                           ,$
