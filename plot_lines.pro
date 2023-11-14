@@ -18,7 +18,7 @@ pro plot_lines, dir=dir, structure_filename=structure_filename, $
                 mk4 = mk4, kcor = kcor, lascoc2 = lascoc2, $
                 log = log
 
-  common data, N_fl, Npt_max, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
+  common data, N_fl, Npt_max, Npt_v, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, index_aia_A, index_sampling_aia_A,$
      Ne_euvia_A, Tm_euvia_A, index_euvia_A, index_sampling_euvia_A,$
      Ne_euvib_A, Tm_euvib_A, index_euvib_A, index_sampling_euvib_A,$

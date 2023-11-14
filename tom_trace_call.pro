@@ -11,9 +11,10 @@ pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
   base_dir = '/data1/DATA/fieldlines_judit/'
 ; dir      = 'CR2082_old_fieldlines/' 
 ; dir      = 'CR2082_new_fieldlines/'
-  dir      = 'radial_synth_fieldlines/'
+; dir      = 'radial_synth_fieldlines/'
+  dir      = 'CR2099/map1/'
   fl_dir   = base_dir + dir
-  fl_list  = 'list_synth.txt' 
+  fl_list  = 'list.txt';'list_synth.txt' 
   
   if keyword_set(demt) then begin
      tom_dir  = '/data1/DATA/ldem_files/'

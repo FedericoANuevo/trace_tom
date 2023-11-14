@@ -32,7 +32,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
   readf,1,N_fl
 
 ; Maximum number of point along the fieldline  
-  Npt_max = 15000 ; Ask JUDIT for an optimal value.
+  Npt_max = 10055 ; Ask JUDIT for an optimal value.
 ; Default value in all arrays.
   default = -678.
   
@@ -323,6 +323,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
 ; Create a pointer structure to store traced information  
   trace_data = { N_fl:        ptr_new(N_fl)                          ,$
                  Npt_max:     ptr_new(Npt_max)                       ,$
+                 Npt_v:       ptr_new(Npt_v)
                  x:           ptr_new(x_A)                           ,$
                  y:           ptr_new(y_A)                           ,$
                  z:           ptr_new(z_A)                           ,$

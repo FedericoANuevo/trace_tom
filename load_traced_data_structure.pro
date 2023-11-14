@@ -21,7 +21,7 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
                                 aia = aia, euvia = euvia, euvib = euvib, eit = eit, $
                                 mk4 = mk4, kcor = kcor, lascoc2 = lascoc2
   
-  common data, N_fl, Npt_max, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
+  common data, N_fl, Npt_max,Npt_v, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, index_aia_A, index_sampling_aia_A,$
      Ne_euvia_A, Tm_euvia_A, index_euvia_A, index_sampling_euvia_A,$
      Ne_euvib_A, Tm_euvib_A, index_euvib_A, index_sampling_euvib_A,$
@@ -34,6 +34,7 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
 
   N_fl    = *trace_data.N_fl
   Npt_max = *trace_data.Npt_max
+  Npt_v   = *trace_data.Npt_v
   x_A     = *trace_data.x
   y_A     = *trace_data.y
   z_A     = *trace_data.z

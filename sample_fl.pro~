@@ -1,9 +1,0 @@
-pro sample_fl, N_l=N_l, Ne_l=Ne_aia_l, index_l=index_aia_l, index_sampling_l=index_sampling_l
-
-  same_cell = 'yes'
-  while same_cell eq 'yes' do begin
-
-  endwhile
-  
-  return
-end
