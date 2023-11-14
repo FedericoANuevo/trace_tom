@@ -75,7 +75,7 @@ pro plot_lines, dir=dir, structure_filename=structure_filename, $
         if keyword_set(aia) then begin
            color_aia = 30
            tmp = reform(index_sampling_aia_A(ifl,*)) & ind_samp = where(tmp eq 1)
-           oplot,(rad_A(ifl,*))(ind_samp),(Ne_AIA_A(ifl,*))(ind_samp), color = colot_aia
+           oplot,(rad_A(ifl,*))(ind_samp),(Ne_AIA_A(ifl,*))(ind_samp), color = color_aia
            interpol_fl,xv=(rad_A(ifl,*))(ind_samp),yv=(Ne_AIA_A(ifl,*))(ind_samp),xi=xi_aia,yi=yi,/aia
            if ifl eq 0 then yi_aia_avg =              yi/float(N_fl)
            if ifl gt 0 then yi_aia_avg = yi_aia_avg + yi/float(N_fl)
@@ -83,7 +83,7 @@ pro plot_lines, dir=dir, structure_filename=structure_filename, $
         if keyword_set(mk4) then begin
            color_mk4 = 100
            tmp = reform(index_sampling_mk4_A(ifl,*)) & ind_samp = where(tmp eq 1)
-           oplot,(rad_A(ifl,*))(ind_samp),(Ne_mk4_A(ifl,*))(ind_samp), color = colot_mk4
+           oplot,(rad_A(ifl,*))(ind_samp),(Ne_mk4_A(ifl,*))(ind_samp), color = color_mk4
            interpol_fl,xv=(rad_A(ifl,*))(ind_samp),yv=(Ne_mk4_A(ifl,*))(ind_samp),xi=xi_mk4,yi=yi,/mk4
            if ifl eq 0 then yi_mk4_avg =              yi/float(N_fl)
            if ifl gt 0 then yi_mk4_avg = yi_mk4_avg + yi/float(N_fl)
@@ -91,11 +91,12 @@ pro plot_lines, dir=dir, structure_filename=structure_filename, $
         if keyword_set(lascoc2) then begin
            color_c2 = 200
            tmp = reform(index_sampling_c2_A(ifl,*)) & ind_samp = where(tmp eq 1)
-           oplot,(rad_A(ifl,*))(ind_samp),(Ne_c2_A(ifl,*))(ind_samp), color = colot_c2
+           oplot,(rad_A(ifl,*))(ind_samp),(Ne_c2_A(ifl,*))(ind_samp), color = color_c2
            interpol_fl,xv=(rad_A(ifl,*))(ind_samp),yv=(Ne_c2_A(ifl,*))(ind_samp),xi=xi_c2,yi=yi,/lascoc2
            if ifl eq 0 then yi_c2_avg =             yi/float(N_fl)
            if ifl gt 0 then yi_c2_avg = yi_c2_avg + yi/float(N_fl)
         endif
+     ;  STOP
      endfor
      if keyword_set(aia)     then oplot,xi_aia,yi_aia_avg,th=8,color=color_aia
      if keyword_set(mk4)     then oplot,xi_mk4,yi_mk4_avg,th=8,color=color_mk4
