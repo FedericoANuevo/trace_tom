@@ -27,6 +27,8 @@ print
 print, 'Everything that says *NullPointer* does not exist. For this particular structure only AIA, MK4 and C2 results exist.'
 print
 print,'-------------------------------'
+print,'help, trace_data, /str'
+print
 help, trace_data, /str
 print,'-------------------------------'
 print
