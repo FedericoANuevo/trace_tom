@@ -20,7 +20,7 @@ load_traced_data_structure, dir=dir, structure_filename=structure_filename, trac
 
 ; 3) See the full contents of the structure.
 print
-print, 'Bellow is the list of the full contents of the structure loaded into memory by the command:'
+print, 'Bellow is the list of the full contents of the structure, named "trace_data", loaded into memory by the command:'
 print
 print, 'load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /aia, /mk4, /lascoc2'
 print
