@@ -38,7 +38,10 @@ pause
 
 ; 4) See the arrays extracted from the structure.
 print
-print, 'Let us see next the output of the command "help" for all variables contained in the header for which there is data:'
+print, 'Besides loading into memory the structure above, the command "load_traced_data_structure...'
+print, 'also creates in memory several variables and arrays with the results stored in the structure,'
+print, 'so they are convenientely ready to be used.'
+print, 'Let us see the output of the command "help" for all variables contained in the header for which there is data:'
 print
 print,'-------------------------------'
 help,N_fl, Npt_max, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
