@@ -13,11 +13,24 @@
 ; HISTORY: V1.0 AMV & FAN, CLaSP, October 2023.
 ;          V1.1 AMV, IAFE, November 2023. Added Sampling, expanded to
 ;          all instruments and performed overall polishing.
+;          V1.5 AMV, IAFE, January 2024. Added fit to tompgraphic resuls.
+;
 
 pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
                         aia = aia, euvia = euvia, euvib = euvib, eit = eit, $
                         mk4 = mk4, kcor = kcor, lascoc2 = lascoc2, $
                         struture_filename = structure_filename
+  
+  common all_data, trace_data, $
+     N_fl, Npt_max, Npt_v,$
+     x_A, y_A, z_A, rad_A, lat_A, lon_A,$
+     Ne_aia_A, Tm_aia_A, index_aia_A, index_sampling_aia_A,$
+     Ne_euvia_A, Tm_euvia_A, index_euvia_A, index_sampling_euvia_A,$
+     Ne_euvib_A, Tm_euvib_A, index_euvib_A, index_sampling_euvib_A,$
+     Ne_eit_A, Tm_eit_A, index_eit_A, index_sampling_eit_A,$
+     Ne_mk4_A, index_mk4_A, index_sampling_mk4_A,$
+     Ne_kcor_A, index_kcor_A, index_sampling_kcor_A,$
+     Ne_c2_A, index_c2_A, index_sampling_c2_A
   
   if not keyword_set(dir_fl) or not keyword_set(fl_list) then STOP
 
@@ -83,7 +96,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      index_c2_A = intarr(N_fl,Npt_max) + default
      index_sampling_c2_A = intarr(N_fl,Npt_max) + default
   endif
-
+           
   for i_fl = 0,N_fl-1 do begin ; Start loop in fieldlines  
      initialized = 'no'
      readf,1,filename
@@ -396,6 +409,9 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      trace_data.index_c2  = ptr_new( index_c2_A)
      trace_data.index_sampling_c2 = ptr_new(index_sampling_c2_A)
   endif
+
+  fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
+                  mk4 = mk4, kcor = kcor, lascoc2 = lascoc2
   
  ; Save structure in dir_fl:
   save, trace_data, filename = dir_fl + structure_filename + '.sav'

@@ -79,7 +79,7 @@ ifl=0
 tmp = reform(index_sampling_aia_A(ifl,*))
 ind_samp_aia = where(tmp eq 1)
 window,0
-plot,rad_A(ifl,ind_samp_aia),Ne_aia_A(ifl,ind_samp_aia),charsize=2,xtitle='r [Rsun]',title='AIA-DEMT Ne(r) [cm!U-3!N]'
+plot,rad_A(ifl,ind_samp_aia),Ne_aia_A(ifl,ind_samp_aia),charsize=2,xtitle='r [Rsun]',title='AIA-DEMT Ne(r) [cm!U-3!N]',psym=4,th=4
 
 print
 print, 'Press SPACE BAR to continue.'
@@ -98,7 +98,7 @@ ifl=0
 tmp = reform(index_sampling_c2_A(ifl,*))
 ind_samp_c2 = where(tmp eq 1)
 window,1
-plot,rad_A(ifl,ind_samp_c2),Ne_c2_A(ifl,ind_samp_c2),charsize=2,xtitle='r [Rsun]',title='C2-SRT Ne(r) [cm!U-3!N]'
+plot,rad_A(ifl,ind_samp_c2),Ne_c2_A(ifl,ind_samp_c2),charsize=2,xtitle='r [Rsun]',title='C2-SRT Ne(r) [cm!U-3!N]',psym=4,th=4
 
 
 print

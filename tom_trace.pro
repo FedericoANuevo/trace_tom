@@ -1,5 +1,5 @@
 ;
-; PURPOSE: This code reads into memory tomographic producs for eiter
+; PURPOSE: This code reads into memory tomographic producs for either
 ;          VL tomography (N_e) or EUV tomography (N_e, T_e).
 ;          It then loops across AWSoM fieldline files and, for each one,
 ;          it calls the routine that actually reads each fieldline
