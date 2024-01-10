@@ -3,12 +3,17 @@
 ; on data from different instruments along given AWSoM fieldlines, and
 ; store all the information in a pointer structure.
 ;
+; It also performs, if requested (/fits) analytical fits to the
+; various tomographic products along individual field lines, including
+; the fits as part of the structure.
+;
 ; INPUTS:
 ; fir_fl and fl_list: STRINGS. directory where field lines are
 ; located, and filename of list of names of field lines filenames.
 ;
 ; FLAGS: one per allowed instrument, use those for which you want to
 ; merge results, provided in any order.
+; Also /fits.
 ;
 ; HISTORY: V1.0 AMV & FAN, CLaSP, October 2023.
 ;          V1.1 AMV, IAFE, November 2023. Added Sampling, expanded to
@@ -19,7 +24,8 @@
 pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
                         aia = aia, euvia = euvia, euvib = euvib, eit = eit, $
                         mk4 = mk4, kcor = kcor, lascoc2 = lascoc2, $
-                        struture_filename = structure_filename
+                        struture_filename = structure_filename, $
+                        fits = fits
   
   common all_data, trace_data, $
      N_fl, Npt_max, Npt_v,$
@@ -410,6 +416,8 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      trace_data.index_sampling_c2 = ptr_new(index_sampling_c2_A)
   endif
 
+; Perform fits if requested:
+  if keyword_set(fits) then $
   fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                   mk4 = mk4, kcor = kcor, lascoc2 = lascoc2
   

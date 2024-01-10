@@ -13,7 +13,7 @@ pro merge_trace_struct_call
    fl_list = 'list_synth.txt'
   ;fl_list = 'list.txt'
 
-  merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list,/aia, /mk4, /lascoc2
+  merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list,/aia, /mk4, /lascoc2, /fits
   
   return
 end
