@@ -48,10 +48,11 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
               Tm_fit_aia_A(ifl,*) = T0_fit_aia_A(ifl) + dTdr_fit_aia_A(ifl)       *      (r_fit_aia_A-1.)  ; K
           endif                 ; covgflag = 'yes'          
        endfor                   ; field lines loop.
-       trace_data = create_struct( trace_data                         ,$
-                                    'r_fit_aia',ptr_new( r_fit_aia_A) ,$
-                                   'Ne_fit_aia',ptr_new(Ne_fit_aia_A) ,$
-                                   'Tm_fit_aia',ptr_new(Tm_fit_aia_A) )
+       trace_data = create_struct( trace_data                          ,$
+                                  'fitflag_aia',ptr_new(fitflag_aia_A) ,$
+                                    'r_fit_aia',ptr_new(  r_fit_aia_A) ,$
+                                   'Ne_fit_aia',ptr_new( Ne_fit_aia_A) ,$
+                                   'Tm_fit_aia',ptr_new( Tm_fit_aia_A) )
     endif ; AIA
     return
  end

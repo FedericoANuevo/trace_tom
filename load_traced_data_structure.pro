@@ -30,7 +30,7 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
      Ne_mk4_A, index_mk4_A, index_sampling_mk4_A,$
      Ne_kcor_A, index_kcor_A, index_sampling_kcor_A,$
      Ne_c2_A, index_c2_A, index_sampling_c2_A,$
-     r_fit_aia_A, Ne_fit_aia_A, Te_fit_aia_A
+     r_fit_aia_A, Ne_fit_aia_A, Te_fit_aia_A, fitflag_aia_A
 
   restore, filename = dir + structure_filename
 
@@ -52,7 +52,8 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
              r_fit_aia_A = *trace_data.r_fit_aia             
             Ne_fit_aia_A = *trace_data.Ne_fit_aia
             Te_fit_aia_A = *trace_data.Tm_fit_aia
-     endif
+           fitflag_aia_A = *trace_data.fitflag_aia
+  endif
   endif
   if keyword_set(euvia) then begin
                 Ne_euvia_A = *trace_data.Ne_euvia 

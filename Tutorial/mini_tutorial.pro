@@ -7,7 +7,7 @@ pro mini_tutorial
      Ne_mk4_A, index_mk4_A, index_sampling_mk4_A,$
      Ne_kcor_A, index_kcor_A, index_sampling_kcor_A,$
      Ne_c2_A, index_c2_A, index_sampling_c2_A,$
-     r_fit_aia_A, Ne_fit_aia_A, Te_fit_aia_A
+     r_fit_aia_A, Ne_fit_aia_A, Te_fit_aia_A, fitflag_AIA_A
 
 ; 1) Declare the DIR where the structure is located, and the filename.
 
@@ -77,13 +77,32 @@ print,' window, 0'
 print,' plot,rad_A(ifl,ind_samp_aia),Ne_aia_A(ifl,ind_samp_aia)'
 print, 'Press SPACE BAR to see the plot.'
 pause
+Device, retain = 2, true_color = 24, decomposed = 0
+window,0
 ifl=0
 tmp = reform(index_sampling_aia_A(ifl,*))
 ind_samp_aia = where(tmp eq 1)
-window,0
-plot,rad_A(ifl,ind_samp_aia),Ne_aia_A(ifl,ind_samp_aia),charsize=2,xtitle='r [Rsun]',title='AIA-DEMT Ne(r) [cm!U-3!N]',psym=4,th=4
-oplot,r_fit_aia_A,Ne_fit_aia_A(ifl,*)
-
+plot,rad_A(ifl,ind_samp_aia),Ne_aia_A(ifl,ind_samp_aia),charsize=2,xtitle='r [Rsun]',title='AIA-DEMT Ne(r) [cm!U-3!N]',psym=4,th=4, /nodata, yr=[0,1.e8], ystyle=1, xr=[1,1.3], xstyle=1
+loadct,12
+Ne_fit_aia_avg = 0. * r_fit_aia_A
+stop
+for ifl=0,N_fl-1 do begin
+  tmp = reform(index_sampling_aia_A(ifl,*))
+  ind_samp_aia = where(tmp eq 1)
+  col = (ifl+1)*50
+  oplot,rad_A(ifl,ind_samp_aia),Ne_aia_A(ifl,ind_samp_aia),psym=4,th=2,color=col
+  if fitflag_AIA_A(ifl) eq +1. then begin
+    oplot,r_fit_aia_A,Ne_fit_aia_A(ifl,*),color=col
+    Ne_fit_aia_avg = Ne_fit_aia_avg + reform(Ne_fit_aia_A(ifl,*))
+  endif
+  stop
+endfor
+  N_fits = n_elements( where(fitflag_AIA_A eq +1.) )
+  Ne_fit_aia_avg = Ne_fit_aia_avg / float(N_fits)
+  loadct,0
+  oplot,r_fit_aia_A,Ne_fit_aia_avg,th=4
+  stop
+  
 print
 print, 'Press SPACE BAR to continue.'
 pause
