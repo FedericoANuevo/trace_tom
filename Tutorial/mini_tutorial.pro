@@ -7,7 +7,8 @@ pro mini_tutorial
      Ne_mk4_A, index_mk4_A, index_sampling_mk4_A,$
      Ne_kcor_A, index_kcor_A, index_sampling_kcor_A,$
      Ne_c2_A, index_c2_A, index_sampling_c2_A,$
-     r_fit_aia_A, Ne_fit_aia_A, Te_fit_aia_A, fitflag_AIA_A
+     r_fit_aia_A, Ne_fit_aia_A, Te_fit_aia_A, fitflag_AIA_A,$
+     r_fit_c2_A, Ne_fit_c2_A, fitflag_c2_A
 
 ; 1) Declare the DIR where the structure is located, and the filename.
 
@@ -49,7 +50,8 @@ help,N_fl, Npt_max, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, index_aia_A, index_sampling_aia_A,$
      Ne_mk4_A, index_mk4_A, index_sampling_mk4_A,$
      Ne_c2_A, index_c2_A, index_sampling_c2_A,$
-     r_fit_aia_A, Ne_fit_aia_A, Te_fit_aia_A
+     r_fit_aia_A, Ne_fit_aia_A, Te_fit_aia_A, fitflag_AIA_A,$
+     r_fit_c2_A, Ne_fit_c2_A, fitflag_c2_A
 print,'-------------------------------'
 print
 
@@ -85,8 +87,9 @@ ind_samp_aia = where(tmp eq 1)
 plot,rad_A(ifl,ind_samp_aia),Ne_aia_A(ifl,ind_samp_aia),charsize=2,xtitle='r [Rsun]',title='AIA-DEMT Ne(r) [cm!U-3!N]',psym=4,th=4, /nodata, yr=[0,1.e8], ystyle=1, xr=[1,1.3], xstyle=1
 loadct,12
 Ne_fit_aia_avg = 0. * r_fit_aia_A
-stop
 for ifl=0,N_fl-1 do begin
+   print, 'Press SPACE BAR to plot next line.'
+   pause
   tmp = reform(index_sampling_aia_A(ifl,*))
   ind_samp_aia = where(tmp eq 1)
   col = (ifl+1)*50
@@ -95,13 +98,13 @@ for ifl=0,N_fl-1 do begin
     oplot,r_fit_aia_A,Ne_fit_aia_A(ifl,*),color=col
     Ne_fit_aia_avg = Ne_fit_aia_avg + reform(Ne_fit_aia_A(ifl,*))
   endif
-  stop
 endfor
+   print, 'Press SPACE BAR to plot average trend.'
+   pause
   N_fits = n_elements( where(fitflag_AIA_A eq +1.) )
   Ne_fit_aia_avg = Ne_fit_aia_avg / float(N_fits)
   loadct,0
   oplot,r_fit_aia_A,Ne_fit_aia_avg,th=4
-  stop
   
 print
 print, 'Press SPACE BAR to continue.'
@@ -120,8 +123,27 @@ ifl=0
 tmp = reform(index_sampling_c2_A(ifl,*))
 ind_samp_c2 = where(tmp eq 1)
 window,1
- plot,rad_A(ifl,ind_samp_c2),Ne_c2_A(ifl,ind_samp_c2),charsize=2,xtitle='r [Rsun]',title='C2-SRT Ne(r) [cm!U-3!N]',psym=4,th=4
-
+ plot,rad_A(ifl,ind_samp_c2),Ne_c2_A(ifl,ind_samp_c2),charsize=2,xtitle='r [Rsun]',title='C2-SRT Ne(r) [cm!U-3!N]',psym=4,th=4,/nodata, xr=[2.5,6.0], xstyle=1
+loadct,12
+Ne_fit_c2_avg = 0. * r_fit_c2_A
+for ifl=0,N_fl-1 do begin
+   print, 'Press SPACE BAR to plot next line.'
+   pause
+  tmp = reform(index_sampling_c2_A(ifl,*))
+  ind_samp_c2 = where(tmp eq 1)
+  col = (ifl+1)*50
+  oplot,rad_A(ifl,ind_samp_c2),Ne_c2_A(ifl,ind_samp_c2),psym=4,th=2,color=col
+  if fitflag_c2_A(ifl) eq +1. then begin
+    oplot,r_fit_c2_A,Ne_fit_c2_A(ifl,*),color=col
+    Ne_fit_c2_avg = Ne_fit_c2_avg + reform(Ne_fit_c2_A(ifl,*))
+  endif
+endfor
+   print, 'Press SPACE BAR to plot average trend.'
+   pause
+  N_fits = n_elements( where(fitflag_c2_A eq +1.) )
+  Ne_fit_c2_avg = Ne_fit_c2_avg / float(N_fits)
+  loadct,0
+  oplot,r_fit_c2_A,Ne_fit_c2_avg,th=4
 
 
 print

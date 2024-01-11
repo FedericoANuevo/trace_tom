@@ -30,7 +30,7 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
        for ifl=0,N_fl-1 do begin      
           tmp = reform(index_sampling_aia_A(ifl,*))
           ind_samp_aia = where(tmp eq 1)
-          rfit =    rad_A(ifl,ind_samp_aia) ; Rsun
+          rfit = rad_A(ifl,ind_samp_aia) ; Rsun
           test_coverage, rfit=rfit, covgflag=covgflag, /aia
           if covgflag eq 'yes' then begin
              fitflag_aia_A(ifl) = +1.
@@ -54,16 +54,48 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                                    'Ne_fit_aia',ptr_new( Ne_fit_aia_A) ,$
                                    'Tm_fit_aia',ptr_new( Tm_fit_aia_A) )
     endif ; AIA
+
+    if keyword_set(lascoc2) then begin
+       Npt_fit = 35 & rmin = 2.5 & rmax = 6.0
+        dr_fit = (rmax-rmin)/float(Npt_fit)
+         Rcrit = rmin
+       fitflag_c2_A = fltarr(N_fl        ) + default
+        N0_fit_c2_A = fltarr(N_fl        ) + default
+         p_fit_c2_A = fltarr(N_fl        ) + default
+       r2N_fit_c2_A = fltarr(N_fl        ) + default
+        Ne_fit_c2_A = fltarr(N_fl,Npt_fit) + default
+         r_fit_c2_A = rmin + dr_fit/2. + dr_fit * findgen(Npt_fit)
+       for ifl=0,N_fl-1 do begin      
+          tmp = reform(index_sampling_c2_A(ifl,*))
+          ind_samp_c2 = where(tmp eq 1)
+          rfit = rad_A(ifl,ind_samp_c2) ; Rsun
+          test_coverage, rfit=rfit, covgflag=covgflag, /lascoc2
+          if covgflag eq 'yes' then begin
+             fitflag_c2_A(ifl) = +1.
+             Nefit = Ne_c2_A(ifl,ind_samp_c2)
+              AN = linfit(alog(rfit/Rcrit), alog(Nefit), prob=probN,/double)
+              N0_fit_c2_A(ifl)   = exp(AN[0]) ; cm-3
+               p_fit_c2_A(ifl)   =    -AN[1]  ; dimensionless exponent of power law
+             r2N_fit_c2_A(ifl)   = probN;r2N
+              Ne_fit_c2_A(ifl,*) = N0_fit_c2_A(ifl) * (r_fit_c2_A / Rcrit)^(-p_fit_c2_A(ifl)) ; cm-3
+          endif                 ; covgflag = 'yes'          
+       endfor                   ; field lines loop.
+       trace_data = create_struct( trace_data                        ,$
+                                  'fitflag_c2',ptr_new(fitflag_c2_A) ,$
+                                    'r_fit_c2',ptr_new(  r_fit_c2_A) ,$
+                                   'Ne_fit_c2',ptr_new( Ne_fit_c2_A) )
+    endif ; LASCOC2
+    
     return
  end
 
-
-
+;-------------------------------------------------------------------------
 pro test_coverage, rfit=rfit, covgflag=covgflag, $
                    aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                    mk4 = mk4, kcor = kcor, lascoc2 = lascoc2
   covgflag = 'no'
-  if keyword_set(aia) or keyword_set(euvi) or keyword_set(eit) then begin
+
+    if keyword_set(aia) or keyword_set(euvi) or keyword_set(eit) then begin
      R1=1.10
      R2=1.15
      R3=1.20
@@ -73,5 +105,17 @@ pro test_coverage, rfit=rfit, covgflag=covgflag, $
         (where(rfit gt R2 and rfit le R3))(0) ne -1 AND  $
         (where(rfit gt R3 and rfit le R4))(0) ne -1 THEN covgflag = 'yes'
   endif
+
+  if keyword_set(lascoc2) then begin
+     R1=3.0
+     R2=4.0
+     R3=5.0
+     R4=6.0
+     if (where(rfit lt R1)               )(0) ne -1 AND  $
+        (where(rfit gt R1 and rfit le R2))(0) ne -1 AND  $
+        (where(rfit gt R2 and rfit le R3))(0) ne -1 AND  $
+        (where(rfit gt R3 and rfit le R4))(0) ne -1 THEN covgflag = 'yes'
+  endif
+
   return
 end
