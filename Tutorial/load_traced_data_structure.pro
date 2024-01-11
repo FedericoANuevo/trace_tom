@@ -31,7 +31,8 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
      Ne_kcor_A, index_kcor_A, index_sampling_kcor_A,$
      Ne_c2_A, index_c2_A, index_sampling_c2_A,$
      r_fit_aia_A, Ne_fit_aia_A, Te_fit_aia_A, fitflag_aia_A,$
-     r_fit_c2_A, Ne_fit_c2_A, fitflag_c2_A
+     r_fit_c2_A, Ne_fit_c2_A, fitflag_c2_A,$
+     r_fit_mk4_A, Ne_fit_mk4_A, fitflag_mk4_A
 
   restore, filename = dir + structure_filename
 
@@ -78,6 +79,11 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
                 Ne_mk4_A = *trace_data.Ne_mk4 
              index_mk4_A = *trace_data.index_mk4
     index_sampling_mk4_A = *trace_data.index_sampling_mk4
+     if keyword_set(fits) then begin
+             r_fit_mk4_A = *trace_data.r_fit_mk4             
+            Ne_fit_mk4_A = *trace_data.Ne_fit_mk4
+           fitflag_mk4_A = *trace_data.fitflag_mk4
+     endif
   endif
   if keyword_set(kcor) then begin
                 Ne_kcor_A = *trace_data.Ne_kcor 
