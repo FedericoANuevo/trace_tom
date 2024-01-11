@@ -18,7 +18,7 @@
 ; HISTORY: V1.0 AMV & FAN, CLaSP, October 2023.
 ;          V1.1 AMV, IAFE, November 2023. Added Sampling, expanded to
 ;          all instruments and performed overall polishing.
-;          V1.5 AMV, IAFE, January 2024. Added fit to tompgraphic resuls.
+;          V2.0 AMV, IAFE, January 2024. Added fit to tompgraphic resuls.
 ;
 
 pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
