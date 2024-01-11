@@ -338,7 +338,6 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
   endfor  ; End loop in fieldlines    
   close,1
 
-
 ; Create a pointer structure to store traced information  
   trace_data = { N_fl:        ptr_new(N_fl)                          ,$
                  Npt_max:     ptr_new(Npt_max)                       ,$

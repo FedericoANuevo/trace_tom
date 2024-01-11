@@ -1,22 +1,23 @@
 pro mini_tutorial
-  common data, N_fl, Npt_max, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
+  common data, N_fl, Npt_max, Npt_v, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, index_aia_A, index_sampling_aia_A,$
      Ne_euvia_A, Tm_euvia_A, index_euvia_A, index_sampling_euvia_A,$
      Ne_euvib_A, Tm_euvib_A, index_euvib_A, index_sampling_euvib_A,$
      Ne_eit_A, Tm_eit_A, index_eit_A, index_sampling_eit_A,$
      Ne_mk4_A, index_mk4_A, index_sampling_mk4_A,$
      Ne_kcor_A, index_kcor_A, index_sampling_kcor_A,$
-     Ne_c2_A, index_c2_A, index_sampling_c2_A
+     Ne_c2_A, index_c2_A, index_sampling_c2_A,$
+     r_fit_aia_A, Ne_fit_aia_A, Te_fit_aia_A
 
 ; 1) Declare the DIR where the structure is located, and the filename.
 
 dir = './'
-structure_filename = 'list_synth.txt-tracing-structure-merge_aia_mk4_lascoc2_aia_mk4_lascoc2_aia_mk4_lascoc2_aia_mk4_lascoc2.sav'
+structure_filename = 'list_synth.txt-tracing-structure-merge_aia_mk4_lascoc2.sav'
 
 ; 2) Load structure into memory and extract all available arrays from it.
 
 load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data,$
-                            /aia, /mk4, /lascoc2
+                            /aia, /mk4, /lascoc2, /fits
 
 ; 3) See the full contents of the structure.
 print
@@ -47,7 +48,8 @@ print,'-------------------------------'
 help,N_fl, Npt_max, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, index_aia_A, index_sampling_aia_A,$
      Ne_mk4_A, index_mk4_A, index_sampling_mk4_A,$
-     Ne_c2_A, index_c2_A, index_sampling_c2_A
+     Ne_c2_A, index_c2_A, index_sampling_c2_A,$
+     r_fit_aia_A, Ne_fit_aia_A, Te_fit_aia_A
 print,'-------------------------------'
 print
 
@@ -80,6 +82,7 @@ tmp = reform(index_sampling_aia_A(ifl,*))
 ind_samp_aia = where(tmp eq 1)
 window,0
 plot,rad_A(ifl,ind_samp_aia),Ne_aia_A(ifl,ind_samp_aia),charsize=2,xtitle='r [Rsun]',title='AIA-DEMT Ne(r) [cm!U-3!N]',psym=4,th=4
+oplot,r_fit_aia_A,Ne_fit_aia_A(ifl,*)
 
 print
 print, 'Press SPACE BAR to continue.'
@@ -98,7 +101,8 @@ ifl=0
 tmp = reform(index_sampling_c2_A(ifl,*))
 ind_samp_c2 = where(tmp eq 1)
 window,1
-plot,rad_A(ifl,ind_samp_c2),Ne_c2_A(ifl,ind_samp_c2),charsize=2,xtitle='r [Rsun]',title='C2-SRT Ne(r) [cm!U-3!N]',psym=4,th=4
+ plot,rad_A(ifl,ind_samp_c2),Ne_c2_A(ifl,ind_samp_c2),charsize=2,xtitle='r [Rsun]',title='C2-SRT Ne(r) [cm!U-3!N]',psym=4,th=4
+
 
 
 print

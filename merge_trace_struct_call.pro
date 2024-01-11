@@ -7,7 +7,7 @@
 ; 
 
 pro merge_trace_struct_call
-  
+
    dir_fl  = '/data1/DATA/fieldlines_judit/radial_synth_fieldlines/'
   ;dir_fl  = '/data1/DATA/fieldlines_judit/CR2099/map1/'
    fl_list = 'list_synth.txt'

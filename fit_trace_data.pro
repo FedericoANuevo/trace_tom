@@ -16,16 +16,18 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
     
     if keyword_set(aia) then begin
        Npt_fit = 30 & rmin = 1.0 & rmax = 1.3
+        dr_fit = (rmax-rmin)/float(Npt_fit)
        fitflag_aia_A = fltarr(N_fl        ) + default
         N0_fit_aia_A = fltarr(N_fl        ) + default
         lN_fit_aia_A = fltarr(N_fl        ) + default
        r2N_fit_aia_A = fltarr(N_fl        ) + default
-
+        T0_fit_aia_A = fltarr(N_fl        ) + default
+      dTdr_fit_aia_A = fltarr(N_fl        ) + default
+       r2T_fit_aia_A = fltarr(N_fl        ) + default
         Ne_fit_aia_A = fltarr(N_fl,Npt_fit) + default
         Tm_fit_aia_A = fltarr(N_fl,Npt_fit) + default
-       dr_fit       = (rmax-rmin)/float(Npt_fit)
-        r_fit_aia   = rmin + dr_fit/2. + dr_fit * findgen(Npt_fit)
-       for ifl=0,Nfl-1 do begin      
+         r_fit_aia_A = rmin + dr_fit/2. + dr_fit * findgen(Npt_fit)
+       for ifl=0,N_fl-1 do begin      
           tmp = reform(index_sampling_aia_A(ifl,*))
           ind_samp_aia = where(tmp eq 1)
           rfit =    rad_A(ifl,ind_samp_aia) ; Rsun
@@ -34,19 +36,23 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
              fitflag_aia_A(ifl) = +1.
              Nefit = Ne_aia_A(ifl,ind_samp_aia)
              Tmfit = Tm_aia_A(ifl,ind_samp_aia)
-             A = linfit(1/rfit,alog(Nefit),prob=prob,/double)
-              N0_fit_aia_A(ifl) = exp(A[0]+A[1])
-              lN_fit_aia_A(ifl) = 1./A[1]
-             r2N_fit_aia_A(ifl) = r2
-
-          endif                 ; covgflag = 'yes'
-          
-          stop
+              AN = linfit(1./rfit   ,alog(Nefit), prob=probN,/double)
+              AT = linfit(   rfit-1.,     Tmfit , prob=probT,/double)
+              N0_fit_aia_A(ifl)   = exp(AN[0]+AN[1]) ; cm-3
+              lN_fit_aia_A(ifl)   = 1./AN[1]         ; Rsun
+              T0_fit_aia_A(ifl)   = AT[0]            ; K
+            dTdr_fit_aia_A(ifl)   = AT[1]            ; K/Rsun
+             r2N_fit_aia_A(ifl)   = probN;r2N
+             r2T_fit_aia_A(ifl)   = probT;r2T
+              Ne_fit_aia_A(ifl,*) = N0_fit_aia_A(ifl) * exp(-(1/lN_fit_aia_A(ifl))*(1.-1./r_fit_aia_A   )) ; cm-3
+              Tm_fit_aia_A(ifl,*) = T0_fit_aia_A(ifl) + dTdr_fit_aia_A(ifl)       *      (r_fit_aia_A-1.)  ; K
+          endif                 ; covgflag = 'yes'          
        endfor                   ; field lines loop.
-    endif
-
-    
-
+       trace_data = create_struct( trace_data                         ,$
+                                    'r_fit_aia',ptr_new( r_fit_aia_A) ,$
+                                   'Ne_fit_aia',ptr_new(Ne_fit_aia_A) ,$
+                                   'Tm_fit_aia',ptr_new(Tm_fit_aia_A) )
+    endif ; AIA
     return
  end
 
@@ -61,10 +67,10 @@ pro test_coverage, rfit=rfit, covgflag=covgflag, $
      R2=1.15
      R3=1.20
      R4=1.25
-     if (where(rfit lt R1)               )(0) ne -1 AND
-        (where(rfit gt R1 and rfit le R2))(0) ne -1 AND
-        (where(rfit gt R2 and rfit le R3))(0) ne -1 AND 
-        (where(rfit gt R3 and rfit le R4 )(0) ne -1 THEN covgflag = 'yes'
-     endif  
+     if (where(rfit lt R1)               )(0) ne -1 AND  $
+        (where(rfit gt R1 and rfit le R2))(0) ne -1 AND  $
+        (where(rfit gt R2 and rfit le R3))(0) ne -1 AND  $
+        (where(rfit gt R3 and rfit le R4))(0) ne -1 THEN covgflag = 'yes'
+  endif
   return
 end
