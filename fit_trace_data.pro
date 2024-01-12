@@ -50,6 +50,8 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
        endfor                   ; field lines loop.
        trace_data = create_struct( trace_data                          ,$
                                   'fitflag_aia',ptr_new(fitflag_aia_A) ,$
+                                  'r2N_fit_aia',ptr_new(r2N_fit_aia_A) ,$
+                                  'r2T_fit_aia',ptr_new(r2T_fit_aia_A) ,$
                                     'r_fit_aia',ptr_new(  r_fit_aia_A) ,$
                                    'Ne_fit_aia',ptr_new( Ne_fit_aia_A) ,$
                                    'Tm_fit_aia',ptr_new( Tm_fit_aia_A) )
@@ -82,6 +84,7 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
        endfor                   ; field lines loop.
        trace_data = create_struct( trace_data                          ,$
                                   'fitflag_mk4',ptr_new(fitflag_mk4_A) ,$
+                                  'r2N_fit_mk4',ptr_new(r2N_fit_mk4_A) ,$
                                     'r_fit_mk4',ptr_new(  r_fit_mk4_A) ,$
                                    'Ne_fit_mk4',ptr_new( Ne_fit_mk4_A) )
     endif ; MK4
@@ -113,6 +116,7 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
        endfor                   ; field lines loop.
        trace_data = create_struct( trace_data                        ,$
                                   'fitflag_c2',ptr_new(fitflag_c2_A) ,$
+                                  'r2N_fit_c2',ptr_new(r2N_fit_c2_A) ,$                                   
                                     'r_fit_c2',ptr_new(  r_fit_c2_A) ,$
                                    'Ne_fit_c2',ptr_new( Ne_fit_c2_A) )
     endif ; LASCOC2

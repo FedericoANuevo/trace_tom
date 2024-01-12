@@ -7,9 +7,9 @@ pro mini_tutorial
      Ne_mk4_A, index_mk4_A, index_sampling_mk4_A,$
      Ne_kcor_A, index_kcor_A, index_sampling_kcor_A,$
      Ne_c2_A, index_c2_A, index_sampling_c2_A,$
-     r_fit_aia_A, Ne_fit_aia_A, Tm_fit_aia_A, fitflag_AIA_A,$
-     r_fit_c2_A, Ne_fit_c2_A, fitflag_c2_A,$
-     r_fit_mk4_A, Ne_fit_mk4_A, fitflag_mk4_A
+     r_fit_aia_A, Ne_fit_aia_A, Tm_fit_aia_A, fitflag_aia_A,r2N_fit_aia_A,r2T_fit_aia_A,$
+     r_fit_c2_A, Ne_fit_c2_A, fitflag_c2_A,r2N_fit_c2_A,$
+     r_fit_mk4_A, Ne_fit_mk4_A, fitflag_mk4_A,r2N_fit_mk4_A
 
 ; 1) Declare the DIR where the structure is located, and the filename.
 
@@ -51,11 +51,11 @@ help,N_fl, Npt_max, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, index_aia_A, index_sampling_aia_A,$
      Ne_mk4_A, index_mk4_A, index_sampling_mk4_A,$
      Ne_c2_A, index_c2_A, index_sampling_c2_A,$
-     r_fit_aia_A, Ne_fit_aia_A, Tm_fit_aia_A, fitflag_AIA_A,$
-     r_fit_c2_A, Ne_fit_c2_A, fitflag_c2_A
+     r_fit_aia_A, Ne_fit_aia_A, Tm_fit_aia_A, fitflag_AIA_A,r2T_fit_aia_A,$
+     r_fit_c2_A, Ne_fit_c2_A, fitflag_c2_A,r2N_fit_c2_A,$
+     r_fit_mk4_A, Ne_fit_mk4_A, fitflag_mk4_A,r2N_fit_mk4_A
 print,'-------------------------------'
 print
-
 
 ; 5) Some explanations follow.
 print,'In this case there are "N_fl=4" field lines that were traced between rmin=1 Rs and rmax=10 Rs. These are synthetic radial field lines with a uniform radial step of 0.0015 Rs. For each field line a maximum of "Npt_max=15000" points is allowed. This number will be optimized later on, depending on what we find to be a typical number of points for Judit field lines. For now we just set it as very large number.'
