@@ -1,3 +1,4 @@
+; Performs theil-sen estimation, avoiding pairs with same abscissa.
 function theilsen, x, y
   x = float(x)
   y = float(y)

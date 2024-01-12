@@ -1,3 +1,5 @@
+; Performs linear fit to data in different selectable ways.
+
 pro linear_fit, xsamp, ysamp, A, r2, $
                 linfit_idl = linfit_idl, theil_sen = theil_sen
 

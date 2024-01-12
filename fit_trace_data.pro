@@ -1,3 +1,10 @@
+;
+; PURPOSE: Performs analytical fits to tomographic products along each
+; traced field line and stores results in the trace_data structure.
+;
+; HISTORY: V1.0, AMV, January 2023, IAFE.
+;          V1.1, AMV & FAN, January 2023, IAFE. Added Theil-Sen and R² metric.
+;
 pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                     mk4 = mk4, kcor = kcor, lascoc2 = lascoc2
 
