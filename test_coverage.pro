@@ -1,7 +1,8 @@
 ;-------------------------------------------------------------------------
-pro test_coverage, rsamp=rsamp, covgflag=covgflag, $
+pro test_coverage, radsamp=radsamp, covgflag=covgflag, $
                    aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                    mk4 = mk4, kcor = kcor, lascoc2 = lascoc2
+
   covgflag = 'no'
 
   if keyword_set(aia) or keyword_set(euvi) or keyword_set(eit) then begin
@@ -10,10 +11,10 @@ pro test_coverage, rsamp=rsamp, covgflag=covgflag, $
      R2=1.15
      R3=1.20
      R4=1.25
-     if (where(rsamp gt R0 and rsamp le R1))(0) ne -1 AND  $
-        (where(rsamp gt R1 and rsamp le R2))(0) ne -1 AND  $
-        (where(rsamp gt R2 and rsamp le R3))(0) ne -1 AND  $
-        (where(rsamp gt R3 and rsamp le R4))(0) ne -1 THEN covgflag = 'yes'
+     if (where(radsamp gt R0 and radsamp le R1))(0) ne -1 AND  $
+        (where(radsamp gt R1 and radsamp le R2))(0) ne -1 AND  $
+        (where(radsamp gt R2 and radsamp le R3))(0) ne -1 AND  $
+        (where(radsamp gt R3 and radsamp le R4))(0) ne -1 THEN covgflag = 'yes'
   endif
 
   if keyword_set(mk4) then begin
@@ -22,10 +23,10 @@ pro test_coverage, rsamp=rsamp, covgflag=covgflag, $
      R2=1.3
      R3=1.4
      R4=1.5
-     if (where(rsamp gt R0 and rsamp le R1))(0) ne -1 AND  $
-        (where(rsamp gt R1 and rsamp le R2))(0) ne -1 AND  $
-        (where(rsamp gt R2 and rsamp le R3))(0) ne -1 AND  $
-        (where(rsamp gt R3 and rsamp le R4))(0) ne -1 THEN covgflag = 'yes'
+     if (where(radsamp gt R0 and radsamp le R1))(0) ne -1 AND  $
+        (where(radsamp gt R1 and radsamp le R2))(0) ne -1 AND  $
+        (where(radsamp gt R2 and radsamp le R3))(0) ne -1 AND  $
+        (where(radsamp gt R3 and radsamp le R4))(0) ne -1 THEN covgflag = 'yes'
   endif
 
   if keyword_set(lascoc2) then begin
@@ -34,10 +35,10 @@ pro test_coverage, rsamp=rsamp, covgflag=covgflag, $
      R2=4.0
      R3=5.0
      R4=6.0
-     if (where(rsamp gt R0 and rsamp le R1))(0) ne -1 AND  $
-        (where(rsamp gt R1 and rsamp le R2))(0) ne -1 AND  $
-        (where(rsamp gt R2 and rsamp le R3))(0) ne -1 AND  $
-        (where(rsamp gt R3 and rsamp le R4))(0) ne -1 THEN covgflag = 'yes'
+     if (where(radsamp gt R0 and radsamp le R1))(0) ne -1 AND  $
+        (where(radsamp gt R1 and radsamp le R2))(0) ne -1 AND  $
+        (where(radsamp gt R2 and radsamp le R3))(0) ne -1 AND  $
+        (where(radsamp gt R3 and radsamp le R4))(0) ne -1 THEN covgflag = 'yes'
   endif
 
   return
