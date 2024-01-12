@@ -3,7 +3,7 @@
 ; fieldlines, in any combination of instruments. 
 ;
 ; INPUTS:
-; dir, structure_filename: STRINGS; the dir where the structure is
+b; dir, structure_filename: STRINGS; the dir where the structure is
 ; located, and is filename.
 ;
 ; FLAGS: instruments whose data us to be plotted, and set /log for log scale.

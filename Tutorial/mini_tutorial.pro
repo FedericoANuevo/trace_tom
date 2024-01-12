@@ -25,7 +25,7 @@ load_traced_data_structure, dir=dir, structure_filename=structure_filename, trac
 print
 print, 'Bellow is the list of the full contents of the structure, named "trace_data", loaded into memory by the command:'
 print
-print, 'load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /aia, /mk4, /lascoc2'
+print, 'load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /aia, /mk4, /lascoc2, /fits'
 print
 print, 'Everything that says *NullPointer* does not exist. For this particular structure only AIA, MK4 and C2 results exist.'
 print

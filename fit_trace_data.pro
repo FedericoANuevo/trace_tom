@@ -30,20 +30,20 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
        for ifl=0,N_fl-1 do begin      
           tmp = reform(index_sampling_aia_A(ifl,*))
           ind_samp_aia = where(tmp eq 1)
-          rfit = rad_A(ifl,ind_samp_aia) ; Rsun
-          test_coverage, rfit=rfit, covgflag=covgflag, /aia
+          rsamp = rad_A(ifl,ind_samp_aia) ; Rsun
+          test_coverage, rsamp=rsamp, covgflag=covgflag, /aia
           if covgflag eq 'yes' then begin
              fitflag_aia_A(ifl) = +1.
-             Nefit = Ne_aia_A(ifl,ind_samp_aia)
-             Tmfit = Tm_aia_A(ifl,ind_samp_aia)
-              AN = linfit(1./rfit   ,alog(Nefit), prob=probN,/double)
-              AT = linfit(   rfit-1.,     Tmfit , prob=probT,/double)
+             Nesamp = Ne_aia_A(ifl,ind_samp_aia)
+             Tmsamp = Tm_aia_A(ifl,ind_samp_aia)
+             linear_fit, 1./rsamp   , alog(Nesamp), AN, r2N, /linfit_idl
+             linear_fit,    rsamp-1.,      Tmsamp , AT, r2T, /linfit_idl
+             r2N_fit_aia_A(ifl)   = r2N
+             r2T_fit_aia_A(ifl)   = r2T
               N0_fit_aia_A(ifl)   = exp(AN[0]+AN[1]) ; cm-3
               lN_fit_aia_A(ifl)   = 1./AN[1]         ; Rsun
               T0_fit_aia_A(ifl)   = AT[0]            ; K
             dTdr_fit_aia_A(ifl)   = AT[1]            ; K/Rsun
-             r2N_fit_aia_A(ifl)   = probN;r2N
-             r2T_fit_aia_A(ifl)   = probT;r2T
               Ne_fit_aia_A(ifl,*) = N0_fit_aia_A(ifl) * exp(-(1/lN_fit_aia_A(ifl))*(1.-1./r_fit_aia_A   )) ; cm-3
               Tm_fit_aia_A(ifl,*) = T0_fit_aia_A(ifl) + dTdr_fit_aia_A(ifl)       *      (r_fit_aia_A-1.)  ; K
           endif                 ; covgflag = 'yes'          
@@ -68,15 +68,15 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
        for ifl=0,N_fl-1 do begin      
           tmp = reform(index_sampling_mk4_A(ifl,*))
           ind_samp_mk4 = where(tmp eq 1)
-          rfit = rad_A(ifl,ind_samp_mk4) ; Rsun
-          test_coverage, rfit=rfit, covgflag=covgflag, /mk4
+          rsamp = rad_A(ifl,ind_samp_mk4) ; Rsun
+          test_coverage, rsamp=rsamp, covgflag=covgflag, /mk4
           if covgflag eq 'yes' then begin
              fitflag_mk4_A(ifl) = +1.
-             Nefit = Ne_mk4_A(ifl,ind_samp_mk4)
-              AN = linfit(1./rfit   ,alog(Nefit), prob=probN,/double)
+             Nesamp = Ne_mk4_A(ifl,ind_samp_mk4)
+             linear_fit, 1./rsamp   ,alog(Nesamp), AN, r2N, /linfit_idl
+             r2N_fit_mk4_A(ifl)   = r2N
               N0_fit_mk4_A(ifl)   = exp(AN[0]+AN[1]) ; cm-3
               lN_fit_mk4_A(ifl)   = 1./AN[1]         ; Rsun
-             r2N_fit_mk4_A(ifl)   = probN;r2N
               Ne_fit_mk4_A(ifl,*) = N0_fit_mk4_A(ifl) * exp(-(1/lN_fit_mk4_A(ifl))*(1.-1./r_fit_mk4_A   )) ; cm-3
           endif                 ; covgflag = 'yes'          
        endfor                   ; field lines loop.
@@ -99,15 +99,15 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
        for ifl=0,N_fl-1 do begin      
           tmp = reform(index_sampling_c2_A(ifl,*))
           ind_samp_c2 = where(tmp eq 1)
-          rfit = rad_A(ifl,ind_samp_c2) ; Rsun
-          test_coverage, rfit=rfit, covgflag=covgflag, /lascoc2
+          rsamp = rad_A(ifl,ind_samp_c2) ; Rsun
+          test_coverage, rsamp=rsamp, covgflag=covgflag, /lascoc2
           if covgflag eq 'yes' then begin
              fitflag_c2_A(ifl) = +1.
-             Nefit = Ne_c2_A(ifl,ind_samp_c2)
-              AN = linfit(alog(rfit/Rcrit), alog(Nefit), prob=probN,/double)
+             Nesamp = Ne_c2_A(ifl,ind_samp_c2)
+             linear_fit, alog(rsamp/Rcrit), alog(Nesamp), AN, r2N, /linfit_idl
+             r2N_fit_c2_A(ifl)   = r2N
               N0_fit_c2_A(ifl)   = exp(AN[0]) ; cm-3
                p_fit_c2_A(ifl)   =    -AN[1]  ; dimensionless exponent of power law
-             r2N_fit_c2_A(ifl)   = probN;r2N
               Ne_fit_c2_A(ifl,*) = N0_fit_c2_A(ifl) * (r_fit_c2_A / Rcrit)^(-p_fit_c2_A(ifl)) ; cm-3
           endif                 ; covgflag = 'yes'          
        endfor                   ; field lines loop.
@@ -120,47 +120,3 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
     return
  end
 
-;-------------------------------------------------------------------------
-pro test_coverage, rfit=rfit, covgflag=covgflag, $
-                   aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
-                   mk4 = mk4, kcor = kcor, lascoc2 = lascoc2
-  covgflag = 'no'
-
-  if keyword_set(aia) or keyword_set(euvi) or keyword_set(eit) then begin
-     R0=1.00
-     R1=1.10
-     R2=1.15
-     R3=1.20
-     R4=1.25
-     if (where(rfit gt R0 and rfit le R1))(0) ne -1 AND  $
-        (where(rfit gt R1 and rfit le R2))(0) ne -1 AND  $
-        (where(rfit gt R2 and rfit le R3))(0) ne -1 AND  $
-        (where(rfit gt R3 and rfit le R4))(0) ne -1 THEN covgflag = 'yes'
-  endif
-
-  if keyword_set(mk4) then begin
-     R0=1.1
-     R1=1.2
-     R2=1.3
-     R3=1.4
-     R4=1.5
-     if (where(rfit gt R0 and rfit le R1))(0) ne -1 AND  $
-        (where(rfit gt R1 and rfit le R2))(0) ne -1 AND  $
-        (where(rfit gt R2 and rfit le R3))(0) ne -1 AND  $
-        (where(rfit gt R3 and rfit le R4))(0) ne -1 THEN covgflag = 'yes'
-  endif
-
-  if keyword_set(lascoc2) then begin
-     R0=2.5
-     R1=3.0
-     R2=4.0
-     R3=5.0
-     R4=6.0
-     if (where(rfit gt R0 and rfit le R1))(0) ne -1 AND  $
-        (where(rfit gt R1 and rfit le R2))(0) ne -1 AND  $
-        (where(rfit gt R2 and rfit le R3))(0) ne -1 AND  $
-        (where(rfit gt R3 and rfit le R4))(0) ne -1 THEN covgflag = 'yes'
-  endif
-
-  return
-end
