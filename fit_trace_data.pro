@@ -63,8 +63,7 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                                   'rad_fit_aia',ptr_new(rad_fit_aia_A) ,$
                                    'Ne_fit_aia',ptr_new( Ne_fit_aia_A) ,$
                                    'Tm_fit_aia',ptr_new( Tm_fit_aia_A) )
-    endif ; AIA
-
+    endif; AIA
 
     if keyword_set(mk4) then begin
        radmin = 1.1 & radmax = 1.5
@@ -103,7 +102,7 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                                   'r2N_fit_mk4',ptr_new(r2N_fit_mk4_A) ,$
                                   'rad_fit_mk4',ptr_new(rad_fit_mk4_A) ,$
                                    'Ne_fit_mk4',ptr_new( Ne_fit_mk4_A) )
-    endif ; MK4
+    endif; MK4
 
     if keyword_set(lascoc2) then begin
        radmin = 2.5 & radmax = 6.0
@@ -136,7 +135,7 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                                   'r2N_fit_c2',ptr_new(r2N_fit_c2_A) ,$                                   
                                   'rad_fit_c2',ptr_new(rad_fit_c2_A) ,$
                                    'Ne_fit_c2',ptr_new( Ne_fit_c2_A) )
-    endif ; LASCOC2
+    endif; LASCOC2
 
     return
  end
