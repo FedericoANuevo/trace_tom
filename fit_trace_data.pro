@@ -37,7 +37,7 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
              Nesamp = Ne_aia_A(ifl,ind_samp_aia)
              Tmsamp = Tm_aia_A(ifl,ind_samp_aia)
              linear_fit, 1./rsamp   , alog(Nesamp), AN, r2N, /linfit_idl
-             linear_fit,    rsamp-1.,      Tmsamp , AT, r2T, /linfit_idl
+             linear_fit,    rsamp-1.,      Tmsamp , AT, r2T, /theil_sen
              r2N_fit_aia_A(ifl)   = r2N
              r2T_fit_aia_A(ifl)   = r2T
               N0_fit_aia_A(ifl)   = exp(AN[0]+AN[1]) ; cm-3
@@ -61,9 +61,11 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
     if keyword_set(mk4) then begin
        Npt_fit = 40 & rmin = 1.1 & rmax = 1.5
         dr_fit = (rmax-rmin)/float(Npt_fit)
+         Rcrit = rmin
        fitflag_mk4_A = fltarr(N_fl        ) + default
         N0_fit_mk4_A = fltarr(N_fl        ) + default
         lN_fit_mk4_A = fltarr(N_fl        ) + default
+;        p_fit_mk4_A = fltarr(N_fl        ) + default
        r2N_fit_mk4_A = fltarr(N_fl        ) + default
         Ne_fit_mk4_A = fltarr(N_fl,Npt_fit) + default
          r_fit_mk4_A = rmin + dr_fit/2. + dr_fit * findgen(Npt_fit)
@@ -80,6 +82,11 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
               N0_fit_mk4_A(ifl)   = exp(AN[0]+AN[1]) ; cm-3
               lN_fit_mk4_A(ifl)   = 1./AN[1]         ; Rsun
               Ne_fit_mk4_A(ifl,*) = N0_fit_mk4_A(ifl) * exp(-(1/lN_fit_mk4_A(ifl))*(1.-1./r_fit_mk4_A   )) ; cm-3
+ ;           linear_fit, alog(rsamp/Rcrit), alog(Nesamp), AN, r2N, /linfit_idl
+ ;           r2N_fit_mk4_A(ifl)   = r2N
+ ;            N0_fit_mk4_A(ifl)   = exp(AN[0]) ; cm-3
+ ;             p_fit_mk4_A(ifl)   =    -AN[1]  ; dimensionless exponent of power law
+ ;            Ne_fit_mk4_A(ifl,*) = N0_fit_mk4_A(ifl) * (r_fit_mk4_A / Rcrit)^(-p_fit_mk4_A(ifl)) ; cm-3
           endif                 ; covgflag = 'yes'          
        endfor                   ; field lines loop.
        trace_data = create_struct( trace_data                          ,$
