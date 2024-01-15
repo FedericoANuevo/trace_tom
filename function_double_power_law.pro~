@@ -1,0 +1,15 @@
+pro function_double_power_law, r, A, rmin, rcrit, f, dfdA
+
+  f = A[0] * (r/rmin)^(-A[1]) + A[2] * (r/rcrit)^(-A[3])
+
+  df_dA0 = (r/rmin)^(-A[1])
+  df_dA1 = - A[0] * (r/rmin)^(-A[1]) * alog(r/rmin)
+  df_dA2 = (x/4.25)^(-A[3])
+  df_dA3 = - A[2] * (x/4.25)^(-A[3]) * alog(x/4.25)
+  
+  IF N_PARAMS() GE 4 THEN $
+     pder = [ [dF_dA0], [dF_dA1], [dF_dA2], [dF_dA3] ]
+
+  
+  return
+end

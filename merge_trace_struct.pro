@@ -423,5 +423,8 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
  ; Save structure in dir_fl:
   save, trace_data, filename = dir_fl + structure_filename + '.sav'
 
+  print,'Output in:'
+  print,dir_fl + structure_filename + '.sav'
+  
   return
 end
