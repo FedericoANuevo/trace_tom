@@ -81,6 +81,7 @@ print,' plot,rad_A(ifl,ind_samp_aia),Ne_aia_A(ifl,ind_samp_aia)'
 print, 'Press SPACE BAR to see the plot.'
 pause
 Device, retain = 2, true_color = 24, decomposed = 0
+goto,lastgraph
 window,0
 ifl=0
 tmp = reform(index_sampling_aia_A(ifl,*))
@@ -191,11 +192,12 @@ print,' window, 3'
 print,' plot,rad_A(ifl,ind_samp_mk4),Ne_mk4_A(ifl,ind_samp_c2)'
 print, 'Press SPACE BAR to see the plot.'
 pause
+lastgraph:
 ifl=0
 tmp = reform(index_sampling_mk4_A(ifl,*))
 ind_samp_mk4 = where(tmp eq 1)
-window,3
- plot,rad_A(ifl,ind_samp_mk4),Ne_mk4_A(ifl,ind_samp_mk4),charsize=2,xtitle='r [Rsun]',title='MK4-SRT Ne(r) [cm!U-3!N]',psym=4,th=4,/nodata, xr=[1.1,1.5], xstyle=1, yr=[0,1.e8], ystyle=1
+window,2
+ plot,rad_A(ifl,ind_samp_mk4),Ne_mk4_A(ifl,ind_samp_mk4),charsize=2,xtitle='r [Rsun]',title='MK4-SRT Ne(r) [cm!U-3!N]',psym=4,th=4,/nodata, xr=[1.15,1.5], xstyle=1, yr=[0,8.e7], ystyle=1
 loadct,12
 Ne_fit_mk4_avg = 0. * rad_fit_mk4_A
 for ifl=0,N_fl-1 do begin

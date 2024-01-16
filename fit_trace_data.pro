@@ -81,11 +81,11 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
        for ifl=0,N_fl-1 do begin      
           tmp = reform(index_sampling_mk4_A(ifl,*))
           ind_samp_mk4 = where(tmp eq 1)
-          radsamp = rad_A(ifl,ind_samp_mk4) ; Rsun
+          radsamp = reform(rad_A(ifl,ind_samp_mk4)) ; Rsun
           test_coverage, radsamp=radsamp, covgflag=covgflag, /mk4
           if covgflag eq 'yes' then begin
              fitflag_mk4_A(ifl) = +1.
-             Nesamp = Ne_mk4_A(ifl,ind_samp_mk4)
+             Nesamp = reform(Ne_mk4_A(ifl,ind_samp_mk4))
              goto,skip_isohthermal_hydrostatic
                  linear_fit, 1./radsamp   ,alog(Nesamp), AN, r2N, /linfit_idl
                  r2N_fit_mk4_A(ifl)   = r2N
@@ -93,19 +93,19 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                   lN_fit_mk4_A(ifl)   = 1./AN[1]         ; Rsun
                   Ne_fit_mk4_A(ifl,*) = N0_fit_mk4_A(ifl) * exp(-(1/lN_fit_mk4_A(ifl))*(1.-1./rad_fit_mk4_A   )) ; cm-3
              skip_isohthermal_hydrostatic:
-            ;goto,single_power_law
+             goto,skip_single_power_law
                  radcrit = radmin
                  linear_fit, alog(radsamp/radcrit), alog(Nesamp), AN, r2N, /linfit_idl
                  r2N_fit_mk4_A(ifl)   = r2N
                   N0_fit_mk4_A(ifl)   = exp(AN[0]) ; cm-3
                    p_fit_mk4_A(ifl)   =    -AN[1]  ; dimensionless exponent of power law
                   Ne_fit_mk4_A(ifl,*) = N0_fit_mk4_A(ifl) * (rad_fit_mk4_A / radcrit)^(-p_fit_mk4_A(ifl)) ; cm-3
-             single_power_law:
-             goto,double_power_law
+             skip_single_power_law:
+            ;goto,skip_double_power_law
              double_power_fit, radmin, radmax, radsamp, Nesamp, A, chisq
                  r2N_fit_mk4_A(ifl)   = chisq
-                  Ne_fit_mk4_A(ifl,*) = A[0] * (rad_fit_mk4_A / radcritA)^(-A[1]) + A[2] * (rad_fit_mk4_A / radcritB)^(-A[3]) ; cm-3
-             double_power_law:
+                  Ne_fit_mk4_A(ifl,*) = A[0] * rad_fit_mk4_A^(-A[1]) + A[2] * rad_fit_mk4_A^(-A[3]) ; cm-3
+             skip_double_power_law:
          endif             ; covgflag = 'yes'          
        endfor              ; field lines loop.
        trace_data = create_struct( trace_data                          ,$
