@@ -68,7 +68,7 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
     endif; AIA
 
     if keyword_set(mk4) then begin
-       radmin = 1.15 & radmax = 1.5
+       radmin = 1.1 & radmax = 1.5
        drad_fit = 0.01
        Npt_fit = round((radmax-radmin)/drad_fit)
        fitflag_mk4_A = fltarr(N_fl        ) + default
@@ -94,7 +94,7 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                   Ne_fit_mk4_A(ifl,*) = N0_fit_mk4_A(ifl) * exp(-(1/lN_fit_mk4_A(ifl))*(1.-1./rad_fit_mk4_A   )) ; cm-3
              skip_isohthermal_hydrostatic:
              goto,skip_single_power_law
-                 radcrit = radmin
+                 radcrit = min(radsamp)
                  linear_fit, alog(radsamp/radcrit), alog(Nesamp), AN, r2N, /linfit_idl
                  r2N_fit_mk4_A(ifl)   = r2N
                   N0_fit_mk4_A(ifl)   = exp(AN[0]) ; cm-3
@@ -102,7 +102,8 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                   Ne_fit_mk4_A(ifl,*) = N0_fit_mk4_A(ifl) * (rad_fit_mk4_A / radcrit)^(-p_fit_mk4_A(ifl)) ; cm-3
              skip_single_power_law:
             ;goto,skip_double_power_law
-             double_power_fit, radmin, radmax, radsamp, Nesamp, A, chisq
+                 rad1 = min(radsamp) & rad2 = max(radsamp)
+                 double_power_fit, rad1, rad2, radsamp, Nesamp, A, chisq
                  r2N_fit_mk4_A(ifl)   = chisq
                   Ne_fit_mk4_A(ifl,*) = A[0] * rad_fit_mk4_A^(-A[1]) + A[2] * rad_fit_mk4_A^(-A[3]) ; cm-3
              skip_double_power_law:

@@ -1,14 +1,13 @@
-pro double_power_fit, radmin, radmax, radsamp, Nesamp, A, chisq
+pro double_power_fit, rad1, rad2, radsamp, Nesamp, A, chisq
 
   A = fltarr(4)
   
-  radcritA = radmin 
-  radcritB = radmin + (radmax-radmin)/3. ; a dynamic value
- ;radcritB = 1.25                        ; a hard-coded one
-  print,radcritB
-  
-        iA = where(radsamp lt radcritB)
-        iB = where(radsamp ge radcritB)
+  radcrit = rad1 + (rad2-rad1)/3. ; a dynamic value
+ ;radcrit = 1.25                  ; a hard-coded one
+  print,radcrit
+
+        iA = where(radsamp lt radcrit)
+        iB = where(radsamp ge radcrit)
   radsampA = radsamp(iA)
   radsampB = radsamp(iB)
    NesampA =  Nesamp(iA)
@@ -22,11 +21,13 @@ pro double_power_fit, radmin, radmax, radsamp, Nesamp, A, chisq
   A[2] = exp(AN[0]) ; cm-3
   A[3] =    -AN[1]  ; dimensionless exponent of power law
 
-  weights = 0.*radsamp + 1.
-  yfit_func = CURVEFIT(radsamp, Nesamp, weights, A, SIGMA, function_name='function_double_power_law',status=status,iter=iter,chisq=chisq)
+  weights = 0.*radsamp + 1. ; No weights
+ ;weights = 1./Nesamp
+  
+  yfit_func = CURVEFIT(radsamp, Nesamp, weights, A, SIGMA, function_name='function_double_power_law', status=status, iter=iter, chisq=chisq, itmax=100, /double)
 
   test = finite(A,/NAN)
   if test(0) eq 1 then stop ; sucede si el determinante es nulo
-
+  
   return
 end
