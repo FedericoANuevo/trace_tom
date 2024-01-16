@@ -3,8 +3,9 @@ pro double_power_fit, radmin, radmax, radsamp, Nesamp, A, chisq
   A = fltarr(4)
   
   radcritA = radmin 
- ;radcritB = radmin + (radmax-radmin)/2.
-  radcritB = 1.25
+  radcritB = radmin + (radmax-radmin)/3. ; a dynamic value
+ ;radcritB = 1.25                        ; a hard-coded one
+  print,radcritB
   
         iA = where(radsamp lt radcritB)
         iB = where(radsamp ge radcritB)

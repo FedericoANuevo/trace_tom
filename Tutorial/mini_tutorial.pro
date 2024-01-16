@@ -196,7 +196,7 @@ lastgraph:
 ifl=0
 tmp = reform(index_sampling_mk4_A(ifl,*))
 ind_samp_mk4 = where(tmp eq 1)
-window,2
+window,5
  plot,rad_A(ifl,ind_samp_mk4),Ne_mk4_A(ifl,ind_samp_mk4),charsize=2,xtitle='r [Rsun]',title='MK4-SRT Ne(r) [cm!U-3!N]',psym=4,th=4,/nodata, xr=[1.15,1.5], xstyle=1, yr=[0,8.e7], ystyle=1
 loadct,12
 Ne_fit_mk4_avg = 0. * rad_fit_mk4_A
