@@ -91,7 +91,7 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                  r2N_fit_mk4_A(ifl)   = r2N
                   N0_fit_mk4_A(ifl)   = exp(AN[0]+AN[1]) ; cm-3
                   lN_fit_mk4_A(ifl)   = 1./AN[1]         ; Rsun
-                  Ne_fit_mk4_A(ifl,*) = N0_fit_mk4_A(ifl) * exp(-(1/lN_fit_mk4_A(ifl))*(1.-1./rad_fit_mk4_A   )) ; cm-3
+                  Ne_fit_mk4_A(ifl,*) = N0_fit_mk4_A(ifl) * exp(-(1/lN_fit_mk4_A(ifl))*(1.-1./rad_fit_mk4_A)) ; cm-3
              skip_isohthermal_hydrostatic:
              goto,skip_single_power_law
                  radcrit = min(radsamp)
