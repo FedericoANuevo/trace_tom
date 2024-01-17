@@ -4,7 +4,7 @@ pro double_power_fit, rad1, rad2, radsamp, Nesamp, A, chisq
   
   radcrit = rad1 + (rad2-rad1)/2. ; The value "2" is based on inspection of specific cases.
                                   ; Tests indicate it provides better results than other
-                                  ; reasonable values (f= 3, 4).
+                                  ; reasonable values (f = 3, 4).
 
         iA = where(radsamp lt radcrit)
         iB = where(radsamp ge radcrit)
@@ -21,9 +21,11 @@ pro double_power_fit, rad1, rad2, radsamp, Nesamp, A, chisq
   A[2] = exp(AN[0]) ; cm-3
   A[3] =    -AN[1]  ; dimensionless exponent of power law
 
-; weights = 0.*radsamp + 1. ; No weights
-; weights = 1./Nesamp
-  weights = Nesamp          ; Tests indicate this provides the BEST results.
+; weights = 0.*Nesamp + 1. ; No weights.
+; weights = 1./Nesamp      ; Tests indicate this provides worse results.
+  weights =    Nesamp      ; Tests indicate this provides the BEST results.
+; Note this is reasonable: we want to give more weight to larger
+; density data points.
   
   yfit_func = CURVEFIT(radsamp, Nesamp, weights, A, SIGMA, function_name='function_double_power_law', status=status, iter=iter, chisq=chisq, itmax=100, /double)
 
