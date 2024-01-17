@@ -2,8 +2,9 @@ pro double_power_fit, rad1, rad2, radsamp, Nesamp, A, chisq
   
   A = fltarr(4)
   
-  radcrit = rad1 + (rad2-rad1)/2. ; a dynamic value based on inspection of specific cases
-                                  ; Tests indicates denominator "2" provides the BEST results.
+  radcrit = rad1 + (rad2-rad1)/2. ; The value "2" is based on inspection of specific cases.
+                                  ; Tests indicate it provides better results than other
+                                  ; reasonable values (f= 3, 4).
 
         iA = where(radsamp lt radcrit)
         iB = where(radsamp ge radcrit)
