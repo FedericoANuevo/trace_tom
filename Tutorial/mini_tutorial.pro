@@ -9,7 +9,10 @@ pro mini_tutorial
      Ne_c2_A, index_c2_A, index_sampling_c2_A,$
      rad_fit_aia_A, Ne_fit_aia_A, Tm_fit_aia_A, fitflag_aia_A,r2N_fit_aia_A,r2T_fit_aia_A,$
      rad_fit_c2_A, Ne_fit_c2_A, fitflag_c2_A,r2N_fit_c2_A,$
-     rad_fit_mk4_A, Ne_fit_mk4_A, fitflag_mk4_A,r2N_fit_mk4_A
+     rad_fit_mk4_A, Ne_fit_mk4_A, fitflag_mk4_A,r2N_fit_mk4_A,$
+     N0_fit_aia_A,lN_fit_aia_A,T0_fit_aia_A,dTdr_fit_aia_A,$
+     N1_fit_mk4_A,N2_fit_mk4_A,p1_fit_mk4_A,p2_fit_mk4_A,$
+     N0_fit_c2_A,p_fit_c2_A
 
 ; 1) Declare the DIR where the structure is located, and the filename.
 
@@ -53,7 +56,10 @@ help,N_fl, Npt_max, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
      Ne_c2_A, index_c2_A, index_sampling_c2_A,$
      rad_fit_aia_A, Ne_fit_aia_A, Tm_fit_aia_A, fitflag_AIA_A,r2T_fit_aia_A,$
      rad_fit_c2_A, Ne_fit_c2_A, fitflag_c2_A,r2N_fit_c2_A,$
-     rad_fit_mk4_A, Ne_fit_mk4_A, fitflag_mk4_A,r2N_fit_mk4_A
+     rad_fit_mk4_A, Ne_fit_mk4_A, fitflag_mk4_A,r2N_fit_mk4_A,$
+     N0_fit_aia_A,lN_fit_aia_A,T0_fit_aia_A,dTdr_fit_aia_A,$
+     N1_fit_mk4_A,N2_fit_mk4_A,p1_fit_mk4_A,p2_fit_mk4_A,$
+     N0_fit_c2_A,p_fit_c2_A
 print,'-------------------------------'
 print
 
@@ -81,7 +87,7 @@ print,' plot,rad_A(ifl,ind_samp_aia),Ne_aia_A(ifl,ind_samp_aia)'
 print, 'Press SPACE BAR to see the plot.'
 pause
 Device, retain = 2, true_color = 24, decomposed = 0
-goto,lastgraph
+
 window,0
 ifl=0
 tmp = reform(index_sampling_aia_A(ifl,*))
@@ -137,7 +143,6 @@ endfor
   loadct,0
   oplot,rad_fit_aia_A,Tm_fit_aia_avg/MK,th=4
 
-
   
 print
 print, 'Press SPACE BAR to continue.'
@@ -172,6 +177,7 @@ for ifl=0,N_fl-1 do begin
     print,'Fit r²:',r2N_fit_c2_A(ifl)
   endif
 endfor
+stop
    print, 'Press SPACE BAR to plot average trend.'
    pause
   N_fits = n_elements( where(fitflag_c2_A eq +1.) )

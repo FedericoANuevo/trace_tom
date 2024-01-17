@@ -16,7 +16,8 @@
 ; from every instrument.
 ;
 ; HISTORY: V1.0, AMV, November 2023, IAFE.
-;          V1.1, AMV, January  2023, IAFE. Added fitting results.
+;          V1.1, AMV, January  2023, IAFE. Added fitted results.
+;          V1.2, AMV, January  2023, IAFE. Added fits' parameters.
 ;
 pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, $
                                 aia = aia, euvia = euvia, euvib = euvib, eit = eit, $
@@ -33,7 +34,10 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
      Ne_c2_A, index_c2_A, index_sampling_c2_A,$
      rad_fit_aia_A, Ne_fit_aia_A, Tm_fit_aia_A, fitflag_aia_A,r2N_fit_aia_A,r2T_fit_aia_A,$
      rad_fit_c2_A, Ne_fit_c2_A, fitflag_c2_A,r2N_fit_c2_A,$
-     rad_fit_mk4_A, Ne_fit_mk4_A, fitflag_mk4_A,r2N_fit_mk4_A
+     rad_fit_mk4_A, Ne_fit_mk4_A, fitflag_mk4_A,r2N_fit_mk4_A,$
+     N0_fit_aia_A,lN_fit_aia_A,T0_fit_aia_A,dTdr_fit_aia_A,$
+     N1_fit_mk4_A,N2_fit_mk4_A,p1_fit_mk4_A,p2_fit_mk4_A,$
+     N0_fit_c2_A,p_fit_c2_A
 
   restore, filename = dir + structure_filename
 
@@ -52,12 +56,16 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
              index_aia_A = *trace_data.index_aia
     index_sampling_aia_A = *trace_data.index_sampling_aia
      if keyword_set(fits) then begin
-           rad_fit_aia_A = *trace_data.rad_fit_aia             
-            Ne_fit_aia_A = *trace_data.Ne_fit_aia
-            Tm_fit_aia_A = *trace_data.Tm_fit_aia
-           r2N_fit_aia_A = *trace_data.r2N_fit_aia
-           r2T_fit_aia_A = *trace_data.r2T_fit_aia
-           fitflag_aia_A = *trace_data.fitflag_aia
+           rad_fit_aia_A = *trace_data. rad_fit_aia             
+            Ne_fit_aia_A = *trace_data.  Ne_fit_aia
+            Tm_fit_aia_A = *trace_data.  Tm_fit_aia
+           r2N_fit_aia_A = *trace_data. r2N_fit_aia
+           r2T_fit_aia_A = *trace_data. r2T_fit_aia
+           fitflag_aia_A = *trace_data. fitflag_aia
+            N0_fit_aia_A = *trace_data.  N0_fit_aia
+            lN_fit_aia_A = *trace_data.  lN_fit_aia
+            T0_fit_aia_A = *trace_data.  T0_fit_aia
+          dTdr_fit_aia_A = *trace_data.dTdr_fit_aia
      endif
   endif
   if keyword_set(euvia) then begin
@@ -84,9 +92,13 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
     index_sampling_mk4_A = *trace_data.index_sampling_mk4
      if keyword_set(fits) then begin
            rad_fit_mk4_A = *trace_data.rad_fit_mk4             
-            Ne_fit_mk4_A = *trace_data.Ne_fit_mk4
+            Ne_fit_mk4_A = *trace_data. Ne_fit_mk4
            r2N_fit_mk4_A = *trace_data.r2N_fit_mk4
            fitflag_mk4_A = *trace_data.fitflag_mk4
+            N1_fit_mk4_A = *trace_data. N1_fit_mk4
+            N2_fit_mk4_A = *trace_data. N2_fit_mk4
+            p1_fit_mk4_A = *trace_data. p1_fit_mk4
+            p2_fit_mk4_A = *trace_data. p2_fit_mk4
      endif
   endif
   if keyword_set(kcor) then begin
@@ -100,9 +112,11 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
     index_sampling_c2_A = *trace_data.index_sampling_c2
      if keyword_set(fits) then begin
            rad_fit_c2_A = *trace_data.rad_fit_c2             
-            Ne_fit_c2_A = *trace_data.Ne_fit_c2
+            Ne_fit_c2_A = *trace_data. Ne_fit_c2
            r2N_fit_c2_A = *trace_data.r2N_fit_c2
            fitflag_c2_A = *trace_data.fitflag_c2
+            N0_fit_c2_A = *trace_data. N0_fit_c2
+             p_fit_c2_A = *trace_data.  p_fit_c2
      endif
   endif
   return
