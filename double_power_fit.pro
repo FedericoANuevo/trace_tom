@@ -1,5 +1,5 @@
 pro double_power_fit, rad1, rad2, radsamp, Nesamp, A, chisq
-
+  
   A = fltarr(4)
   
   radcrit = rad1 + (rad2-rad1)/2. ; a dynamic value based on inspection of specific cases
