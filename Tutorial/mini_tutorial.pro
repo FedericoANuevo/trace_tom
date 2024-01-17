@@ -12,7 +12,7 @@ pro mini_tutorial
      rad_fit_mk4_A, Ne_fit_mk4_A, fitflag_mk4_A,r2N_fit_mk4_A,$
      N0_fit_aia_A,lN_fit_aia_A,T0_fit_aia_A,dTdr_fit_aia_A,$
      N1_fit_mk4_A,N2_fit_mk4_A,p1_fit_mk4_A,p2_fit_mk4_A,$
-     N0_fit_c2_A,p_fit_c2_A
+     N1_fit_c2_A,N2_fit_c2_A,p1_fit_c2_A,p2_fit_c2_A
 
 ; 1) Declare the DIR where the structure is located, and the filename.
 
@@ -59,7 +59,7 @@ help,N_fl, Npt_max, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
      rad_fit_mk4_A, Ne_fit_mk4_A, fitflag_mk4_A,r2N_fit_mk4_A,$
      N0_fit_aia_A,lN_fit_aia_A,T0_fit_aia_A,dTdr_fit_aia_A,$
      N1_fit_mk4_A,N2_fit_mk4_A,p1_fit_mk4_A,p2_fit_mk4_A,$
-     N0_fit_c2_A,p_fit_c2_A
+     N1_fit_c2_A,N2_fit_c2_A,p1_fit_c2_A,p2_fit_c2_A
 print,'-------------------------------'
 print
 
@@ -100,7 +100,7 @@ for ifl=0,N_fl-1 do begin
    pause
   tmp = reform(index_sampling_aia_A(ifl,*))
   ind_samp_aia = where(tmp eq 1)
-  col = (ifl+1)*50
+  col = (ifl+1)*40
   oplot,rad_A(ifl,ind_samp_aia),Ne_aia_A(ifl,ind_samp_aia),psym=4,th=2,color=col
   if fitflag_AIA_A(ifl) eq +1. then begin
     oplot,rad_fit_aia_A,Ne_fit_aia_A(ifl,*),color=col
@@ -128,7 +128,7 @@ for ifl=0,N_fl-1 do begin
    pause
   tmp = reform(index_sampling_aia_A(ifl,*))
   ind_samp_aia = where(tmp eq 1)
-  col = (ifl+1)*50
+  col = (ifl+1)*40
   oplot,rad_A(ifl,ind_samp_aia),Tm_aia_A(ifl,ind_samp_aia)/MK,psym=4,th=2,color=col
   if fitflag_AIA_A(ifl) eq +1. then begin
     oplot,rad_fit_aia_A,Tm_fit_aia_A(ifl,*)/MK,color=col
@@ -157,6 +157,7 @@ print,' window, 2'
 print,' plot,rad_A(ifl,ind_samp_c2),Ne_c2_A(ifl,ind_samp_c2)'
 print, 'Press SPACE BAR to see the plot.'
 pause
+c2:
 ifl=0
 tmp = reform(index_sampling_c2_A(ifl,*))
 ind_samp_c2 = where(tmp eq 1)
@@ -169,7 +170,7 @@ for ifl=0,N_fl-1 do begin
    pause
   tmp = reform(index_sampling_c2_A(ifl,*))
   ind_samp_c2 = where(tmp eq 1)
-  col = (ifl+1)*50
+  col = (ifl+1)*40
   oplot,rad_A(ifl,ind_samp_c2),Ne_c2_A(ifl,ind_samp_c2),psym=4,th=2,color=col
   if fitflag_c2_A(ifl) eq +1. then begin
     oplot,rad_fit_c2_A,Ne_fit_c2_A(ifl,*),color=col
@@ -177,7 +178,7 @@ for ifl=0,N_fl-1 do begin
     print,'Fit r²:',r2N_fit_c2_A(ifl)
   endif
 endfor
-stop
+
    print, 'Press SPACE BAR to plot average trend.'
    pause
   N_fits = n_elements( where(fitflag_c2_A eq +1.) )

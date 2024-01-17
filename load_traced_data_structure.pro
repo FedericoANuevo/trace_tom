@@ -37,7 +37,7 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
      rad_fit_mk4_A, Ne_fit_mk4_A, fitflag_mk4_A,r2N_fit_mk4_A,$
      N0_fit_aia_A,lN_fit_aia_A,T0_fit_aia_A,dTdr_fit_aia_A,$
      N1_fit_mk4_A,N2_fit_mk4_A,p1_fit_mk4_A,p2_fit_mk4_A,$
-     N0_fit_c2_A,p_fit_c2_A
+     N1_fit_c2_A,N2_fit_c2_A,p1_fit_c2_A,p2_fit_c2_A
 
   restore, filename = dir + structure_filename
 
@@ -115,8 +115,10 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
             Ne_fit_c2_A = *trace_data. Ne_fit_c2
            r2N_fit_c2_A = *trace_data.r2N_fit_c2
            fitflag_c2_A = *trace_data.fitflag_c2
-            N0_fit_c2_A = *trace_data. N0_fit_c2
-             p_fit_c2_A = *trace_data.  p_fit_c2
+            N1_fit_c2_A = *trace_data. N1_fit_c2
+            N2_fit_c2_A = *trace_data. N2_fit_c2
+            p1_fit_c2_A = *trace_data. p1_fit_c2
+            p2_fit_c2_A = *trace_data. p2_fit_c2
      endif
   endif
   return

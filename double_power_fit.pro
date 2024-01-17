@@ -1,7 +1,7 @@
-pro double_power_fit, rad1, rad2, radsamp, Nesamp, A, chisq
+pro double_power_fit, radsamp, Nesamp, A, chisq, noweight=noweight, weighted=weighted
   
-  A = fltarr(4)
-  
+     rad1 = min(radsamp)
+     rad2 = max(radsamp)
   radcrit = rad1 + (rad2-rad1)/2. ; The value "2" is based on inspection of specific cases.
                                   ; Tests indicate it provides better results than other
                                   ; reasonable values (f = 3, 4).
@@ -13,20 +13,20 @@ pro double_power_fit, rad1, rad2, radsamp, Nesamp, A, chisq
    NesampA =  Nesamp(iA)
    NesampB =  Nesamp(iB)
 
+; Initial estimate for A:
+  A = fltarr(4)
   linear_fit, alog(radsampA), alog(NesampA), AN, r2N, /linfit_idl
   A[0] = exp(AN[0]) ; cm-3
   A[1] =    -AN[1]  ; dimensionless exponent of power law
-
   linear_fit, alog(radsampB), alog(NesampB), AN, r2N, /linfit_idl
   A[2] = exp(AN[0]) ; cm-3
   A[3] =    -AN[1]  ; dimensionless exponent of power law
 
-; weights = 0.*Nesamp + 1. ; No weights.
-; weights = 1./Nesamp      ; Tests indicate this provides worse results.
-  weights =    Nesamp      ; Tests indicate this provides the BEST results.
-; Note this is reasonable: we want to give more weight to larger
-; density data points.
-  
+; Set weights:
+  if keyword_set(noweight) then weights = 0.*Nesamp + 1.
+  if keyword_set(weighted) then weights =    Nesamp
+
+; Fit:
   yfit_func = CURVEFIT(radsamp, Nesamp, weights, A, SIGMA, function_name='function_double_power_law', status=status, iter=iter, chisq=chisq, itmax=100, /double)
 
   test = finite(A,/NAN)

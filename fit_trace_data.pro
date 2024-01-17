@@ -6,6 +6,7 @@
 ;          V1.1, AMV & FAN, January 2023, IAFE. Added Theil-Sen and R² metric.
 ;          V1.2, AMV, January 2023, IAFE. Added Double-Power-Law for Mk4.
 ;                                         Added fits' parameters to output structure.
+;                                         Added 2-PoweLaw fit for C2.
 ;
 pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                     mk4 = mk4, kcor = kcor, lascoc2 = lascoc2
@@ -42,12 +43,12 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
        for ifl=0,N_fl-1 do begin      
           tmp = reform(index_sampling_aia_A(ifl,*))
           ind_samp_aia = where(tmp eq 1)
-          radsamp = rad_A(ifl,ind_samp_aia) ; Rsun
+          radsamp = reform(rad_A(ifl,ind_samp_aia)) ; Rsun
           test_coverage, radsamp=radsamp, covgflag=covgflag, /aia
           if covgflag eq 'yes' then begin
              fitflag_aia_A(ifl) = +1.
-             Nesamp = Ne_aia_A(ifl,ind_samp_aia)
-             Tmsamp = Tm_aia_A(ifl,ind_samp_aia)
+             Nesamp = reform(Ne_aia_A(ifl,ind_samp_aia))
+             Tmsamp = reform(Tm_aia_A(ifl,ind_samp_aia))
              linear_fit, 1./radsamp   , alog(Nesamp), AN, r2N, /linfit_idl
              linear_fit,    radsamp-1.,      Tmsamp , AT, r2T, /theil_sen
              r2N_fit_aia_A(ifl)   = r2N
@@ -96,31 +97,29 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
           if covgflag eq 'yes' then begin
              fitflag_mk4_A(ifl) = +1.
              Nesamp = reform(Ne_mk4_A(ifl,ind_samp_mk4))
-             goto,skip_isohthermal_hydrostatic
+             goto,skip_mk4_isohthermal_hydrostatic
                  linear_fit, 1./radsamp   ,alog(Nesamp), AN, r2N, /linfit_idl
                  r2N_fit_mk4_A(ifl)   = r2N
                   N0_fit_mk4_A(ifl)   = exp(AN[0]+AN[1]) ; cm-3
                   lN_fit_mk4_A(ifl)   = 1./AN[1]         ; Rsun
                   Ne_fit_mk4_A(ifl,*) = N0_fit_mk4_A(ifl) * exp(-(1/lN_fit_mk4_A(ifl))*(1.-1./rad_fit_mk4_A)) ; cm-3
-             skip_isohthermal_hydrostatic:
-             goto,skip_single_power_law
-                 radcrit = min(radsamp)
-                 linear_fit, alog(radsamp/radcrit), alog(Nesamp), AN, r2N, /linfit_idl
+             skip_mk4_isohthermal_hydrostatic:
+             goto,skip_mk4_single_power_law
+                 linear_fit, alog(radsamp), alog(Nesamp), AN, r2N, /linfit_idl
                  r2N_fit_mk4_A(ifl)   = r2N
                   N0_fit_mk4_A(ifl)   = exp(AN[0]) ; cm-3
                    p_fit_mk4_A(ifl)   =    -AN[1]  ; dimensionless exponent of power law
-                  Ne_fit_mk4_A(ifl,*) = N0_fit_mk4_A(ifl) * (rad_fit_mk4_A / radcrit)^(-p_fit_mk4_A(ifl)) ; cm-3
-             skip_single_power_law:
-            ;goto,skip_double_power_law
-                 rad1 = min(radsamp) & rad2 = max(radsamp)
-                 double_power_fit, rad1, rad2, radsamp, Nesamp, A, chisq
+                  Ne_fit_mk4_A(ifl,*) = N0_fit_mk4_A(ifl) * rad_fit_mk4_A^(-p_fit_mk4_A(ifl)) ; cm-3
+             skip_mk4_single_power_law:
+            ;goto,skip_mk4_double_power_law
+                 double_power_fit, radsamp, Nesamp, A, chisq, /weighted
                  r2N_fit_mk4_A(ifl)   = chisq
                   N1_fit_mk4_A(ifl)   = A[0] ; cm-3
                   p1_fit_mk4_A(ifl)   = A[1] ; dimensionless exponent of power law
                   N2_fit_mk4_A(ifl)   = A[2] ; cm-3
                   p2_fit_mk4_A(ifl)   = A[3] ; dimensionless exponent of power law
                   Ne_fit_mk4_A(ifl,*) = A[0] * rad_fit_mk4_A^(-A[1]) + A[2] * rad_fit_mk4_A^(-A[3]) ; cm-3
-             skip_double_power_law:
+             skip_mk4_double_power_law:
          endif             ; covgflag = 'yes'          
        endfor              ; field lines loop.
        trace_data = create_struct( trace_data                          ,$
@@ -141,33 +140,49 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
        fitflag_c2_A = fltarr(N_fl        ) + default
         N0_fit_c2_A = fltarr(N_fl        ) + default
          p_fit_c2_A = fltarr(N_fl        ) + default
+        N1_fit_c2_A = fltarr(N_fl        ) + default
+        N2_fit_c2_A = fltarr(N_fl        ) + default
+        p1_fit_c2_A = fltarr(N_fl        ) + default
+        p2_fit_c2_A = fltarr(N_fl        ) + default
        r2N_fit_c2_A = fltarr(N_fl        ) + default
         Ne_fit_c2_A = fltarr(N_fl,Npt_fit) + default
        rad_fit_c2_A = radmin + drad_fit/2. + drad_fit * findgen(Npt_fit)
        for ifl=0,N_fl-1 do begin      
           tmp = reform(index_sampling_c2_A(ifl,*))
           ind_samp_c2 = where(tmp eq 1)
-          radsamp = rad_A(ifl,ind_samp_c2) ; Rsun
+          radsamp = reform(rad_A(ifl,ind_samp_c2)) ; Rsun
           test_coverage, radsamp=radsamp, covgflag=covgflag, /lascoc2
           if covgflag eq 'yes' then begin
              fitflag_c2_A(ifl) = +1.
-             Nesamp = Ne_c2_A(ifl,ind_samp_c2)
+             Nesamp = reform(Ne_c2_A(ifl,ind_samp_c2))
+             goto,skip_c2_single_power_law
              linear_fit, alog(radsamp), alog(Nesamp), AN, r2N, /linfit_idl
              r2N_fit_c2_A(ifl)   = r2N
               N0_fit_c2_A(ifl)   = exp(AN[0]) ; cm-3
                p_fit_c2_A(ifl)   =    -AN[1]  ; dimensionless exponent of power law
               Ne_fit_c2_A(ifl,*) = N0_fit_c2_A(ifl) * rad_fit_c2_A^(-p_fit_c2_A(ifl)) ; cm-3
-          endif                 ; covgflag = 'yes'          
+             skip_c2_single_power_law:
+            ;goto,skip_c2_double_power_law
+                 double_power_fit, radsamp, Nesamp, A, chisq, /weighted
+                 r2N_fit_c2_A(ifl)   = chisq
+                  N1_fit_c2_A(ifl)   = A[0] ; cm-3
+                  p1_fit_c2_A(ifl)   = A[1] ; dimensionless exponent of power law
+                  N2_fit_c2_A(ifl)   = A[2] ; cm-3
+                  p2_fit_c2_A(ifl)   = A[3] ; dimensionless exponent of power law
+                  Ne_fit_c2_A(ifl,*) = A[0] * rad_fit_c2_A^(-A[1]) + A[2] * rad_fit_c2_A^(-A[3]) ; cm-3
+             skip_c2_double_power_law:
+           endif                ; covgflag = 'yes'          
        endfor                   ; field lines loop.
        trace_data = create_struct( trace_data                        ,$
                                   'fitflag_c2',ptr_new(fitflag_c2_A) ,$
                                   'r2N_fit_c2',ptr_new(r2N_fit_c2_A) ,$                                   
                                   'rad_fit_c2',ptr_new(rad_fit_c2_A) ,$
                                    'Ne_fit_c2',ptr_new( Ne_fit_c2_A) ,$
-                                   'N0_fit_c2',ptr_new( N0_fit_c2_A) ,$
-                                    'p_fit_c2',ptr_new(  p_fit_c2_A) )
+                                   'N1_fit_c2',ptr_new( N1_fit_c2_A) ,$
+                                   'N2_fit_c2',ptr_new( N2_fit_c2_A) ,$
+                                   'p1_fit_c2',ptr_new( p1_fit_c2_A) ,$
+                                   'p2_fit_c2',ptr_new( p2_fit_c2_A) )
     endif; LASCOC2
 
     return
  end
-
