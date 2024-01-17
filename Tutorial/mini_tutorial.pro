@@ -196,7 +196,7 @@ lastgraph:
 ifl=0
 tmp = reform(index_sampling_mk4_A(ifl,*))
 ind_samp_mk4 = where(tmp eq 1)
-window,4
+window,3
  plot,rad_A(ifl,ind_samp_mk4),Ne_mk4_A(ifl,ind_samp_mk4),charsize=2,xtitle='r [Rsun]',title='MK4-SRT Ne(r) [cm!U-3!N]',psym=4,th=4,/nodata, xr=[1.15,1.5], xstyle=1, yr=[0,8.e7], ystyle=1
 loadct,12
 Ne_fit_mk4_avg = 0. * rad_fit_mk4_A
@@ -218,7 +218,7 @@ endfor
   N_fits = n_elements( where(fitflag_mk4_A eq +1.) )
   Ne_fit_mk4_avg = Ne_fit_mk4_avg / float(N_fits)
   loadct,0
- ;oplot,rad_fit_mk4_A,Ne_fit_mk4_avg,th=4
+  oplot,rad_fit_mk4_A,Ne_fit_mk4_avg,th=4
 
 print
 print,'Note that rad_A is NOT associated to an instrument.'
