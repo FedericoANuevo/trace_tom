@@ -69,7 +69,7 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
 
     if keyword_set(mk4) then begin
        radmin = 1.1 & radmax = 1.5
-       drad_fit = 0.01
+       drad_fit = 0.001
        Npt_fit = round((radmax-radmin)/drad_fit)
        fitflag_mk4_A = fltarr(N_fl        ) + default
         N0_fit_mk4_A = fltarr(N_fl        ) + default

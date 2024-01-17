@@ -205,12 +205,12 @@ for ifl=0,N_fl-1 do begin
    pause
   tmp = reform(index_sampling_mk4_A(ifl,*))
   ind_samp_mk4 = where(tmp eq 1)
-  col = (ifl+1)*50
+  col = (ifl+1)*40
   oplot,rad_A(ifl,ind_samp_mk4),Ne_mk4_A(ifl,ind_samp_mk4),psym=4,th=2,color=col
   if fitflag_mk4_A(ifl) eq +1. then begin
     oplot,rad_fit_mk4_A,Ne_fit_mk4_A(ifl,*),color=col
     Ne_fit_mk4_avg = Ne_fit_mk4_avg + reform(Ne_fit_mk4_A(ifl,*))
-    print,'Fit r²:',r2N_fit_mk4_A(ifl)
+    print,'Fit Chisq:',r2N_fit_mk4_A(ifl)
   endif
 endfor
    print, 'Press SPACE BAR to plot average trend.'
