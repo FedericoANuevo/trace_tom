@@ -1,8 +1,9 @@
 ;
-; PURPOSE: This code reads a single AWSoM fieldline tracing file,
+; PURPOSE: This code reads a single AWSoM fieldline tracing file
+;          (which is esentially an ASCII table),
 ;          traces th VL-SRT 3D N_e along it,
 ;          and produces an expanded fieldline tracing file including
-;          the tomographic electron density as a new column.
+;          the tomographic electron density as a new column in the table.
 ;
 ; HISTORY: V1.0 FAN & AMV, CLaSP, October 2023.
 ;
