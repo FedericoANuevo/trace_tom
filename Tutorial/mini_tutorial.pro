@@ -14,6 +14,7 @@ pro mini_tutorial
      N1_fit_mk4_A,N2_fit_mk4_A,p1_fit_mk4_A,p2_fit_mk4_A,$
      N1_fit_c2_A,N2_fit_c2_A,p1_fit_c2_A,p2_fit_c2_A
 
+stop
 ; 1) Declare the DIR where the structure is located, and the filename.
 
 dir = './'
@@ -50,7 +51,7 @@ print, 'so they are convenientely ready to be used.'
 print, 'Let us see the output of the command "help" for all variables contained in the header for which there is data:'
 print
 print,'-------------------------------'
-help,N_fl, Npt_max, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
+help,N_fl, Npt_max, Npt_v, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, index_aia_A, index_sampling_aia_A,$
      Ne_mk4_A, index_mk4_A, index_sampling_mk4_A,$
      Ne_c2_A, index_c2_A, index_sampling_c2_A,$
@@ -64,7 +65,7 @@ print,'-------------------------------'
 print
 
 ; 5) Some explanations follow.
-print,'In this case there are "N_fl=4" field lines that were traced between rmin=1 Rs and rmax=10 Rs. These are synthetic radial field lines with a uniform radial step of 0.0015 Rs. For each field line a maximum of "Npt_max=15000" points is allowed. This number will be optimized later on, depending on what we find to be a typical number of points for Judit field lines. For now we just set it as very large number.'
+print,'In this case there are "N_fl=4" field lines that were traced between rmin=1 Rs and rmax=10 Rs. For each field line a maximum of "Npt_max=10100" points is allowed. This number will be optimized later on, depending on what we find to be a typical number of points for Judit field lines. For now we just set it as very large number. These are synthetic radial field lines with a uniform radial step of 0.0015 Rs, so that these four lines contain "Npt_v = [6000, 6000, 6000, 6000]" points (because (10-1)/0.0015=6000.'
 print
 print,'All variables named "name_A" are 2D arrays of dimensions "(N_fl,Npt_max)". For example: "rad_A(ifl,*)" contains the radial points of field line "ifl (=0,..,3 in this example)". Similarly, "Ne_aia_A(ifl,*)" contains the AIA-based DEMT result for Ne at points "rad_A(ifl,*)". Etc.'
 print
