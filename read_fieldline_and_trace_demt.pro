@@ -1,8 +1,9 @@
 ;
-; PURPOSE: This code reads a single AWSoM fieldline tracing file,
-;          traces DEMT 3D products (N-E, T_e) along it,
+; PURPOSE: This code reads a single AWSoM fieldline tracing file
+;          (which is esentially an ASCII table),
+;          traces DEMT 3D products (N_e, T_e) along it,
 ;          and produces an expanded fieldline tracing file including
-;          the tomographic producs as new columns.
+;          the tomographic producs as new columns in the table.
 ;
 ; HISTORY: V1.0 FAN & AMV, CLaSP, October 2023.
 ;
