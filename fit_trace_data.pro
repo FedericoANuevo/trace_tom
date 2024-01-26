@@ -133,9 +133,9 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                   fit_F_Ne_mk4  = 'SPL'
                   linear_fit, alog(radsamp), alog(Nesamp), AN, r2N, /linfit_idl
                  r2N_fit_mk4_A(ifl)   = r2N
-                  N0_fit_mk4_A(ifl)   = exp(AN[0]) ; cm-3
-                   p_fit_mk4_A(ifl)   =    -AN[1]  ; dimensionless exponent of power law
-                  Ne_fit_mk4_A(ifl,*) = N0_fit_mk4_A(ifl) * rad_fit_mk4_A^(-p_fit_mk4_A(ifl)) ; cm-3
+                  N1_fit_mk4_A(ifl)   = exp(AN[0]) ; cm-3
+                  p1_fit_mk4_A(ifl)   =    -AN[1]  ; dimensionless exponent of power law
+                  Ne_fit_mk4_A(ifl,*) = N1_fit_mk4_A(ifl) * rad_fit_mk4_A^(-p1_fit_mk4_A(ifl)) ; cm-3
              skip_mk4_single_power_law:
             ;goto,skip_mk4_double_power_law
                   fit_F_Ne_mk4  = 'DPL'
@@ -154,11 +154,21 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                                  'fit_F_Ne_mk4',ptr_new( fit_F_Ne_mk4) ,$
                                   'r2N_fit_mk4',ptr_new(r2N_fit_mk4_A) ,$
                                   'rad_fit_mk4',ptr_new(rad_fit_mk4_A) ,$
-                                   'Ne_fit_mk4',ptr_new( Ne_fit_mk4_A) ,$
-                                   'N1_fit_mk4',ptr_new( N1_fit_mk4_A) ,$
-                                   'N2_fit_mk4',ptr_new( N2_fit_mk4_A) ,$
-                                   'p1_fit_mk4',ptr_new( p1_fit_mk4_A) ,$
-                                   'p2_fit_mk4',ptr_new( p2_fit_mk4_A) )
+                                   'Ne_fit_mk4',ptr_new( Ne_fit_mk4_A) )
+       if fit_F_Ne_mk4  = 'IHS' then $
+          trace_data = create_struct( trace_data                        ,$
+                                   'N0_fit_mk4',ptr_new(  N0_fit_mk4_A) ,$
+                                   'lN_fit_mk4',ptr_new(  lN_fit_mk4_A) )                                                                        
+       if fit_F_Ne_mk4  = 'SPL' then $
+          trace_data = create_struct( trace_data                        ,$
+                                    'N1_fit_mk4',ptr_new( N1_fit_mk4_A) ,$
+                                    'p1_fit_mk4',ptr_new( p1_fit_mk4_A) )
+       if fit_F_Ne_mk4  = 'DPL' then $
+          trace_data = create_struct( trace_data                        ,$
+                                    'N1_fit_mk4',ptr_new( N1_fit_mk4_A) ,$
+                                    'N2_fit_mk4',ptr_new( N2_fit_mk4_A) ,$
+                                    'p1_fit_mk4',ptr_new( p1_fit_mk4_A) ,$
+                                    'p2_fit_mk4',ptr_new( p2_fit_mk4_A) )
     endif ; MK4
 
     if keyword_set(lascoc2) then begin
@@ -208,7 +218,13 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                                  'fit_F_Ne_c2',ptr_new( fit_F_Ne_c2) ,$
                                   'r2N_fit_c2',ptr_new(r2N_fit_c2_A) ,$                                   
                                   'rad_fit_c2',ptr_new(rad_fit_c2_A) ,$
-                                   'Ne_fit_c2',ptr_new( Ne_fit_c2_A) ,$
+                                   'Ne_fit_c2',ptr_new( Ne_fit_c2_A) )
+       if fit_F_Ne_c2  = 'SPL' then $
+          trace_data = create_struct( trace_data                     ,$
+                                   'N1_fit_c2',ptr_new( N1_fit_c2_A) ,$
+                                   'p1_fit_c2',ptr_new( p1_fit_c2_A) )
+       if fit_F_Ne_c2  = 'DPL' then $
+          trace_data = create_struct( trace_data                     ,$
                                    'N1_fit_c2',ptr_new( N1_fit_c2_A) ,$
                                    'N2_fit_c2',ptr_new( N2_fit_c2_A) ,$
                                    'p1_fit_c2',ptr_new( p1_fit_c2_A) ,$
