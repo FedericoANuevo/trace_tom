@@ -21,8 +21,7 @@
 ;
 pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, $
                                 aia = aia, euvia = euvia, euvib = euvib, eit = eit, $
-                                mk4 = mk4, kcor = kcor, lascoc2 = lascoc2, $
-                                fits = fits
+                                mk4 = mk4, kcor = kcor, lascoc2 = lascoc2
   
   common data, N_fl, Npt_max, Npt_v, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, index_aia_A, index_sampling_aia_A,$
@@ -55,7 +54,6 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
                 Tm_aia_A = *trace_data.Tm_aia
              index_aia_A = *trace_data.index_aia
     index_sampling_aia_A = *trace_data.index_sampling_aia
-     if keyword_set(fits) then begin
            rad_fit_aia_A = *trace_data. rad_fit_aia             
             Ne_fit_aia_A = *trace_data.  Ne_fit_aia
             Tm_fit_aia_A = *trace_data.  Tm_fit_aia
@@ -66,7 +64,6 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
             lN_fit_aia_A = *trace_data.  lN_fit_aia
             T0_fit_aia_A = *trace_data.  T0_fit_aia
           dTdr_fit_aia_A = *trace_data.dTdr_fit_aia
-     endif
   endif
   if keyword_set(euvia) then begin
                 Ne_euvia_A = *trace_data.Ne_euvia 
@@ -90,7 +87,6 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
                 Ne_mk4_A = *trace_data.Ne_mk4 
              index_mk4_A = *trace_data.index_mk4
     index_sampling_mk4_A = *trace_data.index_sampling_mk4
-     if keyword_set(fits) then begin
            rad_fit_mk4_A = *trace_data.rad_fit_mk4             
             Ne_fit_mk4_A = *trace_data. Ne_fit_mk4
            r2N_fit_mk4_A = *trace_data.r2N_fit_mk4
@@ -99,7 +95,6 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
             N2_fit_mk4_A = *trace_data. N2_fit_mk4
             p1_fit_mk4_A = *trace_data. p1_fit_mk4
             p2_fit_mk4_A = *trace_data. p2_fit_mk4
-     endif
   endif
   if keyword_set(kcor) then begin
                 Ne_kcor_A = *trace_data.Ne_kcor 
@@ -110,7 +105,6 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
                 Ne_c2_A = *trace_data.Ne_c2 
              index_c2_A = *trace_data.index_c2
     index_sampling_c2_A = *trace_data.index_sampling_c2
-     if keyword_set(fits) then begin
            rad_fit_c2_A = *trace_data.rad_fit_c2             
             Ne_fit_c2_A = *trace_data. Ne_fit_c2
            r2N_fit_c2_A = *trace_data.r2N_fit_c2
@@ -119,7 +113,6 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
             N2_fit_c2_A = *trace_data. N2_fit_c2
             p1_fit_c2_A = *trace_data. p1_fit_c2
             p2_fit_c2_A = *trace_data. p2_fit_c2
-     endif
   endif
   return
 end

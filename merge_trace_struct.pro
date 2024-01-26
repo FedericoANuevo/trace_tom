@@ -13,7 +13,6 @@
 ;
 ; FLAGS: one per allowed instrument, use those for which you want to
 ; merge results, provided in any order.
-; Also /fits.
 ;
 ; HISTORY: V1.0 AMV & FAN, CLaSP, October 2023.
 ;          V1.1 AMV, IAFE, November 2023. Added Sampling, expanded to
@@ -415,8 +414,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      trace_data.index_sampling_c2 = ptr_new(index_sampling_c2_A)
   endif
 
-; Perform fits if requested:
-  if keyword_set(fits) then $
+; Perform fits:
   fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                   mk4 = mk4, kcor = kcor, lascoc2 = lascoc2
   
