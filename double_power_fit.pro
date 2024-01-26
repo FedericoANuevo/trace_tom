@@ -2,7 +2,7 @@ pro double_power_fit, radsamp, Nesamp, A, chisq, noweight=noweight, weighted=wei
   
      rad1 = min(radsamp)
      rad2 = max(radsamp)
-  radcrit = rad1 + (rad2-rad1)/2. ; The value "2" is based on inspection of specific cases.
+  radcrit = rad1 + (rad2-rad1)/3. ; The value "2" is based on inspection of specific cases.
                                   ; Tests indicate it provides better results than other
                                   ; reasonable values (f = 3, 4).
 

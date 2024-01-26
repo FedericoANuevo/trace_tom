@@ -17,7 +17,6 @@ pro mini_tutorial
      N1_fit_c2_A,N2_fit_c2_A,p1_fit_c2_A,p2_fit_c2_A,$
      fit_F_Ne_aia,fit_F_Ne_mk4,fit_F_Ne_c2
   
-stop
 ; 1) Declare the DIR where the structure is located, and the filename.
 
 dir = './'
@@ -26,6 +25,8 @@ structure_filename = 'list_synth.txt-tracing-structure-merge_aia_mk4_lascoc2.sav
 ; 2) Load structure into memory and extract all available arrays from it.
 
 load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /aia, /mk4, /lascoc2
+
+stop
 
 ; 3) See the full contents of the structure.
 print
