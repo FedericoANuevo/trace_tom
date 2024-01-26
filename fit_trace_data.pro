@@ -7,6 +7,10 @@
 ;          V1.2, AMV, January 2023, IAFE. Added Double-Power-Law for Mk4.
 ;                                         Added fits' parameters to output structure.
 ;                                         Added 2-PoweLaw fit for C2.
+;          V1.3, AMV, January 2023, IAFE. Added DPL fit for EUV.
+;                                         Added fitted function name
+;                                         and automated parameter
+;                                         storing in output structure.
 ;
 pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                     mk4 = mk4, kcor = kcor, lascoc2 = lascoc2
