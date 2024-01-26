@@ -24,7 +24,7 @@ pro double_power_fit, radsamp, Nesamp, A, chisq, noweight=noweight, weighted=wei
 
 ; Set weights:
   if keyword_set(noweight) then weights = 0.*Nesamp + 1.
-  if keyword_set(weighted) then weights =    Nesamp
+  if keyword_set(weighted) then weights =    Nesamp / mean(Nesamp)
 
 ; Fit:
   yfit_func = CURVEFIT(radsamp, Nesamp, weights, A, SIGMA, function_name='function_double_power_law', status=status, iter=iter, chisq=chisq, itmax=100, /double)

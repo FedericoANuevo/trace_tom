@@ -31,9 +31,9 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
      Ne_mk4_A, index_mk4_A, index_sampling_mk4_A,$
      Ne_kcor_A, index_kcor_A, index_sampling_kcor_A,$
      Ne_c2_A, index_c2_A, index_sampling_c2_A,$
-     rad_fit_aia_A, Ne_fit_aia_A, Tm_fit_aia_A, fitflag_aia_A,r2N_fit_aia_A,r2T_fit_aia_A,$
-     rad_fit_c2_A, Ne_fit_c2_A, fitflag_c2_A,r2N_fit_c2_A,$
-     rad_fit_mk4_A, Ne_fit_mk4_A, fitflag_mk4_A,r2N_fit_mk4_A,$
+     rad_fit_aia_A, Ne_fit_aia_A, Tm_fit_aia_A, fitflag_aia_A,scN_fit_aia_A,scT_fit_aia_A,$
+     rad_fit_c2_A, Ne_fit_c2_A, fitflag_c2_A,scN_fit_c2_A,$
+     rad_fit_mk4_A, Ne_fit_mk4_A, fitflag_mk4_A,scN_fit_mk4_A,$
      N0_fit_aia_A,lN_fit_aia_A,T0_fit_aia_A,dTdr_fit_aia_A,$
      N1_fit_aia_A,N2_fit_aia_A,p1_fit_aia_A,p2_fit_aia_A,$
      N0_fit_mk4_A,lN_fit_mk4_A,$
@@ -60,8 +60,8 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
            rad_fit_aia_A = *trace_data. rad_fit_aia             
             Ne_fit_aia_A = *trace_data.  Ne_fit_aia
             Tm_fit_aia_A = *trace_data.  Tm_fit_aia
-           r2N_fit_aia_A = *trace_data. r2N_fit_aia
-           r2T_fit_aia_A = *trace_data. r2T_fit_aia
+           scN_fit_aia_A = *trace_data. scN_fit_aia
+           scT_fit_aia_A = *trace_data. scT_fit_aia
            fitflag_aia_A = *trace_data. fitflag_aia
             T0_fit_aia_A = *trace_data.  T0_fit_aia
           dTdr_fit_aia_A = *trace_data.dTdr_fit_aia
@@ -101,7 +101,7 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
     index_sampling_mk4_A = *trace_data.index_sampling_mk4
            rad_fit_mk4_A = *trace_data. rad_fit_mk4             
             Ne_fit_mk4_A = *trace_data.  Ne_fit_mk4
-           r2N_fit_mk4_A = *trace_data. r2N_fit_mk4
+           scN_fit_mk4_A = *trace_data. scN_fit_mk4
            fitflag_mk4_A = *trace_data. fitflag_mk4
           fit_F_Ne_mk4   = *trace_data.fit_F_Ne_mk4
           if fit_F_Ne_mk4 eq 'IHS' then begin
@@ -130,7 +130,7 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
     index_sampling_c2_A = *trace_data.index_sampling_c2
            rad_fit_c2_A = *trace_data. rad_fit_c2             
             Ne_fit_c2_A = *trace_data.  Ne_fit_c2
-           r2N_fit_c2_A = *trace_data. r2N_fit_c2
+           scN_fit_c2_A = *trace_data. scN_fit_c2
            fitflag_c2_A = *trace_data. fitflag_c2
           fit_F_Ne_c2   = *trace_data.fit_F_Ne_c2
           if fit_F_Ne_c2 eq 'SPL' then begin
