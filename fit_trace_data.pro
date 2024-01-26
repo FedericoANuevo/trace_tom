@@ -33,6 +33,10 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
        fitflag_aia_A = fltarr(N_fl        ) + default
         N0_fit_aia_A = fltarr(N_fl        ) + default
         lN_fit_aia_A = fltarr(N_fl        ) + default
+        N1_fit_aia_A = fltarr(N_fl        ) + default
+        N2_fit_aia_A = fltarr(N_fl        ) + default
+        p1_fit_aia_A = fltarr(N_fl        ) + default
+        p2_fit_aia_A = fltarr(N_fl        ) + default
        r2N_fit_aia_A = fltarr(N_fl        ) + default
         T0_fit_aia_A = fltarr(N_fl        ) + default
       dTdr_fit_aia_A = fltarr(N_fl        ) + default
@@ -85,11 +89,11 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                                    'Tm_fit_aia',ptr_new(  Tm_fit_aia_A) ,$
                                    'T0_fit_aia',ptr_new(  T0_fit_aia_A) ,$
                                  'dTdr_fit_aia',ptr_new(dTdr_fit_aia_A) )
-       if fit_F_Ne_aia  = 'IHS' then $
+       if fit_F_Ne_aia eq 'IHS' then $
           trace_data = create_struct( trace_data                        ,$
                                    'N0_fit_aia',ptr_new(  N0_fit_aia_A) ,$
                                    'lN_fit_aia',ptr_new(  lN_fit_aia_A) )                                                                        
-       if fit_F_Ne_aia  = 'DPL' then $
+       if fit_F_Ne_aia eq 'DPL' then $
           trace_data = create_struct( trace_data                        ,$
                                     'N1_fit_aia',ptr_new( N1_fit_aia_A) ,$
                                     'N2_fit_aia',ptr_new( N2_fit_aia_A) ,$
@@ -105,7 +109,6 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
        fitflag_mk4_A = fltarr(N_fl        ) + default
         N0_fit_mk4_A = fltarr(N_fl        ) + default
         lN_fit_mk4_A = fltarr(N_fl        ) + default
-         p_fit_mk4_A = fltarr(N_fl        ) + default
         N1_fit_mk4_A = fltarr(N_fl        ) + default
         N2_fit_mk4_A = fltarr(N_fl        ) + default
         p1_fit_mk4_A = fltarr(N_fl        ) + default
@@ -155,15 +158,15 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                                   'r2N_fit_mk4',ptr_new(r2N_fit_mk4_A) ,$
                                   'rad_fit_mk4',ptr_new(rad_fit_mk4_A) ,$
                                    'Ne_fit_mk4',ptr_new( Ne_fit_mk4_A) )
-       if fit_F_Ne_mk4  = 'IHS' then $
+       if fit_F_Ne_mk4 eq 'IHS' then $
           trace_data = create_struct( trace_data                        ,$
                                    'N0_fit_mk4',ptr_new(  N0_fit_mk4_A) ,$
                                    'lN_fit_mk4',ptr_new(  lN_fit_mk4_A) )                                                                        
-       if fit_F_Ne_mk4  = 'SPL' then $
+       if fit_F_Ne_mk4 eq 'SPL' then $
           trace_data = create_struct( trace_data                        ,$
                                     'N1_fit_mk4',ptr_new( N1_fit_mk4_A) ,$
                                     'p1_fit_mk4',ptr_new( p1_fit_mk4_A) )
-       if fit_F_Ne_mk4  = 'DPL' then $
+       if fit_F_Ne_mk4 eq 'DPL' then $
           trace_data = create_struct( trace_data                        ,$
                                     'N1_fit_mk4',ptr_new( N1_fit_mk4_A) ,$
                                     'N2_fit_mk4',ptr_new( N2_fit_mk4_A) ,$
@@ -176,8 +179,6 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
        drad_fit = 0.1
        Npt_fit = round((radmax-radmin)/drad_fit)
        fitflag_c2_A = fltarr(N_fl        ) + default
-        N0_fit_c2_A = fltarr(N_fl        ) + default
-         p_fit_c2_A = fltarr(N_fl        ) + default
         N1_fit_c2_A = fltarr(N_fl        ) + default
         N2_fit_c2_A = fltarr(N_fl        ) + default
         p1_fit_c2_A = fltarr(N_fl        ) + default
@@ -197,9 +198,9 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                  fit_F_Ne_c2 = 'SPL'
                  linear_fit, alog(radsamp), alog(Nesamp), AN, r2N, /linfit_idl
                  r2N_fit_c2_A(ifl)  = r2N
-                 N0_fit_c2_A(ifl)   = exp(AN[0]) ; cm-3
-                  p_fit_c2_A(ifl)   =    -AN[1]  ; dimensionless exponent of power law
-                 Ne_fit_c2_A(ifl,*) = N0_fit_c2_A(ifl) * rad_fit_c2_A^(-p_fit_c2_A(ifl)) ; cm-3
+                 N1_fit_c2_A(ifl)   = exp(AN[0]) ; cm-3
+                 p1_fit_c2_A(ifl)   =    -AN[1]  ; dimensionless exponent of power law
+                 Ne_fit_c2_A(ifl,*) = N1_fit_c2_A(ifl) * rad_fit_c2_A^(-p1_fit_c2_A(ifl)) ; cm-3
              skip_c2_single_power_law:
             ;goto,skip_c2_double_power_law
                  fit_F_Ne_c2  = 'DPL'
@@ -219,11 +220,11 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                                   'r2N_fit_c2',ptr_new(r2N_fit_c2_A) ,$                                   
                                   'rad_fit_c2',ptr_new(rad_fit_c2_A) ,$
                                    'Ne_fit_c2',ptr_new( Ne_fit_c2_A) )
-       if fit_F_Ne_c2  = 'SPL' then $
+       if fit_F_Ne_c2 eq 'SPL' then $
           trace_data = create_struct( trace_data                     ,$
                                    'N1_fit_c2',ptr_new( N1_fit_c2_A) ,$
                                    'p1_fit_c2',ptr_new( p1_fit_c2_A) )
-       if fit_F_Ne_c2  = 'DPL' then $
+       if fit_F_Ne_c2 eq 'DPL' then $
           trace_data = create_struct( trace_data                     ,$
                                    'N1_fit_c2',ptr_new( N1_fit_c2_A) ,$
                                    'N2_fit_c2',ptr_new( N2_fit_c2_A) ,$
