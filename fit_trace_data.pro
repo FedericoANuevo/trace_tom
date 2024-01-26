@@ -49,30 +49,54 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
              fitflag_aia_A(ifl) = +1.
              Nesamp = reform(Ne_aia_A(ifl,ind_samp_aia))
              Tmsamp = reform(Tm_aia_A(ifl,ind_samp_aia))
-             linear_fit, 1./radsamp   , alog(Nesamp), AN, r2N, /linfit_idl
-             linear_fit,    radsamp-1.,      Tmsamp , AT, r2T, /theil_sen
-             r2N_fit_aia_A(ifl)   = r2N
-             r2T_fit_aia_A(ifl)   = r2T
-              N0_fit_aia_A(ifl)   = exp(AN[0]+AN[1]) ; cm-3
-              lN_fit_aia_A(ifl)   = 1./AN[1]         ; Rsun
-              T0_fit_aia_A(ifl)   = AT[0]            ; K
-            dTdr_fit_aia_A(ifl)   = AT[1]            ; K/Rsun
-              Ne_fit_aia_A(ifl,*) = N0_fit_aia_A(ifl) * exp(-(1/lN_fit_aia_A(ifl))*(1.-1./rad_fit_aia_A   )) ; cm-3
-              Tm_fit_aia_A(ifl,*) = T0_fit_aia_A(ifl) + dTdr_fit_aia_A(ifl)       *      (rad_fit_aia_A-1.)  ; K
+             goto,skip_aia_isohthermal_hydrostatic
+                 fit_function_Ne_aia  = 'IHS'
+                 linear_fit, 1./radsamp   , alog(Nesamp), AN, r2N, /linfit_idl
+                 r2N_fit_aia_A(ifl)   = r2N             
+                  N0_fit_aia_A(ifl)   = exp(AN[0]+AN[1]) ; cm-3
+                  lN_fit_aia_A(ifl)   = 1./AN[1]         ; Rsun
+                  Ne_fit_aia_A(ifl,*) = N0_fit_aia_A(ifl) * exp(-(1/lN_fit_aia_A(ifl))*(1.-1./rad_fit_aia_A   )) ; cm-3
+              skip_aia_isohthermal_hydrostatic:
+             ;goto,skip_aia_double_power_law
+                  fit_F_Ne_aia  = 'DPL'
+                  double_power_fit, radsamp, Nesamp, A, chisq, /weighted
+                 r2N_fit_aia_A(ifl)   = chisq
+                  N1_fit_aia_A(ifl)   = A[0] ; cm-3
+                  p1_fit_aia_A(ifl)   = A[1] ; dimensionless exponent of power law
+                  N2_fit_aia_A(ifl)   = A[2] ; cm-3
+                  p2_fit_aia_A(ifl)   = A[3] ; dimensionless exponent of power law
+                  Ne_fit_aia_A(ifl,*) = A[0] * rad_fit_aia_A^(-A[1]) + A[2] * rad_fit_aia_A^(-A[3]) ; cm-3
+              skip_aia_double_power_law:
+             ;Linear fit to Te(r)
+                  linear_fit,    radsamp-1.,      Tmsamp , AT, r2T, /theil_sen
+                  r2T_fit_aia_A(ifl)   = r2T
+                   T0_fit_aia_A(ifl)   = AT[0]            ; K
+                 dTdr_fit_aia_A(ifl)   = AT[1]            ; K/Rsun
+                   Tm_fit_aia_A(ifl,*) = T0_fit_aia_A(ifl) + dTdr_fit_aia_A(ifl)       *      (rad_fit_aia_A-1.)  ; K
           endif                 ; covgflag = 'yes'          
        endfor                   ; field lines loop.
        trace_data = create_struct( trace_data                           ,$
                                   'fitflag_aia',ptr_new( fitflag_aia_A) ,$
+                                 'fit_F_Ne_aia',ptr_new(  fit_F_Ne_aia) ,$
                                   'r2N_fit_aia',ptr_new( r2N_fit_aia_A) ,$
                                   'r2T_fit_aia',ptr_new( r2T_fit_aia_A) ,$
                                   'rad_fit_aia',ptr_new( rad_fit_aia_A) ,$
                                    'Ne_fit_aia',ptr_new(  Ne_fit_aia_A) ,$
                                    'Tm_fit_aia',ptr_new(  Tm_fit_aia_A) ,$
-                                   'N0_fit_aia',ptr_new(  N0_fit_aia_A) ,$
                                    'T0_fit_aia',ptr_new(  T0_fit_aia_A) ,$
-                                   'lN_fit_aia',ptr_new(  lN_fit_aia_A) ,$
                                  'dTdr_fit_aia',ptr_new(dTdr_fit_aia_A) )
-    endif; AIA
+       if fit_F_Ne_aia  = 'IHS' then $
+          trace_data = create_struct( trace_data                        ,$
+                                   'N0_fit_aia',ptr_new(  N0_fit_aia_A) ,$
+                                   'lN_fit_aia',ptr_new(  lN_fit_aia_A) )                                                                        
+       if fit_F_Ne_aia  = 'DPL' then $
+          trace_data = create_struct( trace_data                        ,$
+                                    'N1_fit_aia',ptr_new( N1_fit_aia_A) ,$
+                                    'N2_fit_aia',ptr_new( N2_fit_aia_A) ,$
+                                    'p1_fit_aia',ptr_new( p1_fit_aia_A) ,$
+                                    'p2_fit_aia',ptr_new( p2_fit_aia_A) )
+
+    endif                       ; AIA
 
     if keyword_set(mk4) then begin
        radmin = 1.1 & radmax = 1.5
@@ -98,21 +122,24 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
              fitflag_mk4_A(ifl) = +1.
              Nesamp = reform(Ne_mk4_A(ifl,ind_samp_mk4))
              goto,skip_mk4_isohthermal_hydrostatic
-                 linear_fit, 1./radsamp   ,alog(Nesamp), AN, r2N, /linfit_idl
-                 r2N_fit_mk4_A(ifl)   = r2N
+                 fit_F_Ne_mk4  = 'IHS'
+                  linear_fit, 1./radsamp   ,alog(Nesamp), AN, r2N, /linfit_idl
+                  r2N_fit_mk4_A(ifl)   = r2N
                   N0_fit_mk4_A(ifl)   = exp(AN[0]+AN[1]) ; cm-3
                   lN_fit_mk4_A(ifl)   = 1./AN[1]         ; Rsun
                   Ne_fit_mk4_A(ifl,*) = N0_fit_mk4_A(ifl) * exp(-(1/lN_fit_mk4_A(ifl))*(1.-1./rad_fit_mk4_A)) ; cm-3
              skip_mk4_isohthermal_hydrostatic:
              goto,skip_mk4_single_power_law
-                 linear_fit, alog(radsamp), alog(Nesamp), AN, r2N, /linfit_idl
+                  fit_F_Ne_mk4  = 'SPL'
+                  linear_fit, alog(radsamp), alog(Nesamp), AN, r2N, /linfit_idl
                  r2N_fit_mk4_A(ifl)   = r2N
                   N0_fit_mk4_A(ifl)   = exp(AN[0]) ; cm-3
                    p_fit_mk4_A(ifl)   =    -AN[1]  ; dimensionless exponent of power law
                   Ne_fit_mk4_A(ifl,*) = N0_fit_mk4_A(ifl) * rad_fit_mk4_A^(-p_fit_mk4_A(ifl)) ; cm-3
              skip_mk4_single_power_law:
             ;goto,skip_mk4_double_power_law
-                 double_power_fit, radsamp, Nesamp, A, chisq, /weighted
+                  fit_F_Ne_mk4  = 'DPL'
+                  double_power_fit, radsamp, Nesamp, A, chisq, /weighted
                  r2N_fit_mk4_A(ifl)   = chisq
                   N1_fit_mk4_A(ifl)   = A[0] ; cm-3
                   p1_fit_mk4_A(ifl)   = A[1] ; dimensionless exponent of power law
@@ -124,6 +151,7 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
        endfor              ; field lines loop.
        trace_data = create_struct( trace_data                          ,$
                                   'fitflag_mk4',ptr_new(fitflag_mk4_A) ,$
+                                 'fit_F_Ne_mk4',ptr_new( fit_F_Ne_mk4) ,$
                                   'r2N_fit_mk4',ptr_new(r2N_fit_mk4_A) ,$
                                   'rad_fit_mk4',ptr_new(rad_fit_mk4_A) ,$
                                    'Ne_fit_mk4',ptr_new( Ne_fit_mk4_A) ,$
@@ -156,13 +184,15 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
              fitflag_c2_A(ifl) = +1.
              Nesamp = reform(Ne_c2_A(ifl,ind_samp_c2))
              goto,skip_c2_single_power_law
-             linear_fit, alog(radsamp), alog(Nesamp), AN, r2N, /linfit_idl
-             r2N_fit_c2_A(ifl)   = r2N
-              N0_fit_c2_A(ifl)   = exp(AN[0]) ; cm-3
-               p_fit_c2_A(ifl)   =    -AN[1]  ; dimensionless exponent of power law
-              Ne_fit_c2_A(ifl,*) = N0_fit_c2_A(ifl) * rad_fit_c2_A^(-p_fit_c2_A(ifl)) ; cm-3
+                 fit_F_Ne_c2 = 'SPL'
+                 linear_fit, alog(radsamp), alog(Nesamp), AN, r2N, /linfit_idl
+                 r2N_fit_c2_A(ifl)  = r2N
+                 N0_fit_c2_A(ifl)   = exp(AN[0]) ; cm-3
+                  p_fit_c2_A(ifl)   =    -AN[1]  ; dimensionless exponent of power law
+                 Ne_fit_c2_A(ifl,*) = N0_fit_c2_A(ifl) * rad_fit_c2_A^(-p_fit_c2_A(ifl)) ; cm-3
              skip_c2_single_power_law:
             ;goto,skip_c2_double_power_law
+                 fit_F_Ne_c2  = 'DPL'
                  double_power_fit, radsamp, Nesamp, A, chisq, /weighted
                  r2N_fit_c2_A(ifl)   = chisq
                   N1_fit_c2_A(ifl)   = A[0] ; cm-3
@@ -175,6 +205,7 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
        endfor                   ; field lines loop.
        trace_data = create_struct( trace_data                        ,$
                                   'fitflag_c2',ptr_new(fitflag_c2_A) ,$
+                                 'fit_F_Ne_c2',ptr_new( fit_F_Ne_c2) ,$
                                   'r2N_fit_c2',ptr_new(r2N_fit_c2_A) ,$                                   
                                   'rad_fit_c2',ptr_new(rad_fit_c2_A) ,$
                                    'Ne_fit_c2',ptr_new( Ne_fit_c2_A) ,$
