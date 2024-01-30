@@ -65,8 +65,7 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                  scN_fit_aia_A(ifl)   = r2N             
                   N0_fit_aia_A(ifl)   = exp(AN[0]+AN[1]) ; cm-3
                   lN_fit_aia_A(ifl)   = 1./AN[1]         ; Rsun
-                  Ne_fit_aia_A(ifl,*) = N0_fit_aia_A(ifl) * exp(-(1/lN_fit_aia_A(ifl))*(1.-1./rad_fit_aia_A   )) ; cm-3
-                  print,lN_fit_aia_A(ifl)
+                  Ne_fit_aia_A(ifl,*) = N0_fit_aia_A(ifl) * exp(-(1/lN_fit_aia_A(ifl))*(1.-1./rad_fit_aia_A)) ; cm-3
               skip_aia_isohthermal_hydrostatic:
              ;goto,skip_aia_double_power_law
                   fit_F_Ne_aia  = 'DPL'
