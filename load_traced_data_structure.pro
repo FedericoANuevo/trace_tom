@@ -39,6 +39,7 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
      N0_fit_mk4_A,lN_fit_mk4_A,$
      N1_fit_mk4_A,N2_fit_mk4_A,p1_fit_mk4_A,p2_fit_mk4_A,$
      N1_fit_c2_A,N2_fit_c2_A,p1_fit_c2_A,p2_fit_c2_A,$
+     lN_fit_c2_A,$
      fit_F_Ne_aia,fit_F_Ne_mk4,fit_F_Ne_c2
 
   restore, filename = dir + structure_filename
@@ -66,10 +67,9 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
             T0_fit_aia_A = *trace_data.  T0_fit_aia
           dTdr_fit_aia_A = *trace_data.dTdr_fit_aia
           fit_F_Ne_aia   = *trace_data.fit_F_Ne_aia
-          if fit_F_Ne_aia eq 'IHS' then begin
-             N0_fit_aia_A = *trace_data.  N0_fit_aia
-             lN_fit_aia_A = *trace_data.  lN_fit_aia
-          endif
+            lN_fit_aia_A = *trace_data.  lN_fit_aia
+          if fit_F_Ne_aia eq 'IHS' then $
+            N0_fit_aia_A = *trace_data.  N0_fit_aia
           if fit_F_Ne_aia eq 'DPL' then begin
              N1_fit_aia_A = *trace_data. N1_fit_aia
              N2_fit_aia_A = *trace_data. N2_fit_aia
@@ -104,10 +104,9 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
            scN_fit_mk4_A = *trace_data. scN_fit_mk4
            fitflag_mk4_A = *trace_data. fitflag_mk4
           fit_F_Ne_mk4   = *trace_data.fit_F_Ne_mk4
-          if fit_F_Ne_mk4 eq 'IHS' then begin
+            lN_fit_mk4_A = *trace_data.  lN_fit_mk4 
+          if fit_F_Ne_mk4 eq 'IHS' then $
              N0_fit_mk4_A = *trace_data. N0_fit_mk4
-             lN_fit_mk4_A = *trace_data. lN_fit_mk4
-          endif
           if fit_F_Ne_mk4 eq 'SPL' then begin
              N1_fit_mk4_A = *trace_data. N1_fit_mk4
              p1_fit_mk4_A = *trace_data. p1_fit_mk4
@@ -133,6 +132,7 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
            scN_fit_c2_A = *trace_data. scN_fit_c2
            fitflag_c2_A = *trace_data. fitflag_c2
           fit_F_Ne_c2   = *trace_data.fit_F_Ne_c2
+            lN_fit_c2_A = *trace_data.  lN_fit_c2 
           if fit_F_Ne_c2 eq 'SPL' then begin
              N1_fit_c2_A = *trace_data. N1_fit_c2
              p1_fit_c2_A = *trace_data. p1_fit_c2
