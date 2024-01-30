@@ -59,7 +59,7 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
              fitflag_aia_A(ifl) = +1.
              Nesamp = reform(Ne_aia_A(ifl,ind_samp_aia))
              Tmsamp = reform(Tm_aia_A(ifl,ind_samp_aia))
-             ;goto,skip_aia_isohthermal_hydrostatic
+              goto,skip_aia_isohthermal_hydrostatic
                  fit_F_Ne_aia  = 'IHS'
                  linear_fit, 1./radsamp   , alog(Nesamp), AN, r2N, /linfit_idl
                  scN_fit_aia_A(ifl)   = r2N             
