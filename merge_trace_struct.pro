@@ -23,8 +23,8 @@
 pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
                         aia = aia, euvia = euvia, euvib = euvib, eit = eit, $
                         mk4 = mk4, kcor = kcor, lascoc2 = lascoc2, $
-                        struture_filename = structure_filename, $
-                        fits = fits
+                        struture_filename = structure_filename
+                        
   
   common all_data, trace_data, $
      N_fl, Npt_max, Npt_v,$

@@ -59,7 +59,7 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
              fitflag_aia_A(ifl) = +1.
              Nesamp = reform(Ne_aia_A(ifl,ind_samp_aia))
              Tmsamp = reform(Tm_aia_A(ifl,ind_samp_aia))
-             ;goto,skip_aia_isohthermal_hydrostatic
+             goto,skip_aia_isohthermal_hydrostatic
                  fit_F_Ne_aia  = 'IHS'
                  linear_fit, 1./radsamp   , alog(Nesamp), AN, r2N, /linfit_idl
                  scN_fit_aia_A(ifl)   = r2N             
@@ -85,8 +85,8 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                   indsamp = where(rad_fit_aia_A ge min(radsamp) and rad_fit_aia_A le max(radsamp) AND dNe_dr lt 0.)
                   v = abs(dNe_dr(indsamp)/reform(Ne_fit_aia_A(ifl,indsamp)))^(-1)
                   lN_fit_aia_A(ifl)   =  int_tabulated(rad_fit_aia_A(indsamp),v) / (max(rad_fit_aia_A(indsamp))-min(rad_fit_aia_A(indsamp)))
-                  print,lN_fit_aia_A(ifl), float(mean(v)), float(median(v))
-                  stop
+                 ; print,lN_fit_aia_A(ifl), float(mean(v)), float(median(v))
+                 ;stop
               skip_aia_double_power_law:
              ;Linear fit to Te(r)
                   linear_fit,    radsamp-1.,      Tmsamp , AT, r2T, /theil_sen
@@ -141,7 +141,7 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
           if covgflag eq 'yes' then begin
              fitflag_mk4_A(ifl) = +1.
              Nesamp = reform(Ne_mk4_A(ifl,ind_samp_mk4))
-            ;goto,skip_mk4_isohthermal_hydrostatic
+            goto,skip_mk4_isohthermal_hydrostatic
                  fit_F_Ne_mk4  = 'IHS'
                   linear_fit, 1./radsamp   ,alog(Nesamp), AN, r2N, /linfit_idl
                   scN_fit_mk4_A(ifl)   = r2N
@@ -154,7 +154,7 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                   lN_fit_mk4_A(ifl)   =  int_tabulated(rad_fit_mk4_A(indsamp),v) / (max(rad_fit_mk4_A(indsamp))-min(rad_fit_mk4_A(indsamp))) ; cm-3 / Rsun                  
                   print,lN_fit_mk4_A(ifl), float(mean(v)), float(median(v)), float(1./AN[1])
              skip_mk4_isohthermal_hydrostatic:
-            ;goto,skip_mk4_single_power_law
+             goto,skip_mk4_single_power_law
                   fit_F_Ne_mk4  = 'SPL'
                   linear_fit, alog(radsamp), alog(Nesamp), AN, r2N, /linfit_idl
                  scN_fit_mk4_A(ifl)   = r2N
@@ -179,8 +179,8 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                   indsamp = where(rad_fit_mk4_A ge min(radsamp) and rad_fit_mk4_A le max(radsamp) AND dNe_dr lt 0.)
                   v = abs(dNe_dr(indsamp)/reform(Ne_fit_mk4_A(ifl,indsamp)))^(-1)
                   lN_fit_mk4_A(ifl)   = int_tabulated(rad_fit_mk4_A(indsamp), v) / (max(rad_fit_mk4_A(indsamp))-min(rad_fit_mk4_A(indsamp))) ; Rsun
-                  print,lN_fit_mk4_A(ifl), float(mean(v)), float(median(v))
-                  stop
+                 ; print,lN_fit_mk4_A(ifl), float(mean(v)), float(median(v))
+                 ;stop
             skip_mk4_double_power_law:
          endif             ; covgflag = 'yes'          
        endfor              ; field lines loop.
@@ -227,7 +227,7 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
           if covgflag eq 'yes' then begin
              fitflag_c2_A(ifl) = +1.
              Nesamp = reform(Ne_c2_A(ifl,ind_samp_c2))
-            ;goto,skip_c2_single_power_law
+            goto,skip_c2_single_power_law
                  fit_F_Ne_c2 = 'SPL'
                  linear_fit, alog(radsamp), alog(Nesamp), AN, r2N, /linfit_idl
                  scN_fit_c2_A(ifl)  = r2N
@@ -252,8 +252,8 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                   indsamp = where(rad_fit_c2_A ge min(radsamp) and rad_fit_c2_A le max(radsamp) AND dNe_dr lt 0.)
                   v = abs(dNe_dr(indsamp)/reform(Ne_fit_c2_A(ifl,indsamp)))^(-1)
                   lN_fit_c2_A(ifl)   = int_tabulated(rad_fit_c2_A(indsamp), v) / (max(rad_fit_c2_A(indsamp))-min(rad_fit_c2_A(indsamp))) ; Rsun
-                  print,lN_fit_c2_A(ifl), float(mean(v)), float(median(v))
-                  stop
+                 ; print,lN_fit_c2_A(ifl), float(mean(v)), float(median(v))
+            ;     stop
              skip_c2_double_power_law:
            endif                ; covgflag = 'yes'          
        endfor                   ; field lines loop.
