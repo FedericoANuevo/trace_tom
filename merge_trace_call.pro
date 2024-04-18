@@ -8,7 +8,7 @@
 
 pro merge_trace_call
   
-  dir_fl  = '/data1/DATA/fieldlines_judit/radial_synth_fieldline/'
+  dir_fl  = '/data1/DATA/fieldlines_judit/radial_synth_fieldlines/'
   fl_list = 'list.txt'
 
   merge_trace, dir_fl = dir_fl, fl_list = fl_list, /aia, /mk4, /lascoc2

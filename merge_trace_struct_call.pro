@@ -8,11 +8,10 @@
 
 pro merge_trace_struct_call
 
-   dir_fl  = '/data1/DATA/fieldlines_judit/radial_synth_fieldlines/'
-  ;dir_fl  = '/data1/DATA/fieldlines_judit/CR2099/map1/'
-   fl_list = 'list_synth.txt'
-  ;fl_list = 'list.txt'
-
+; dir_fl  = '/data1/DATA/fieldlines_judit/radial_synth_fieldlines/'
+; fl_list = 'list_synth.txt'
+  dir_fl  = '/data1/DATA/fieldlines_judit/CR2099/map1/'
+  fl_list = 'list.map1.txt'
   merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list,/aia, /mk4, /lascoc2, /fits
   
   return

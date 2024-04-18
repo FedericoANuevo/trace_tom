@@ -2,16 +2,16 @@
 ; PURPOSE: Performs analytical fits to tomographic products along each
 ; traced field line and stores results in the trace_data structure.
 ;
-; HISTORY: V1.0, AMV, January 2023, IAFE.
-;          V1.1, AMV & FAN, January 2023, IAFE. Added Theil-Sen and R² metric.
+; HISTORY: V1.0, AMV, January 2024, IAFE.
+;          V1.1, AMV & FAN, January 2024, IAFE. Added Theil-Sen and R² metric.
 ;          V1.2, AMV, January 2023, IAFE. Added Double-Power-Law for Mk4.
 ;                                         Added fits' parameters to output structure.
 ;                                         Added 2-PoweLaw fit for C2.
-;          V1.3, AMV, January 2023, IAFE. Added DPL fit for EUV.
+;          V1.3, AMV, January 2024, IAFE. Added DPL fit for EUV.
 ;                                         Added fitted function name
 ;                                         and automated parameter
 ;                                         storing in output structure.
-;          V1.4, AMV, January 2023, IAFE. Added <lambda_N> for all
+;          V1.4, AMV, January 2024, IAFE. Added <lambda_N> for all
 ;                                         functional fits.
 ;
 pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$

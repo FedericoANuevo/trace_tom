@@ -14,10 +14,10 @@
 pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
 
   base_dir = '/data1/DATA/fieldlines_judit/'
-  dir      = 'radial_synth_fieldlines/'
-; dir      = 'CR2099/map1/'
+; dir      = 'radial_synth_fieldlines/'
+  dir      = 'CR2099/map1/'
   fl_dir   = base_dir + dir
-  fl_list  = 'list_synth.txt'
+  fl_list  = 'list.map1.txt'
   
   if keyword_set(demt) then begin
      tom_dir  = '/data1/DATA/ldem_files/'
@@ -46,7 +46,7 @@ pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
      rmin     = 2.5
      rmax     = 8.5
      Irmin    = 2.5
-     Irmax    = 6.5
+     Irmax    = 6.0
      tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_list=fl_list,$
                nr=nr,nt=nt,np=np,rmin=rmin,rmax=rmax,Irmin=Irmin,Irmax=Irmax
   endif
