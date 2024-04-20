@@ -53,6 +53,7 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
        for ifl=0,N_fl-1 do begin      
           tmp = reform(index_sampling_aia_A(ifl,*))
           ind_samp_aia = where(tmp eq 1)
+          if ind_samp_aia[0] eq -1 then goto,skip_fit_aia
           radsamp = reform(rad_A(ifl,ind_samp_aia)) ; Rsun
           test_coverage, radsamp=radsamp, covgflag=covgflag, /aia
           if covgflag eq 'yes' then begin
@@ -87,14 +88,15 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                   lN_fit_aia_A(ifl)   =  int_tabulated(rad_fit_aia_A(indsamp),v) / (max(rad_fit_aia_A(indsamp))-min(rad_fit_aia_A(indsamp)))
                  ; print,lN_fit_aia_A(ifl), float(mean(v)), float(median(v))
                  ;stop
-              skip_aia_double_power_law:
+             skip_aia_double_power_law: 
              ;Linear fit to Te(r)
                   linear_fit,    radsamp-1.,      Tmsamp , AT, r2T, /theil_sen
                   scT_fit_aia_A(ifl)   = r2T
                    T0_fit_aia_A(ifl)   = AT[0]            ; K
                  dTdr_fit_aia_A(ifl)   = AT[1]            ; K/Rsun
                    Tm_fit_aia_A(ifl,*) = T0_fit_aia_A(ifl) + dTdr_fit_aia_A(ifl)       *      (rad_fit_aia_A-1.)  ; K
-          endif                 ; covgflag = 'yes'          
+                endif                                                                                             ; covgflag = 'yes'
+          skip_fit_aia:
        endfor                   ; field lines loop.
        trace_data = create_struct( trace_data                           ,$
                                   'fitflag_aia',ptr_new( fitflag_aia_A) ,$
@@ -250,8 +252,10 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                   Ne_fit_c2_A(ifl,*) = A[0] * rad_fit_c2_A^(-A[1]) + A[2] * rad_fit_c2_A^(-A[3]) ; cm-3
                   dNe_dr              = - A[1]*A[0] * rad_fit_c2_A^(-A[1]-1) - A[3]*A[2] * rad_fit_c2_A^(-A[3]-1) ; cm-3 / Rsun
                   indsamp = where(rad_fit_c2_A ge min(radsamp) and rad_fit_c2_A le max(radsamp) AND dNe_dr lt 0.)
-                  v = abs(dNe_dr(indsamp)/reform(Ne_fit_c2_A(ifl,indsamp)))^(-1)
-                  lN_fit_c2_A(ifl)   = int_tabulated(rad_fit_c2_A(indsamp), v) / (max(rad_fit_c2_A(indsamp))-min(rad_fit_c2_A(indsamp))) ; Rsun
+                  if indsamp[0] ne -1 then begin
+                     v = abs(dNe_dr(indsamp)/reform(Ne_fit_c2_A(ifl,indsamp)))^(-1)
+                     lN_fit_c2_A(ifl)   = int_tabulated(rad_fit_c2_A(indsamp), v) / (max(rad_fit_c2_A(indsamp))-min(rad_fit_c2_A(indsamp))) ; Rsun
+                  endif
                  ; print,lN_fit_c2_A(ifl), float(mean(v)), float(median(v))
             ;     stop
              skip_c2_double_power_law:

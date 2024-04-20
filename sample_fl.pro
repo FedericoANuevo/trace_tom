@@ -8,6 +8,7 @@
 pro sample_fl, Ne_l=Ne_l, index_l=index_l, index_sampling_l=index_sampling_l
   index_sampling_l = lonarr(n_elements(index_l))
   il_range   = where(index_l ne -1)
+  if il_range[0] eq -1 then goto,skip_sample
   il_min     = min(il_range)
   il_max     = max(il_range)
   il         = il_min
@@ -19,5 +20,6 @@ pro sample_fl, Ne_l=Ne_l, index_l=index_l, index_sampling_l=index_sampling_l
      if Ne_l(ind_sampling_cell) gt 0. then index_sampling_l(ind_sampling_cell) = +1
      il = il2+1
   endwhile
+  skip_sample:
   return
 end
