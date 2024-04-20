@@ -4,6 +4,7 @@
 ; or +1. Values +1 indicate sampling indexes.
 ;
 ; HISTORY: V1.0 AMV, IAFE, November-2023.
+; HISTORY: V1.0.1 FAN, IAFE, April-2024, goto,skip_sample added
 ;
 pro sample_fl, Ne_l=Ne_l, index_l=index_l, index_sampling_l=index_sampling_l
   index_sampling_l = lonarr(n_elements(index_l))
