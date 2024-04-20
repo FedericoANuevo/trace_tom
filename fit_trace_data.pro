@@ -86,10 +86,12 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                   Ne_fit_aia_A(ifl,*) = A[0] * rad_fit_aia_A^(-A[1]) + A[2] * rad_fit_aia_A^(-A[3]) ; cm-3
                   dNe_dr              = - A[1]*A[0] * rad_fit_aia_A^(-A[1]-1) - A[3]*A[2] * rad_fit_aia_A^(-A[3]-1) ; cm-3 / Rsun
                   indsamp = where(rad_fit_aia_A ge min(radsamp) and rad_fit_aia_A le max(radsamp) AND dNe_dr lt 0.)
-                  v = abs(dNe_dr(indsamp)/reform(Ne_fit_aia_A(ifl,indsamp)))^(-1)
-                  lN_fit_aia_A(ifl)   =  int_tabulated(rad_fit_aia_A(indsamp),v) / (max(rad_fit_aia_A(indsamp))-min(rad_fit_aia_A(indsamp)))
-                 ; print,lN_fit_aia_A(ifl), float(mean(v)), float(median(v))
-                 ;stop
+                  if indsamp[0] ne -1 then begin
+                     v = abs(dNe_dr(indsamp)/reform(Ne_fit_aia_A(ifl,indsamp)))^(-1)
+                     lN_fit_aia_A(ifl)   =  int_tabulated(rad_fit_aia_A(indsamp),v) / (max(rad_fit_aia_A(indsamp))-min(rad_fit_aia_A(indsamp)))
+                   ; print,lN_fit_aia_A(ifl), float(mean(v)), float(median(v))
+                   ; stop
+                  endif
              skip_aia_double_power_law: 
              ;Linear fit to Te(r)
                   linear_fit,    radsamp-1.,      Tmsamp , AT, r2T, /theil_sen
@@ -181,10 +183,12 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                   Ne_fit_mk4_A(ifl,*) = A[0] * rad_fit_mk4_A^(-A[1]) + A[2] * rad_fit_mk4_A^(-A[3]) ; cm-3
                   dNe_dr              = - A[1]*A[0] * rad_fit_mk4_A^(-A[1]-1) - A[3]*A[2] * rad_fit_mk4_A^(-A[3]-1) ; cm-3 / Rsun
                   indsamp = where(rad_fit_mk4_A ge min(radsamp) and rad_fit_mk4_A le max(radsamp) AND dNe_dr lt 0.)
-                  v = abs(dNe_dr(indsamp)/reform(Ne_fit_mk4_A(ifl,indsamp)))^(-1)
-                  lN_fit_mk4_A(ifl)   = int_tabulated(rad_fit_mk4_A(indsamp), v) / (max(rad_fit_mk4_A(indsamp))-min(rad_fit_mk4_A(indsamp))) ; Rsun
-                 ; print,lN_fit_mk4_A(ifl), float(mean(v)), float(median(v))
-                 ;stop
+                  if indsamp[0] ne -1 then begin
+                     v = abs(dNe_dr(indsamp)/reform(Ne_fit_mk4_A(ifl,indsamp)))^(-1)
+                     lN_fit_mk4_A(ifl)   = int_tabulated(rad_fit_mk4_A(indsamp), v) / (max(rad_fit_mk4_A(indsamp))-min(rad_fit_mk4_A(indsamp))) ; Rsun
+                   ; print,lN_fit_mk4_A(ifl), float(mean(v)), float(median(v))
+                   ; stop
+                  endif 
             skip_mk4_double_power_law:
          endif             ; covgflag = 'yes'          
        endfor              ; field lines loop.
