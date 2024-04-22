@@ -15,7 +15,10 @@
 ;                                         functional fits.
 ;          V1.4.1, FAN, April 2024, IAFE. Added goto,skip_fit_aia
 ;          and if indsamp[0] ne -1 then ...
-;  
+;
+; NOTA 22-04-24: Falta programar el FIT para euvia, euvib y eit. Seria simplemente
+; replicar el codigo para aia y renombrar variables...
+
 pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                     mk4 = mk4, kcor = kcor, lascoc2 = lascoc2
 
