@@ -80,7 +80,7 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
               skip_aia_isohthermal_hydrostatic:
              ;goto,skip_aia_double_power_law
                   fit_F_Ne_aia  = 'DPL'
-                  double_power_fit, radsamp, Nesamp, A, chisq, /weighted
+                  double_power_fit, radsamp, Nesamp, A, chisq;, /weighted
                  scN_fit_aia_A(ifl)   = chisq
                   N1_fit_aia_A(ifl)   = A[0] ; cm-3
                   p1_fit_aia_A(ifl)   = A[1] ; dimensionless exponent of power law
@@ -97,8 +97,8 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                   endif
              skip_aia_double_power_law: 
              ;Linear fit to Te(r)
-                  linear_fit,    radsamp-1.,      Tmsamp , AT, r2T, /theil_sen
-                  scT_fit_aia_A(ifl)   = r2T
+                  linear_fit,    radsamp-1.,      Tmsamp , AT, r2T, /theil_sen, chisqr = chisqr
+                  scT_fit_aia_A(ifl)   = chisqr;r2T
                    T0_fit_aia_A(ifl)   = AT[0]            ; K
                  dTdr_fit_aia_A(ifl)   = AT[1]            ; K/Rsun
                    Tm_fit_aia_A(ifl,*) = T0_fit_aia_A(ifl) + dTdr_fit_aia_A(ifl)       *      (rad_fit_aia_A-1.)  ; K
@@ -177,7 +177,7 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
              skip_mk4_single_power_law:
             ;goto,skip_mk4_double_power_law
                   fit_F_Ne_mk4  = 'DPL'
-                  double_power_fit, radsamp, Nesamp, A, chisq, /weighted
+                  double_power_fit, radsamp, Nesamp, A, chisq;, /weighted
                  scN_fit_mk4_A(ifl)   = chisq
                   N1_fit_mk4_A(ifl)   = A[0] ; cm-3
                   p1_fit_mk4_A(ifl)   = A[1] ; dimensionless exponent of power law
@@ -252,7 +252,7 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
              skip_c2_single_power_law:
             ;goto,skip_c2_double_power_law
                  fit_F_Ne_c2  = 'DPL'
-                 double_power_fit, radsamp, Nesamp, A, chisq, /weighted
+                 double_power_fit, radsamp, Nesamp, A, chisq;, /weighted
                  scN_fit_c2_A(ifl)   = chisq
                   N1_fit_c2_A(ifl)   = A[0] ; cm-3
                   p1_fit_c2_A(ifl)   = A[1] ; dimensionless exponent of power law
