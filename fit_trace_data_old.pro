@@ -4,7 +4,7 @@
 ;
 ; HISTORY: V1.0, AMV, January 2024, IAFE.
 ;          V1.1, AMV & FAN, January 2024, IAFE. Added Theil-Sen and R² metric.
-;          V1.2, AMV, January 2024, IAFE. Added Double-Power-Law for Mk4.
+;          V1.2, AMV, January 2023, IAFE. Added Double-Power-Law for Mk4.
 ;                                         Added fits' parameters to output structure.
 ;                                         Added 2-PoweLaw fit for C2.
 ;          V1.3, AMV, January 2024, IAFE. Added DPL fit for EUV.
@@ -18,8 +18,9 @@
 ;          v1.4.1, FAN, May 2024, ClaSP. Change GOTO by IF
 ;          v1.4.1, FAN, May 2024, ClaSP. Change scN_fit and scT_fit as
 ;          a function of chisqr
-;          v1.4.2, FAN, May 2024, ClaSP. euvia keyword added.
 
+; NOTA 22-04-24: Falta programar el FIT para euvia, euvib y eit. Seria simplemente
+; replicar el codigo para aia y renombrar variables...
 
 pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                     mk4 = mk4, kcor = kcor, lascoc2 = lascoc2
@@ -129,97 +130,6 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                                     'p2_fit_aia',ptr_new( p2_fit_aia_A) )
 
     endif                       ; AIA
-
-    if keyword_set(euvia) then begin
-       radmin = 1.0 & radmax = 1.3
-       drad_fit = 0.01
-       Npt_fit = round((radmax-radmin)/drad_fit)
-       fitflag_euvia_A = fltarr(N_fl        ) + default
-        N0_fit_euvia_A = fltarr(N_fl        ) + default
-        lN_fit_euvia_A = fltarr(N_fl        ) + default
-        N1_fit_euvia_A = fltarr(N_fl        ) + default
-        N2_fit_euvia_A = fltarr(N_fl        ) + default
-        p1_fit_euvia_A = fltarr(N_fl        ) + default
-        p2_fit_euvia_A = fltarr(N_fl        ) + default
-       scN_fit_euvia_A = fltarr(N_fl        ) + default
-        T0_fit_euvia_A = fltarr(N_fl        ) + default
-      dTdr_fit_euvia_A = fltarr(N_fl        ) + default
-       scT_fit_euvia_A = fltarr(N_fl        ) + default
-        Ne_fit_euvia_A = fltarr(N_fl,Npt_fit) + default
-        Tm_fit_euvia_A = fltarr(N_fl,Npt_fit) + default
-       rad_fit_euvia_A = radmin + drad_fit/2. + drad_fit * findgen(Npt_fit)
-       for ifl=0,N_fl-1 do begin      
-          tmp = reform(index_sampling_euvia_A(ifl,*))
-          ind_samp_euvia = where(tmp eq 1)
-          if ind_samp_euvia[0] ne -1 then begin
-             radsamp = reform(rad_A(ifl,ind_samp_euvia)) ; Rsun
-             test_coverage, radsamp=radsamp, covgflag=covgflag, /euvi
-             if covgflag eq 'yes' then begin
-                fitflag_euvia_A(ifl) = +1.
-                Nesamp = reform(Ne_euvia_A(ifl,ind_samp_aia))
-                Tmsamp = reform(Tm_euvia_A(ifl,ind_samp_aia))
-                goto,skip_aia_isohthermal_hydrostatic
-                fit_F_Ne_euvia  = 'IHS'
-                linear_fit, 1./radsamp   , alog(Nesamp), AN, r2N, /linfit_idl
-                scN_fit_euvia_A(ifl)  = r2N             
-                N0_fit_euvia_A(ifl)   = exp(AN[0]+AN[1])                                                            ; cm-3
-                lN_fit_euvia_A(ifl)   = 1./AN[1]                                                                    ; Rsun
-                Ne_fit_euvia_A(ifl,*) = N0_fit_euvia_A(ifl) * exp(-(1/lN_fit_euvia_A(ifl))*(1.-1./rad_fit_euvia_A)) ; cm-3
-                dNe_dr              = reform(Ne_fit_euvia_A(ifl,*)) * float(-(1/lN_fit_euvia_A(ifl))) / rad_fit_euvia_A^2 ; cm-3 / Rsun
-                indsamp = where(rad_fit_euvia_A ge min(radsamp) and rad_fit_euvia_A le max(radsamp) AND dNe_dr lt 0.)
-                v = abs(dNe_dr(indsamp)/reform(Ne_fit_euvia_A(ifl,indsamp)))^(-1)
-                lN_fit_euvia_A(ifl)   =  int_tabulated(rad_fit_euvia_A(indsamp),v) / (max(rad_fit_euvia_A(indsamp))-min(rad_fit_euvia_A(indsamp))) ; cm-3 / Rsun
-                print,lN_fit_euvia_A(ifl), float(mean(v)), float(median(v)), float(1./AN[1])
-                skip_aia_isohthermal_hydrostatic:
-               ;goto,skip_aia_double_power_law
-                fit_F_Ne_euvia  = 'DPL'
-                double_power_fit, radsamp, Nesamp, A, chisq ;, /weighted
-                scN_fit_euvia_A(ifl)  = sqrt(chisq)/mean(Nesamp)
-                N1_fit_euvia_A(ifl)   = A[0]                                                                          ; cm-3
-                p1_fit_euvia_A(ifl)   = A[1]                                                                          ; dimensionless exponent of power law
-                N2_fit_euvia_A(ifl)   = A[2]                                                                          ; cm-3
-                p2_fit_euvia_A(ifl)   = A[3]                                                                          ; dimensionless exponent of power law
-                Ne_fit_euvia_A(ifl,*) = A[0] * rad_fit_euvia_A^(-A[1]) + A[2] * rad_fit_euvia_A^(-A[3])                   ; cm-3
-                dNe_dr              = - A[1]*A[0] * rad_fit_euvia_A^(-A[1]-1) - A[3]*A[2] * rad_fit_euvia_A^(-A[3]-1)   ; cm-3 / Rsun
-                indsamp = where(rad_fit_euvia_A ge min(radsamp) and rad_fit_euvia_A le max(radsamp) AND dNe_dr lt 0.)
-                if indsamp[0] ne -1 then begin
-                   v = abs(dNe_dr(indsamp)/reform(Ne_fit_euvia_A(ifl,indsamp)))^(-1)
-                   lN_fit_euvia_A(ifl)   =  int_tabulated(rad_fit_euvia_A(indsamp),v) / (max(rad_fit_euvia_A(indsamp))-min(rad_fit_euvia_A(indsamp)))
-                   ; print,lN_fit_aia_A(ifl), float(mean(v)), float(median(v))
-                   ; stop
-                endif
-                skip_aia_double_power_law: 
-                ;Linear fit to Te(r)
-                linear_fit,    radsamp-1.,      Tmsamp , AT, r2T, /theil_sen, chisqr = chisqr
-                scT_fit_euvia_A(ifl)  = sqrt(chisqr)/mean(Tmsamp)                                                                    
-                T0_fit_euvia_A(ifl)   = AT[0]                                                                         ; K
-                dTdr_fit_euvia_A(ifl) = AT[1]                                                                         ; K/Rsun
-                Tm_fit_euvia_A(ifl,*) = T0_fit_euvia_A(ifl) + dTdr_fit_euvia_A(ifl)       *      (rad_fit_euvia_A-1.) ; K
-             endif                                                                                                    ; covgflag = 'yes'
-          endif
-       endfor                   ; field lines loop.
-       trace_data = create_struct( trace_data                               ,$
-                                  'fitflag_euvia',ptr_new( fitflag_euvia_A) ,$
-                                 'fit_F_Ne_euvia',ptr_new(  fit_F_Ne_euvia) ,$
-                                  'scN_fit_euvia',ptr_new( scN_fit_euvia_A) ,$
-                                  'scT_fit_euvia',ptr_new( scT_fit_euvia_A) ,$
-                                  'rad_fit_euvia',ptr_new( rad_fit_euvia_A) ,$
-                                   'Ne_fit_euvia',ptr_new(  Ne_fit_euvia_A) ,$
-                                   'Tm_fit_euvia',ptr_new(  Tm_fit_euvia_A) ,$
-                                   'T0_fit_euvia',ptr_new(  T0_fit_euvia_A) ,$
-                                 'dTdr_fit_euvia',ptr_new(dTdr_fit_euvia_A) ,$
-                                   'lN_fit_euvia',ptr_new(  lN_fit_euvia_A) )
-       if fit_F_Ne_euvia eq 'IHS' then $
-          trace_data = create_struct( trace_data                        ,$
-                                 'N0_fit_aia',ptr_new(  N0_fit_euvia_A) )                                                                        
-       if fit_F_Ne_euvia eq 'DPL' then $
-          trace_data = create_struct( trace_data                        ,$
-                                    'N1_fit_euvia',ptr_new( N1_fit_euvia_A) ,$
-                                    'N2_fit_euvia',ptr_new( N2_fit_euvia_A) ,$
-                                    'p1_fit_euvia',ptr_new( p1_fit_euvia_A) ,$
-                                    'p2_fit_euvia',ptr_new( p2_fit_euvia_A) )
-
-    endif                       ; EUVI-A
 
     if keyword_set(mk4) then begin
        radmin = 1.15 & radmax = 1.5

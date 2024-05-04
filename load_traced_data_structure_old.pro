@@ -16,10 +16,8 @@
 ; from every instrument.
 ;
 ; HISTORY: V1.0, AMV, November 2023, IAFE.
-;          V1.1, AMV, January  2024, IAFE. Added fitted results.
-;          V1.2, AMV, January  2024, IAFE. Added fits' parameters.
-;          V1.3, FAN, May      2024, ClaSP. Added euvia, euvib, and
-;          eit keywords.
+;          V1.1, AMV, January  2023, IAFE. Added fitted results.
+;          V1.2, AMV, January  2023, IAFE. Added fits' parameters.
 ;
 pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, $
                                 aia = aia, euvia = euvia, euvib = euvib, eit = eit, $
@@ -34,25 +32,15 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
      Ne_kcor_A, index_kcor_A, index_sampling_kcor_A,$
      Ne_c2_A, index_c2_A, index_sampling_c2_A,$
      rad_fit_aia_A, Ne_fit_aia_A, Tm_fit_aia_A, fitflag_aia_A,scN_fit_aia_A,scT_fit_aia_A,$
-     rad_fit_euvia_A, Ne_fit_euvia_A, Tm_fit_euvia_A, fitflag_euvia_A,scN_fit_euvia_A,scT_fit_euvia_A,$
-     rad_fit_euvib_A, Ne_fit_euvib_A, Tm_fit_euvib_A, fitflag_euvib_A,scN_fit_euvib_A,scT_fit_euvib_A,$
-     rad_fit_eit_A, Ne_eit_aia_A, Tm_eit_aia_A, fitflag_eit_A,scN_fit_eit_A,scT_fit_eit_A,$
      rad_fit_c2_A, Ne_fit_c2_A, fitflag_c2_A,scN_fit_c2_A,$
      rad_fit_mk4_A, Ne_fit_mk4_A, fitflag_mk4_A,scN_fit_mk4_A,$
      N0_fit_aia_A,lN_fit_aia_A,T0_fit_aia_A,dTdr_fit_aia_A,$
-     N0_fit_euvia_A,lN_fit_euvia_A,T0_fit_euvia_A,dTdr_fit_euvia_A,$
-     N0_fit_euvib_A,lN_fit_euvib_A,T0_fit_euvib_A,dTdr_fit_euvib_A,$
-     N0_fit_eit_A,lN_fit_eit_A,T0_fit_eit_A,dTdr_fit_eit_A,$
      N1_fit_aia_A,N2_fit_aia_A,p1_fit_aia_A,p2_fit_aia_A,$
-     N1_fit_euvia_A,N2_fit_euvia_A,p1_fit_euvia_A,p2_fit_euvia_A,$
-     N1_fit_euvib_A,N2_fit_euvib_A,p1_fit_euvib_A,p2_fit_euvib_A,$
-     N1_fit_eit_A,N2_fit_eit_A,p1_fit_eit_A,p2_fit_eit_A,$
      N0_fit_mk4_A,lN_fit_mk4_A,$
      N1_fit_mk4_A,N2_fit_mk4_A,p1_fit_mk4_A,p2_fit_mk4_A,$
      N1_fit_c2_A,N2_fit_c2_A,p1_fit_c2_A,p2_fit_c2_A,$
      lN_fit_c2_A,$
-     fit_F_Ne_aia,fit_F_Ne_mk4,fit_F_Ne_c2,$
-     fit_F_Ne_euvia,fit_F_Ne_euvib,fit_F_eit_c2
+     fit_F_Ne_aia,fit_F_Ne_mk4,fit_F_Ne_c2
 
   restore, filename = dir + structure_filename
 
@@ -94,75 +82,18 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
                 Tm_euvia_A = *trace_data.Tm_euvia
              index_euvia_A = *trace_data.index_euvia
     index_sampling_euvia_A = *trace_data.index_sampling_euvia
-           rad_fit_euvia_A = *trace_data. rad_fit_euvia             
-           Ne_ fit_euvia_A = *trace_data.  Ne_fit_euvia
-            Tm_fit_euvia_A = *trace_data.  Tm_fit_euvia
-           scN_fit_euvia_A = *trace_data. scN_fit_euvia
-           scT_fit_euvia_A = *trace_data. scT_fit_euvia
-           fitflag_euvia_A = *trace_data. fitflag_euvia
-            T0_fit_euvia_A = *trace_data.  T0_fit_euvia
-          dTdr_fit_euvia_A = *trace_data.dTdr_fit_euvia
-          fit_F_Ne_euvia   = *trace_data.fit_F_Ne_euvia
-            lN_fit_euvia_A = *trace_data.  lN_fit_euvia
-          if fit_F_Ne_euvia eq 'IHS' then $
-            N0_fit_euvia_A = *trace_data.  N0_fit_euvia
-          if fit_F_Ne_euvia eq 'DPL' then begin
-             N1_fit_euvia_A = *trace_data. N1_fit_euvia
-             N2_fit_euvia_A = *trace_data. N2_fit_euvia
-             p1_fit_euvia_A = *trace_data. p1_fit_euvia
-             p2_fit_euvia_A = *trace_data. p2_fit_euvia
-          endif
-
   endif
   if keyword_set(euvib) then begin
                 Ne_euvib_A = *trace_data.Ne_euvib 
                 Tm_euvib_A = *trace_data.Tm_euvib
              index_euvib_A = *trace_data.index_euvib
     index_sampling_euvib_A = *trace_data.index_sampling_euvib
-           rad_fit_euvib_A = *trace_data. rad_fit_euvib
-           Ne_ fit_euvib_A = *trace_data.  Ne_fit_euvib
-            Tm_fit_euvib_A = *trace_data.  Tm_fit_euvib
-           scN_fit_euvib_A = *trace_data. scN_fit_euvib
-           scT_fit_euvib_A = *trace_data. scT_fit_euvib
-           fitflag_euvib_A = *trace_data. fitflag_euvib
-            T0_fit_euvib_A = *trace_data.  T0_fit_euvib
-          dTdr_fit_euvib_A = *trace_data.dTdr_fit_euvib
-          fit_F_Ne_euvib   = *trace_data.fit_F_Ne_euvib
-            lN_fit_euvib_A = *trace_data.  lN_fit_euvib
-          if fit_F_Ne_euvib eq 'IHS' then $
-            N0_fit_euvib_A = *trace_data.  N0_fit_euvib
-          if fit_F_Ne_euvia eq 'DPL' then begin
-             N1_fit_euvib_A = *trace_data. N1_fit_euvib
-             N2_fit_euvib_A = *trace_data. N2_fit_euvi
-             p1_fit_euvib_A = *trace_data. p1_fit_euvib
-             p2_fit_euvib_A = *trace_data. p2_fit_euvib
-          endif
-
   endif
   if keyword_set(eit) then begin
                 Ne_eit_A = *trace_data.Ne_eit 
                 Tm_eit_A = *trace_data.Tm_eit
              index_eit_A = *trace_data.index_eit
     index_sampling_eit_A = *trace_data.index_sampling_eit
-           rad_fit_eit_A = *trace_data. rad_fit_eit             
-            Ne_fit_eit_A = *trace_data.  Ne_fit_eit
-            Tm_fit_eit_A = *trace_data.  Tm_fit_eit
-           scN_fit_eit_A = *trace_data. scN_fit_eit
-           scT_fit_eit_A = *trace_data. scT_fit_eit
-           fitflag_eit_A = *trace_data. fitflag_eit
-            T0_fit_eit_A = *trace_data.  T0_fit_eit
-          dTdr_fit_eit_A = *trace_data.dTdr_fit_eit
-          fit_F_Ne_eit   = *trace_data.fit_F_Ne_eit
-            lN_fit_eit_A = *trace_data.  lN_fit_eit
-          if fit_F_Ne_eit eq 'IHS' then $
-            N0_fit_eit_A = *trace_data.  N0_fit_eit
-          if fit_F_Ne_eit eq 'DPL' then begin
-             N1_fit_eit_A = *trace_data. N1_fit_eit
-             N2_fit_eit_A = *trace_data. N2_fit_eit
-             p1_fit_eit_A = *trace_data. p1_fit_eit
-             p2_fit_eit_A = *trace_data. p2_fit_eit
-          endif
- 
   endif
   if keyword_set(mk4) then begin
                 Ne_mk4_A = *trace_data.Ne_mk4 
