@@ -1,3 +1,7 @@
+; This script plots, for each field-line of CR-2082, the Ne(r) and Tm(r)
+; profiles and their fits for EUVI-A.
+
+
 pro call_load_structure
   
   common data, N_fl, Npt_max, Npt_v, x_A, y_A, z_A, rad_A, lat_A, lon_A,$

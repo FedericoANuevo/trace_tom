@@ -1,3 +1,7 @@
+; This script plots, for each field-line of CR-2099, the Ne(r) and Tm(r)
+; profiles and their fits for AIA, Mk4, and LASCO-C2, respectively. 
+
+
 pro call_load_structure
   
   common data, N_fl, Npt_max, Npt_v, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
@@ -31,9 +35,9 @@ pro call_load_structure
 
 
 ; File-name and window
-  file = 'list.map1.txt-tracing-structure-merge_aia_mk4_lascoc2.sav' & win=0
+; file = 'list.map1.txt-tracing-structure-merge_aia_mk4_lascoc2.sav' & win=0
   file = 'list.map7.txt-tracing-structure-merge_aia_mk4_lascoc2.sav' & win=0
-  file = 'list.map12.txt-tracing-structure-merge_aia_mk4_lascoc2.sav'& win=0
+; file = 'list.map12.txt-tracing-structure-merge_aia_mk4_lascoc2.sav'& win=0
 
 ; Load the traced-data-structure (stored in common data )
   load_traced_data_structure,dir='./',structure_filename=file,/aia,/mk4,/lascoc2
@@ -92,63 +96,66 @@ pro call_load_structure
            print,'Tm fit quality:', scT_fit_aia_A(ifl)
            print,'density scale height',lN_fit_aia_A(ifl)
         endif else begin
-           PRINT,'Nfitflag_aia_AO FIT'
+           PRINT,'NO FIT'
         endelse
      endif else begin
         print,'NO DATA'
      endelse
      STOP
   endfor
-    !p.multi=0
-    skip_AIA:
+  !p.multi=0
+  skip_AIA:
 
 ; Visualize each field-line profiles for Mk4 data 
-    goto,skip_MK4
-    print,'Mk4 profiles'
-    print,'Basic Statistics:'
-    i_fit = where(fitflag_mk4_A eq +1)
-    print,'field-lines with fit:',n_elements(i_fit), ' of ',N_fl
-    i_goodfit = where( scN_fit_mk4_A gt 0. and  scN_fit_mk4_A lt 0.2)
-    print,'field-lines with GOOD fit in Ne:',n_elements(i_goodfit), ' of ',N_fl
-    print
- 
-    for ifl = 0,N_fl-1 do begin
-       print,'field-line #',ifl,'/',N_fl-1
-       print,'init coord.',rad_A(ifl,0),lat_A(ifl,0),lon_A(ifl,0)
-       print,'final coord.',rad_A(ifl,Npt_v(ifl)-1),lat_A(ifl,Npt_v(ifl)-1),lon_A(ifl,Npt_v(ifl)-1)
-       window,win+2
-       plot,rad_A(ifl,0:Npt_v(ifl)-1),lat_A(ifl,0:Npt_v(ifl)-1),$
-            xr=[1.15,1.5],xstyle=1,xtitle='rad [Rsun]',ytitle='lat [DEG]',charsize=2
-       tmp = reform(index_sampling_mk4_A(ifl,*))
-       ind_samp_mk4 = where(tmp eq 1)
-       if ind_samp_mk4[0] ne -1 then begin
-          radsamp = reform(rad_A(ifl,ind_samp_mk4))    ; Rsun
-          Nesamp  = reform(Ne_mk4_A(ifl,ind_samp_mk4)) ; cm-3
-          if fitflag_mk4_A(ifl) eq  +1 then begin
-             radfit = rad_fit_mk4_A
-             Nefit  = Ne_fit_mk4_A(ifl,*)
-          endif
-          window,win
-          plot,radsamp,Nesamp/1.e8,psym=4,$
-               xtitle='r [R!dSUN!N]', ytitle= 'N!de!n [10!u8!n cm!u-3!n]',$
-               charsize=2.,xr=[1.15,1.5],xstyle=1
-          if fitflag_mk4_A(ifl) eq  +1  then $
-             oplot,radfit,Nefit/1.e8          
-          IF fitflag_mk4_A(ifl) eq +1 then begin
-             print,'Ne fit quality:',scN_fit_mk4_A(ifl)
-             print,'density scale height',lN_fit_mk4_A(ifl)
-          endif else begin
-             PRINT,'NO FIT'
-          endelse
-       endif else begin
-          print,'NO DATA'
-       ENDELSE
-       STOP
-    endfor
-    skip_MK4:
+  goto,skip_MK4
+  print,'Mk4 profiles'
+  print,'Basic Statistics:'
+  i_fit = where(fitflag_mk4_A eq +1)
+  print,'field-lines with fit:',n_elements(i_fit), ' of ',N_fl
+  i_goodfit = where( scN_fit_mk4_A gt 0. and  scN_fit_mk4_A lt 0.2)
+  print,'field-lines with GOOD fit in Ne:',n_elements(i_goodfit), ' of ',N_fl
+  print
+  for ifl = 0,N_fl-1 do begin
+     print,'field-line #',ifl,'/',N_fl-1
+     print,'init coord.',rad_A(ifl,0),lat_A(ifl,0),lon_A(ifl,0)
+     print,'final coord.',rad_A(ifl,Npt_v(ifl)-1),lat_A(ifl,Npt_v(ifl)-1),lon_A(ifl,Npt_v(ifl)-1)
+;    Plot field-line geometry
+     window,win+2
+     plot,rad_A(ifl,0:Npt_v(ifl)-1),lat_A(ifl,0:Npt_v(ifl)-1),$
+          xr=[1.15,1.5],xstyle=1,xtitle='rad [Rsun]',ytitle='lat [DEG]',charsize=2
+;    Ne(r) profile  and its fit
+     tmp = reform(index_sampling_mk4_A(ifl,*))
+     ind_samp_mk4 = where(tmp eq 1)
+     if ind_samp_mk4[0] ne -1 then begin
+        radsamp = reform(rad_A(ifl,ind_samp_mk4))      ; Rsun
+        Nesamp  = reform(Ne_mk4_A(ifl,ind_samp_mk4))   ; cm-3
+        if fitflag_mk4_A(ifl) eq  +1 then begin
+           radfit = rad_fit_mk4_A
+           Nefit  = Ne_fit_mk4_A(ifl,*)
+        endif
+;       Plot Ne(r) profile and overplot fit          
+        window,win
+        plot,radsamp,Nesamp/1.e8,psym=4,$
+             xtitle='r [R!dSUN!N]', ytitle= 'N!de!n [10!u8!n cm!u-3!n]',$
+             charsize=2.,xr=[1.15,1.5],xstyle=1
+        if fitflag_mk4_A(ifl) eq  +1  then $
+           oplot,radfit,Nefit/1.e8
+;       Print quality fit indicator and density scale height  
+        if fitflag_mk4_A(ifl) eq +1 then begin
+           print,'Ne fit quality:',scN_fit_mk4_A(ifl)
+           print,'density scale height',lN_fit_mk4_A(ifl)
+        endif else begin
+           PRINT,'NO FIT'
+        endelse
+     endif else begin
+        print,'NO DATA'
+     endelse
+     STOP
+  endfor
+  skip_MK4:
     
 ; Visualize each field-line profiles for LASCO-C2 data 
- ;   goto,skip_C2
+    goto,skip_C2
     print,'LASCO-C2 profiles'
     print,'Basic Statistics:'
     i_fit = where(fitflag_c2_A eq +1)
@@ -160,9 +167,11 @@ pro call_load_structure
        print,'field-line #',ifl,'/',N_fl-1
        print,'init coord.',rad_A(ifl,0),lat_A(ifl,0),lon_A(ifl,0)
        print,'final coord.',rad_A(ifl,Npt_v(ifl)-1),lat_A(ifl,Npt_v(ifl)-1),lon_A(ifl,Npt_v(ifl)-1)
+;      Plot field-line geometry
        window,win+2
        plot,rad_A(ifl,0:Npt_v(ifl)-1),lat_A(ifl,0:Npt_v(ifl)-1),$
             xr=[2.5,6.0],xstyle=1,xtitle='rad [Rsun]',ytitle='lat [DEG]',charsize=2
+;      Ne(r) profile and its fit      
        tmp = reform(index_sampling_c2_A(ifl,*))
        ind_samp_c2 = where(tmp eq 1)
        if ind_samp_c2[0] ne -1 then begin
@@ -172,12 +181,14 @@ pro call_load_structure
              radfit = rad_fit_c2_A
              Nefit  = Ne_fit_c2_A(ifl,*)
           endif
+;         Plot Ne(r) profile and overplot fit          
           window,win           
           plot,radsamp,Nesamp/1.e5,psym=4,$
                xtitle='r [R!dSUN!N]', ytitle= 'N!de!n [10!u5!n cm!u-3!n]',$
                charsize=2.,xr=[2.5,6.0],xstyle=1
           if fitflag_c2_A(ifl) eq  +1  then $
              oplot,radfit,Nefit/1.e5
+;         Print quality fit indicator and density scale height          
           IF fitflag_c2_A(ifl) eq +1 then begin
              print,'Ne fit quality:',scN_fit_c2_A(ifl)
              print,'density scale height',lN_fit_c2_A(ifl)
