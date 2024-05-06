@@ -95,7 +95,7 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
              index_euvia_A = *trace_data.index_euvia
     index_sampling_euvia_A = *trace_data.index_sampling_euvia
            rad_fit_euvia_A = *trace_data. rad_fit_euvia             
-           Ne_ fit_euvia_A = *trace_data.  Ne_fit_euvia
+            Ne_fit_euvia_A = *trace_data.  Ne_fit_euvia
             Tm_fit_euvia_A = *trace_data.  Tm_fit_euvia
            scN_fit_euvia_A = *trace_data. scN_fit_euvia
            scT_fit_euvia_A = *trace_data. scT_fit_euvia
@@ -120,7 +120,7 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
              index_euvib_A = *trace_data.index_euvib
     index_sampling_euvib_A = *trace_data.index_sampling_euvib
            rad_fit_euvib_A = *trace_data. rad_fit_euvib
-           Ne_ fit_euvib_A = *trace_data.  Ne_fit_euvib
+            Ne_fit_euvib_A = *trace_data.  Ne_fit_euvib
             Tm_fit_euvib_A = *trace_data.  Tm_fit_euvib
            scN_fit_euvib_A = *trace_data. scN_fit_euvib
            scT_fit_euvib_A = *trace_data. scT_fit_euvib

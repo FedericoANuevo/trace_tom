@@ -153,12 +153,12 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
           ind_samp_euvia = where(tmp eq 1)
           if ind_samp_euvia[0] ne -1 then begin
              radsamp = reform(rad_A(ifl,ind_samp_euvia)) ; Rsun
-             test_coverage, radsamp=radsamp, covgflag=covgflag, /euvi
+             test_coverage, radsamp=radsamp, covgflag=covgflag, /euvia
              if covgflag eq 'yes' then begin
                 fitflag_euvia_A(ifl) = +1.
-                Nesamp = reform(Ne_euvia_A(ifl,ind_samp_aia))
-                Tmsamp = reform(Tm_euvia_A(ifl,ind_samp_aia))
-                goto,skip_aia_isohthermal_hydrostatic
+                Nesamp = reform(Ne_euvia_A(ifl,ind_samp_euvia))
+                Tmsamp = reform(Tm_euvia_A(ifl,ind_samp_euvia))
+                goto,skip_euvia_isohthermal_hydrostatic
                 fit_F_Ne_euvia  = 'IHS'
                 linear_fit, 1./radsamp   , alog(Nesamp), AN, r2N, /linfit_idl
                 scN_fit_euvia_A(ifl)  = r2N             
@@ -170,8 +170,8 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                 v = abs(dNe_dr(indsamp)/reform(Ne_fit_euvia_A(ifl,indsamp)))^(-1)
                 lN_fit_euvia_A(ifl)   =  int_tabulated(rad_fit_euvia_A(indsamp),v) / (max(rad_fit_euvia_A(indsamp))-min(rad_fit_euvia_A(indsamp))) ; cm-3 / Rsun
                 print,lN_fit_euvia_A(ifl), float(mean(v)), float(median(v)), float(1./AN[1])
-                skip_aia_isohthermal_hydrostatic:
-               ;goto,skip_aia_double_power_law
+                skip_euvia_isohthermal_hydrostatic:
+               ;goto,skip_euvia_double_power_law
                 fit_F_Ne_euvia  = 'DPL'
                 double_power_fit, radsamp, Nesamp, A, chisq ;, /weighted
                 scN_fit_euvia_A(ifl)  = sqrt(chisq)/mean(Nesamp)
@@ -185,10 +185,10 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                 if indsamp[0] ne -1 then begin
                    v = abs(dNe_dr(indsamp)/reform(Ne_fit_euvia_A(ifl,indsamp)))^(-1)
                    lN_fit_euvia_A(ifl)   =  int_tabulated(rad_fit_euvia_A(indsamp),v) / (max(rad_fit_euvia_A(indsamp))-min(rad_fit_euvia_A(indsamp)))
-                   ; print,lN_fit_aia_A(ifl), float(mean(v)), float(median(v))
+                   ; print,lN_fit_euvia_A(ifl), float(mean(v)), float(median(v))
                    ; stop
                 endif
-                skip_aia_double_power_law: 
+                skip_euvia_double_power_law: 
                 ;Linear fit to Te(r)
                 linear_fit,    radsamp-1.,      Tmsamp , AT, r2T, /theil_sen, chisqr = chisqr
                 scT_fit_euvia_A(ifl)  = sqrt(chisqr)/mean(Tmsamp)                                                                    
@@ -211,7 +211,7 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                                    'lN_fit_euvia',ptr_new(  lN_fit_euvia_A) )
        if fit_F_Ne_euvia eq 'IHS' then $
           trace_data = create_struct( trace_data                        ,$
-                                 'N0_fit_aia',ptr_new(  N0_fit_euvia_A) )                                                                        
+                                 'N0_fit_euvia',ptr_new(  N0_fit_euvia_A) )                                                                        
        if fit_F_Ne_euvia eq 'DPL' then $
           trace_data = create_struct( trace_data                        ,$
                                     'N1_fit_euvia',ptr_new( N1_fit_euvia_A) ,$

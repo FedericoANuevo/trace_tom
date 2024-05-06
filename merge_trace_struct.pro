@@ -139,7 +139,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
         file_euvia = filename+'_euvia.out'
         outfile   =  outfile +'_euvia'
         if i_fl eq 0 then structure_filename = structure_filename + '_euvia'
-        readcol,dir_fl+file_aia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_euvia_l,Tm_euvia_l,index_euvia_l,FORMAT='D,D,D,D,D,D'
+        readcol,dir_fl+file_euvia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_euvia_l,Tm_euvia_l,index_euvia_l,FORMAT='D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_euvia_l, index_l=index_euvia_l, index_sampling_l=index_sampling_l
         if initialized eq 'yes' then begin
            output_columns = [[[output_columns]],[Ne_euvia_l],[Tm_euvia_l],[index_euvia_l],[index_sampling_l]]
@@ -197,7 +197,6 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
         index_euvib_A(i_fl,0:N_l-1) = index_euvib_l
         index_sampling_euvib_A(i_fl,0:N_l-1) = index_sampling_l
      endif
-
    ; EIT
      if keyword_set(eit)    then begin
         file_euvib = filename+'_eit.out'
@@ -384,7 +383,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      trace_data.Ne_euvia     = ptr_new(    Ne_euvia_A)
      trace_data.Tm_euvia     = ptr_new(    Tm_euvia_A)
      trace_data.index_euvia  = ptr_new( index_euvia_A)
-     trace_data.index_sampling_euvia = ptr_new(index_sampling_aia_A)
+     trace_data.index_sampling_euvia = ptr_new(index_sampling_euvia_A)
   endif
   if keyword_set(euvib) then begin
      trace_data.Ne_euvib     = ptr_new(    Ne_euvib_A)

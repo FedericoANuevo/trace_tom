@@ -5,7 +5,7 @@ pro test_coverage, radsamp=radsamp, covgflag=covgflag, $
 
   covgflag = 'no'
 
-  if keyword_set(aia) or keyword_set(euvi) or keyword_set(eit) then begin
+  if keyword_set(aia) or keyword_set(euvia) or keyword_set(euvib)  or keyword_set(eit) then begin
      R0=1.00
      R1=1.10
      R2=1.15

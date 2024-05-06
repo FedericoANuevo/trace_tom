@@ -14,10 +14,11 @@
 pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
 
   base_dir = '/data1/DATA/fieldlines_judit/'
-; dir      = 'radial_synth_fieldlines/'
+; dir      = 'radial_synth_fieldlines/' & fl_list='list_synth.txt'
 ; dir      = 'CR2099/map1/' & fl_list  = 'list.map1.txt' 
 ; dir      = 'CR2099/map7/' & fl_list  = 'list.map7.txt'
-  dir      = 'CR2099/map12/'& fl_list  = 'list.map12.txt'
+; dir      = 'CR2099/map12/'& fl_list  = 'list.map12.txt'
+  dir      = 'CR2082/map1/' & fl_list  = 'list.map1.txt'
   fl_dir   = base_dir + dir
 
 
@@ -25,10 +26,10 @@ pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
   
   if keyword_set(demt) then begin
      tom_dir  = '/data1/DATA/ldem_files/'
-    ;tom_file = 'CR2082_HOLLOW_compound2.dat' & instr = 'euvi'
+     tom_file = 'CR2082_HOLLOW_compound2.dat' & instr = 'euvia'
     ;tom_file = 'LDEM.CR2099_aia_Hollow_3Bands_gauss1_lin_Norm-median_singlStart' & instr = 'aia'
     ;tom_file = 'CR2099_AIA_compound1.dat'    & instr = 'aia'
-     tom_file = 'CR2099_AIA_compound2.dat'    & instr = 'aia'
+    ;tom_file = 'CR2099_AIA_compound2.dat'    & instr = 'aia'
      nr       = 30
      nt       = 90
      np       = 2*nt
