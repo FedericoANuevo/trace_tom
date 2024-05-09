@@ -8,7 +8,7 @@
 ; HISTORY: V1.0 FAN & AMV, CLaSP, October 2023.
 ;
 
-pro read_fieldline_and_trace_demt,instr,dir,file,rad,lat,lon,nr,nt,np,N_e,T_e
+pro read_fieldline_and_trace_demt,instr,dir,file,rad,lat,lon,nr,nt,np,N_e,T_e,W_T,ldem_flag
 ; Define name of output file
   outfile = file+'_'+instr+'.out'  
 ; Read the ASCII fieldline file with readcol (SolarSoft)  
@@ -22,6 +22,8 @@ pro read_fieldline_and_trace_demt,instr,dir,file,rad,lat,lon,nr,nt,np,N_e,T_e
 ; Define the fieldline tomographic variables arrays
   Ne_l  = fltarr(N)  
   Te_l  = fltarr(N)
+  WT_l  = fltarr(N)
+  ldem_flag_l = fltarr(N)
   ind_l = lonarr(N)
 ; Trace tomographic products along the fieldline  
   for i = 0,N-1 do begin
@@ -37,19 +39,23 @@ pro read_fieldline_and_trace_demt,instr,dir,file,rad,lat,lon,nr,nt,np,N_e,T_e
      if irad ne -1 and ilat ne -1 and ilon ne -1 then begin
         Ne_l (i) =  N_e (irad,ilat,ilon)
         Te_l (i) =  T_e (irad,ilat,ilon)
+        WT_l (i) =  W_T (irad,ilat,ilon)
+        ldem_flag_l(i) = ldem_flag(irad,ilat,ilon)
         ind_l(i) =  irad + nr*ilat + nr*nt*ilon
      endif else begin
         Ne_l (i) = -1.
         Te_l (i) = -1.
+        WT_l (i) = -1.
+        ldem_flag_l(i) = -1.
         ind_l(i) = -1
      endelse
   endfor
 ; Write output file
   openw,2,dir+outfile
-    printf,2,'  X [Rs]            Y [Rs]            Z [Rs]                  r [Rs]        lat [deg]          lon [deg]        Ne [cm^ -3]       Te [K]               Cell-3D-index'
+    printf,2,'  X [Rs]            Y [Rs]            Z [Rs]                  r [Rs]        lat [deg]          lon [deg]        Ne [cm^ -3]       Te [K]               WT [K]          LDEM-flag         Cell-3D-index'
     for i = 0,N-1 do begin
-     printf,2,x_l(i),y_l(i),z_l(i),r_l(i),90. -th_l(i)/!dtor, ph_l(i)/!dtor, Ne_l(i),Te_l(i),ind_l(i),$
-            FORMAT = '(8(E18.10)," ",I9)' 
+     printf,2,x_l(i),y_l(i),z_l(i),r_l(i),90. -th_l(i)/!dtor, ph_l(i)/!dtor, Ne_l(i),Te_l(i),WT_l(i),ldem_flag_l(i),ind_l(i),$
+            FORMAT = '(10(E18.10)," ",I9)' 
   endfor
   close,2
   return

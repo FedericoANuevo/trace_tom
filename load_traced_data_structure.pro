@@ -26,17 +26,17 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
                                 mk4 = mk4, kcor = kcor, lascoc2 = lascoc2
   
   common data, N_fl, Npt_max, Npt_v, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
-     Ne_aia_A, Tm_aia_A, index_aia_A, index_sampling_aia_A,$
-     Ne_euvia_A, Tm_euvia_A, index_euvia_A, index_sampling_euvia_A,$
-     Ne_euvib_A, Tm_euvib_A, index_euvib_A, index_sampling_euvib_A,$
-     Ne_eit_A, Tm_eit_A, index_eit_A, index_sampling_eit_A,$
+     Ne_aia_A, Tm_aia_A, WT_aia_A, ldem_flag_aia_A, index_aia_A, index_sampling_aia_A,$
+     Ne_euvia_A, Tm_euvia_A,  WT_euvia_A, ldem_flag_euvia_A, index_euvia_A, index_sampling_euvia_A,$
+     Ne_euvib_A, Tm_euvib_A, WT_euvib_A, ldem_flag_euvib_A, index_euvib_A, index_sampling_euvib_A,$
+     Ne_eit_A, Tm_eit_A, WT_eit_A, ldem_flag_eit_A, index_eit_A, index_sampling_eit_A,$
      Ne_mk4_A, index_mk4_A, index_sampling_mk4_A,$
      Ne_kcor_A, index_kcor_A, index_sampling_kcor_A,$
      Ne_c2_A, index_c2_A, index_sampling_c2_A,$
      rad_fit_aia_A, Ne_fit_aia_A, Tm_fit_aia_A, fitflag_aia_A,scN_fit_aia_A,scT_fit_aia_A,$
      rad_fit_euvia_A, Ne_fit_euvia_A, Tm_fit_euvia_A, fitflag_euvia_A,scN_fit_euvia_A,scT_fit_euvia_A,$
      rad_fit_euvib_A, Ne_fit_euvib_A, Tm_fit_euvib_A, fitflag_euvib_A,scN_fit_euvib_A,scT_fit_euvib_A,$
-     rad_fit_eit_A, Ne_eit_aia_A, Tm_eit_aia_A, fitflag_eit_A,scN_fit_eit_A,scT_fit_eit_A,$
+     rad_fit_eit_A, Ne_fit_eit_A, Tm_fit_eit_A, fitflag_eit_A,scN_fit_eit_A,scT_fit_eit_A,$
      rad_fit_c2_A, Ne_fit_c2_A, fitflag_c2_A,scN_fit_c2_A,$
      rad_fit_mk4_A, Ne_fit_mk4_A, fitflag_mk4_A,scN_fit_mk4_A,$
      N0_fit_aia_A,lN_fit_aia_A,T0_fit_aia_A,dTdr_fit_aia_A,$
@@ -68,6 +68,8 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
   if keyword_set(aia) then begin
                 Ne_aia_A = *trace_data.Ne_aia 
                 Tm_aia_A = *trace_data.Tm_aia
+                WT_aia_A = *trace_data.WT_aia
+         ldem_flag_aia_A = *trace_data.ldem_flag_aia
              index_aia_A = *trace_data.index_aia
     index_sampling_aia_A = *trace_data.index_sampling_aia
            rad_fit_aia_A = *trace_data. rad_fit_aia             
@@ -92,6 +94,8 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
   if keyword_set(euvia) then begin
                 Ne_euvia_A = *trace_data.Ne_euvia 
                 Tm_euvia_A = *trace_data.Tm_euvia
+                WT_euvia_A = *trace_data.WT_euvia
+         ldem_flag_euvia_A = *trace_data.ldem_flag_euvia
              index_euvia_A = *trace_data.index_euvia
     index_sampling_euvia_A = *trace_data.index_sampling_euvia
            rad_fit_euvia_A = *trace_data. rad_fit_euvia             
@@ -117,6 +121,8 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
   if keyword_set(euvib) then begin
                 Ne_euvib_A = *trace_data.Ne_euvib 
                 Tm_euvib_A = *trace_data.Tm_euvib
+                WT_euvib_A = *trace_data.WT_euvib
+         ldem_flag_euvib_A = *trace_data.ldem_flag_euvib
              index_euvib_A = *trace_data.index_euvib
     index_sampling_euvib_A = *trace_data.index_sampling_euvib
            rad_fit_euvib_A = *trace_data. rad_fit_euvib
@@ -142,6 +148,8 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
   if keyword_set(eit) then begin
                 Ne_eit_A = *trace_data.Ne_eit 
                 Tm_eit_A = *trace_data.Tm_eit
+                WT_eit_A = *trace_data.WT_eit
+         ldem_flag_eit_A = *trace_data.ldem_flag_eit
              index_eit_A = *trace_data.index_eit
     index_sampling_eit_A = *trace_data.index_sampling_eit
            rad_fit_eit_A = *trace_data. rad_fit_eit             
