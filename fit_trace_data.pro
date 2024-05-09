@@ -24,7 +24,7 @@
 pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                     mk4 = mk4, kcor = kcor, lascoc2 = lascoc2
 
-    common all_data, trace_data, $
+    common to_fit_data, trace_data, $
      N_fl, Npt_max, Npt_v,$
      x_A, y_A, z_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, index_aia_A, index_sampling_aia_A,$

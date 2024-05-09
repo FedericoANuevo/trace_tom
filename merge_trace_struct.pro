@@ -26,7 +26,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
                         struture_filename = structure_filename
                         
   
-  common all_data, trace_data, $
+  common to_fit_data, trace_data, $
      N_fl, Npt_max, Npt_v,$
      x_A, y_A, z_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, index_aia_A, index_sampling_aia_A,$
@@ -145,7 +145,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
         file_euvia = filename+'_euvia.out'
         if i_fl eq 0 then structure_filename = structure_filename + '_euvia'
         readcol,dir_fl+file_euvia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_euvia_l,Tm_euvia_l,$
-                WT_euvia_l,dem_flag_euvia_l,index_euvia_l,FORMAT='D,D,D,D,D,D'
+                WT_euvia_l,ldem_flag_euvia_l,index_euvia_l,FORMAT='D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_euvia_l, index_l=index_euvia_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
            N_l         = n_elements(x_l)
@@ -338,7 +338,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      trace_data.Ne_aia             = ptr_new(            Ne_aia_A)
      trace_data.Tm_aia             = ptr_new(            Tm_aia_A)
      trace_data.WT_aia             = ptr_new(            WT_aia_A)
-     trace_data.ldem_flag__aia     = ptr_new(     ldem_flag_aia_A)     
+     trace_data.ldem_flag_aia      = ptr_new(     ldem_flag_aia_A)     
      trace_data.index_aia          = ptr_new(         index_aia_A)
      trace_data.index_sampling_aia = ptr_new(index_sampling_aia_A)
   endif
