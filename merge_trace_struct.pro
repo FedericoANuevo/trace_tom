@@ -292,33 +292,33 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
   close,1
 
 ; Create a pointer structure to store field line extraction information  
-  trace_data = { N_fl:        ptr_new(N_fl)    ,$
-                 Npt_max:     ptr_new(Npt_max) ,$
-                 Npt_v:       ptr_new(Npt_v)   ,$
-                 x:           ptr_new(x_A)     ,$
-                 y:           ptr_new(y_A)     ,$
-                 z:           ptr_new(z_A)     ,$
-                 rad:         ptr_new(rad_A)   ,$
-                 lat:         ptr_new(lat_A)   ,$
-                 lon:         ptr_new(lon_A)    }
+  trace_data = { N_fl:    ptr_new(N_fl)    ,$
+                 Npt_max: ptr_new(Npt_max) ,$
+                 Npt_v:   ptr_new(Npt_v)   ,$
+                 x:       ptr_new(x_A)     ,$
+                 y:       ptr_new(y_A)     ,$
+                 z:       ptr_new(z_A)     ,$
+                 rad:     ptr_new(rad_A)   ,$
+                 lat:     ptr_new(lat_A)   ,$
+                 lon:     ptr_new(lon_A)    }
 
 ; Store into the structure traced tomographic resuls
   if keyword_set(aia) then begin
      trace_data = create_struct( trace_data ,$
-       'Ne_aia'             , ptr_new(            Ne_aia_A) ,$
-       'Tm_aia'             , ptr_new(            Tm_aia_A) ,$
-       'WT_aia'             , ptr_new(            WT_aia_A) ,$
-       'ldem_flag_aia'      , ptr_new(     ldem_flag_aia_A) ,$     
-       'index_aia'          , ptr_new(         index_aia_A) ,$
+                   'Ne_aia' , ptr_new(            Ne_aia_A) ,$
+                   'Tm_aia' , ptr_new(            Tm_aia_A) ,$
+                   'WT_aia' , ptr_new(            WT_aia_A) ,$
+            'ldem_flag_aia' , ptr_new(     ldem_flag_aia_A) ,$     
+                'index_aia' , ptr_new(         index_aia_A) ,$
        'index_sampling_aia' , ptr_new(index_sampling_aia_A)  )
   endif
   if keyword_set(euvia) then begin
      trace_data = create_struct( trace_data ,$
-     'Ne_euvia'             , ptr_new(            Ne_euvia_A) ,$
-     'Tm_euvia'             , ptr_new(            Tm_euvia_A) ,$
-     'WT_euvia'             , ptr_new(            WT_euvia_A) ,$
-     'ldem_flag_euvia'      , ptr_new(     ldem_flag_euvia_A) ,$
-     'index_euvia'          , ptr_new(         index_euvia_A) ,$
+                 'Ne_euvia' , ptr_new(            Ne_euvia_A) ,$
+                 'Tm_euvia' , ptr_new(            Tm_euvia_A) ,$
+                 'WT_euvia' , ptr_new(            WT_euvia_A) ,$
+          'ldem_flag_euvia' , ptr_new(     ldem_flag_euvia_A) ,$
+              'index_euvia' , ptr_new(         index_euvia_A) ,$
      'index_sampling_euvia' , ptr_new(index_sampling_euvia_A)  )
   endif
   if keyword_set(euvib) then begin
