@@ -29,14 +29,13 @@ pro mini_tutorial
      fit_F_Ne_euvia,fit_F_Ne_euvib,fit_F_eit_c2
   
 ; 1) Declare the DIR where the structure is located, and the filename.
-
-dir = './'
-structure_filename = 'CR2099_Synth-lines_tracing-structure-merge_aia_mk4_lascoc2.sav'
+  dir = './'
+  structure_filename = 'CR2099_Synth-lines_tracing-structure-merge_aia_mk4_lascoc2.sav'
 
 ; 2) Load structure into memory and extract all available arrays from it.
-
-load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /aia, /mk4, /lascoc2
-
+  load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /aia, /mk4, /lascoc2
+ ;goto,plots:
+ 
 print, 'Press SPACE BAR to continue.'
 pause
 
@@ -131,6 +130,7 @@ print, 'Press SPACE BAR to see the plot.'
 pause
 Device, retain = 2, true_color = 24, decomposed = 0
 
+plots:
 window,0
 ifl=0
 tmp = reform(index_sampling_aia_A(ifl,*))
@@ -167,7 +167,7 @@ ifl=0
 tmp = reform(index_sampling_aia_A(ifl,*))
 ind_samp_aia = where(tmp eq 1)
 MK = 1.e6 ; K
-plot,rad_A(ifl,ind_samp_aia),Tm_aia_A(ifl,ind_samp_aia)/MK,charsize=2,xtitle='r [Rsun]',title='AIA-DEMT Te(r) [MK]',psym=4,th=4, /nodata, yr=[0.5,1.5], ystyle=1, xr=[1,1.3], xstyle=1
+plot,rad_A(ifl,ind_samp_aia),Tm_aia_A(ifl,ind_samp_aia)/MK,charsize=2,xtitle='r [Rsun]',title='AIA-DEMT Te(r) [MK]',psym=4,th=4, /nodata, yr=[0.,2.], ystyle=1, xr=[1,1.3], xstyle=1
 loadct,12
 Tm_fit_aia_avg = 0. * rad_fit_aia_A
 for ifl=0,N_fl-1 do begin

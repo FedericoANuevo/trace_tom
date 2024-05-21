@@ -29,14 +29,12 @@ pro mini_tutorial
      fit_F_Ne_euvia,fit_F_Ne_euvib,fit_F_eit_c2
 
 ; 1) Declare the DIR where the structure is located, and the filename.
-
   dir = './'
   structure_filename = 'CR2082_AWsOM-lines-1_tracing-structure-merge_euvia.sav'
 
 ; 2) Load structure into memory and extract all available arrays from it.
-
- load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /euvia
- goto,plots
+  load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /euvia
+ ;goto,plots
  
 print, 'Press SPACE BAR to continue.'
 pause
