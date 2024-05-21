@@ -302,15 +302,15 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
                  lat:         ptr_new(lat_A)   ,$
                  lon:         ptr_new(lon_A)    }
 
-; Store tomography traced data
+; Store into the structure traced tomographic resuls
   if keyword_set(aia) then begin
      trace_data = create_struct( trace_data ,$
-     'Ne_aia'             , ptr_new(            Ne_aia_A) ,$
-     'Tm_aia'             , ptr_new(            Tm_aia_A) ,$
-     'WT_aia'             , ptr_new(            WT_aia_A) ,$
-     'ldem_flag_aia'      , ptr_new(     ldem_flag_aia_A) ,$     
-     'index_aia'          , ptr_new(         index_aia_A) ,$
-     'index_sampling_aia' , ptr_new(index_sampling_aia_A) )
+       'Ne_aia'             , ptr_new(            Ne_aia_A) ,$
+       'Tm_aia'             , ptr_new(            Tm_aia_A) ,$
+       'WT_aia'             , ptr_new(            WT_aia_A) ,$
+       'ldem_flag_aia'      , ptr_new(     ldem_flag_aia_A) ,$     
+       'index_aia'          , ptr_new(         index_aia_A) ,$
+       'index_sampling_aia' , ptr_new(index_sampling_aia_A)  )
   endif
   if keyword_set(euvia) then begin
      trace_data = create_struct( trace_data ,$
@@ -319,7 +319,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      'WT_euvia'             , ptr_new(            WT_euvia_A) ,$
      'ldem_flag_euvia'      , ptr_new(     ldem_flag_euvia_A) ,$
      'index_euvia'          , ptr_new(         index_euvia_A) ,$
-     'index_sampling_euvia' , ptr_new(index_sampling_euvia_A) )
+     'index_sampling_euvia' , ptr_new(index_sampling_euvia_A)  )
   endif
   if keyword_set(euvib) then begin
      trace_data = create_struct( trace_data ,$
@@ -328,34 +328,34 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
                  'WT_euvib' , ptr_new(            WT_euvib_A) ,$
           'ldem_flag_euvib' , ptr_new(     ldem_flag_euvib_A) ,$
               'index_euvib' , ptr_new(         index_euvib_A) ,$
-     'index_sampling_euvib' , ptr_new(index_sampling_euvib_A) )
+     'index_sampling_euvib' , ptr_new(index_sampling_euvib_A)  )
   endif
   if keyword_set(eit) then begin
      trace_data = create_struct( trace_data ,$
-                 'Ne_eit' , ptr_new(            Ne_eit_A) ,$
-                 'Tm_eit' , ptr_new(            Tm_eit_A) ,$
-                 'WT_eit' , ptr_new(            WT_eit_A) ,$
-          'ldem_flag_eit' , ptr_new(     ldem_flag_eit_A) ,$
-              'index_eit' , ptr_new(         index_eit_A) ,$
-     'index_sampling_eit' , ptr_new(index_sampling_eit_A) )
+                   'Ne_eit' , ptr_new(            Ne_eit_A) ,$
+                   'Tm_eit' , ptr_new(            Tm_eit_A) ,$
+                   'WT_eit' , ptr_new(            WT_eit_A) ,$
+            'ldem_flag_eit' , ptr_new(     ldem_flag_eit_A) ,$
+                'index_eit' , ptr_new(         index_eit_A) ,$
+       'index_sampling_eit' , ptr_new(index_sampling_eit_A)  )
   endif
   if keyword_set(mk4) then begin
      trace_data = create_struct( trace_data ,$
-                 'Ne_mk4' , ptr_new(            Ne_mk4_A) ,$
-              'index_mk4' , ptr_new(         index_mk4_A) ,$
-     'index_sampling_mk4' , ptr_new(index_sampling_mk4_A) )
+                   'Ne_mk4' , ptr_new(            Ne_mk4_A) ,$
+                'index_mk4' , ptr_new(         index_mk4_A) ,$
+       'index_sampling_mk4' , ptr_new(index_sampling_mk4_A)  )
   endif
   if keyword_set(kcor) then begin
      trace_data = create_struct( trace_data ,$
                  'Ne_kcor' , ptr_new(            Ne_kcor_A) ,$
               'index_kcor' , ptr_new(         index_kcor_A) ,$
-     'index_sampling_kcor' , ptr_new(index_sampling_kcor_A) )
+     'index_sampling_kcor' , ptr_new(index_sampling_kcor_A)  )
   endif
   if keyword_set(lascoc2) then begin
      trace_data = create_struct( trace_data ,$
                    'Ne_c2' , ptr_new(            Ne_c2_A) ,$
                 'index_c2' , ptr_new(         index_c2_A) ,$
-       'index_sampling_c2' , ptr_new(index_sampling_c2_A) )
+       'index_sampling_c2' , ptr_new(index_sampling_c2_A)  )
   endif
 
 ; Perform fits:
