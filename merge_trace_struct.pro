@@ -304,13 +304,13 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
 
 ; Store tomography traced data
   if keyword_set(aia) then begin
-     trace_data = create_struct( trace_data ,$
+     trace_data = {trace_data ,$
                  Ne_aia: ptr_new()          ,$
                  Tm_aia: ptr_new()          ,$
                  WT_aia: ptr_new()          ,$
           ldem_flag_aia: ptr_new()          ,$
               index_aia: ptr_new()          ,$
-     index_sampling_aia: ptr_new()           )
+     index_sampling_aia: ptr_new()           }
      trace_data.Ne_aia             = ptr_new(            Ne_aia_A)
      trace_data.Tm_aia             = ptr_new(            Tm_aia_A)
      trace_data.WT_aia             = ptr_new(            WT_aia_A)
@@ -319,13 +319,13 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      trace_data.index_sampling_aia = ptr_new(index_sampling_aia_A)
   endif
   if keyword_set(euvia) then begin
-     trace_data = create_struct( trace_data ,$
+     trace_data = {trace_data ,$
                  Ne_euvia: ptr_new()     ,$
                  Tm_euvia: ptr_new()     ,$
                  WT_euvia: ptr_new()     ,$
           ldem_flag_euvia: ptr_new()     ,$
               index_euvia: ptr_new()     ,$
-     index_sampling_euvia: ptr_new()      )
+     index_sampling_euvia: ptr_new()      }
      trace_data.Ne_euvia             = ptr_new(            Ne_euvia_A)
      trace_data.Tm_euvia             = ptr_new(            Tm_euvia_A)
      trace_data.WT_euvia             = ptr_new(            WT_euvia_A)
@@ -334,13 +334,13 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      trace_data.index_sampling_euvia = ptr_new(index_sampling_euvia_A)
   endif
   if keyword_set(euvib) then begin
-     trace_data = create_struct( trace_data ,$
+     trace_data = {trace_data ,$
                  Ne_euvib: ptr_new()        ,$
                  Tm_euvib: ptr_new()        ,$
                  WT_euvib: ptr_new()        ,$
           ldem_flag_euvib: ptr_new()        ,$
               index_euvib: ptr_new()        ,$
-     index_sampling_euvib: ptr_new()         )                                 
+     index_sampling_euvib: ptr_new()         }                                 
      trace_data.Ne_euvib             = ptr_new(            Ne_euvib_A)
      trace_data.Tm_euvib             = ptr_new(            Tm_euvib_A)
      trace_data.WT_euvib             = ptr_new(            WT_euvib_A)
@@ -349,13 +349,13 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      trace_data.index_sampling_euvib = ptr_new(index_sampling_euvib_A)
   endif
   if keyword_set(eit) then begin
-     trace_data = create_struct( trace_data ,$
+     trace_data = {trace_data ,$
                  Ne_eit: ptr_new()          ,$
                  Tm_eit: ptr_new()          ,$
                  WT_eit: ptr_new()          ,$
           ldem_flag_eit: ptr_new()          ,$
               index_eit: ptr_new()          ,$
-     index_sampling_eit: ptr_new()           )
+     index_sampling_eit: ptr_new()           }
      trace_data.Ne_eit             = ptr_new(            Ne_eit_A)
      trace_data.Tm_eit             = ptr_new(            Tm_eit_A)
      trace_data.WT_eit             = ptr_new(            WT_eit_A)
@@ -364,28 +364,28 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      trace_data.index_sampling_eit = ptr_new(index_sampling_eit_A)
   endif
   if keyword_set(mk4) then begin
-     trace_data = create_struct( trace_data ,$
+     trace_data = {trace_data ,$
                   Ne_mk4: ptr_new() ,$
                index_mk4: ptr_new() ,$
-      index_sampling_mk4: ptr_new()  )
+      index_sampling_mk4: ptr_new()  }
      trace_data.Ne_mk4             = ptr_new(            Ne_mk4_A)
      trace_data.index_mk4          = ptr_new(         index_mk4_A)
      trace_data.index_sampling_mk4 = ptr_new(index_sampling_mk4_A)
   endif
   if keyword_set(kcor) then begin
-     trace_data = create_struct( trace_data ,$
+     trace_data = {trace_data ,$
                  Ne_kcor: ptr_new() ,$
               index_kcor: ptr_new() ,$
-     index_sampling_kcor: ptr_new()  )
+     index_sampling_kcor: ptr_new()  }
      trace_data.Ne_kcor             = ptr_new(            Ne_kcor_A)
      trace_data.index_kcor          = ptr_new(         index_kcor_A)
      trace_data.index_sampling_kcor = ptr_new(index_sampling_kcor_A)
   endif
   if keyword_set(lascoc2) then begin
-     trace_data = create_struct( trace_data ,$
+     trace_data = {trace_data ,$
                    Ne_c2: ptr_new() ,$
                 index_c2: ptr_new() ,$
-       index_sampling_c2: ptr_new()  )
+       index_sampling_c2: ptr_new()  }
      trace_data.Ne_c2             = ptr_new(            Ne_c2_A)
      trace_data.index_c2          = ptr_new(         index_c2_A)
      trace_data.index_sampling_c2 = ptr_new(index_sampling_c2_A)
