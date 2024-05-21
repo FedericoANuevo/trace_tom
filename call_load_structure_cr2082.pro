@@ -35,8 +35,10 @@ pro call_load_structure
 
 
 ; File-name and window
-  dir  = '/data1/DATA/fieldlines_judit/CR2082/map1/'
-  file = 'list.map1.txt-tracing-structure-merge_euvia.sav' & win=0
+; dir  = '/data1/DATA/fieldlines_judit/CR2082/map1/'
+; file = 'list.map1.txt-tracing-structure-merge_euvia.sav' & win=0
+  dir  = '/data1/DATA/fieldlines_judit/CR2082/map1_new/'
+  file = 'list.map1.new.txt-tracing-structure-merge_euvia.sav' & win=0
 
 
 ; Load the traced-data-structure (stored in common data )
@@ -63,7 +65,7 @@ pro call_load_structure
      plot,rad_A(ifl,0:Npt_v(ifl)-1),lat_A(ifl,0:Npt_v(ifl)-1),$
           xtitle='rad [Rsun]',ytitle='lat [DEG]',charsize=2
      plot,rad_A(ifl,0:Npt_v(ifl)-1),lat_A(ifl,0:Npt_v(ifl)-1),$
-          xr=[1.02,1.25],xstyle=1,xtitle='rad [Rsun]',ytitle='lat [DEG]',charsize=2
+          xr=[1.0 ,1.25],xstyle=1,xtitle='rad [Rsun]',ytitle='lat [DEG]',charsize=2
 ;    Ne(r) and Tm(r) profiles  and their fits
      tmp = reform(index_sampling_euvia_A(ifl,*))
      ind_samp_euvia = where(tmp eq 1)

@@ -18,7 +18,8 @@ pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
 ; dir      = 'CR2099/map1/' & fl_list  = 'list.map1.txt' 
 ; dir      = 'CR2099/map7/' & fl_list  = 'list.map7.txt'
 ; dir      = 'CR2099/map12/'& fl_list  = 'list.map12.txt'
-  dir      = 'CR2082/map1/' & fl_list  = 'list.map1.txt'
+; dir      = 'CR2082/map1/' & fl_list  = 'list.map1.txt'
+  dir      = 'CR2082/map1_new/' & fl_list  = 'list.map1.new.txt'
   fl_dir   = base_dir + dir
 
 
