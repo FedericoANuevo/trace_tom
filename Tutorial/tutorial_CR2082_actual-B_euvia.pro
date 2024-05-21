@@ -1,4 +1,4 @@
-pro tmini_tutorial
+pro mini_tutorial
   common data, N_fl, Npt_max, Npt_v, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, WT_aia_A, ldem_flag_aia_A, index_aia_A, index_sampling_aia_A,$
      Ne_euvia_A, Tm_euvia_A,  WT_euvia_A, ldem_flag_euvia_A, index_euvia_A, index_sampling_euvia_A,$
@@ -27,18 +27,19 @@ pro tmini_tutorial
      lN_fit_c2_A,$
      fit_F_Ne_aia,fit_F_Ne_mk4,fit_F_Ne_c2,$
      fit_F_Ne_euvia,fit_F_Ne_euvib,fit_F_eit_c2
+
 ; 1) Declare the DIR where the structure is located, and the filename.
 
-dir = './'
-; structure_filename = 'list_synth.txt-tracing-structure-merge_aia_mk4_lascoc2.sav'
-  structure_filename = 'CR-2082_AWsOM-lines-1_tracing-structure-merge_euvia.sav'
+  dir = './'
+  structure_filename = 'CR2082_AWsOM-lines-1_tracing-structure-merge_euvia.sav'
 
 ; 2) Load structure into memory and extract all available arrays from it.
 
-;load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /aia, /mk4, /lascoc2
  load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /euvia
 
-stop
+print, 'Press SPACE BAR to continue.'
+pause
+
 ; 3) See the full contents of the structure.
 print
 print, 'Bellow is the list of the full contents of the structure, named "trace_data", loaded into memory by the command:'
@@ -72,17 +73,33 @@ pause
 print
 print,'-------------------------------'
 help,N_fl, Npt_max, Npt_v, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
-     Ne_aia_A, Tm_aia_A, index_aia_A, index_sampling_aia_A,$
+     Ne_aia_A, Tm_aia_A, WT_aia_A, ldem_flag_aia_A, index_aia_A, index_sampling_aia_A,$
+     Ne_euvia_A, Tm_euvia_A,  WT_euvia_A, ldem_flag_euvia_A, index_euvia_A, index_sampling_euvia_A,$
+     Ne_euvib_A, Tm_euvib_A, WT_euvib_A, ldem_flag_euvib_A, index_euvib_A, index_sampling_euvib_A,$
+     Ne_eit_A, Tm_eit_A, WT_eit_A, ldem_flag_eit_A, index_eit_A, index_sampling_eit_A,$
      Ne_mk4_A, index_mk4_A, index_sampling_mk4_A,$
+     Ne_kcor_A, index_kcor_A, index_sampling_kcor_A,$
      Ne_c2_A, index_c2_A, index_sampling_c2_A,$
-     rad_fit_aia_A, Ne_fit_aia_A, Tm_fit_aia_A, fitflag_AIA_A,scT_fit_aia_A,$
+     rad_fit_aia_A, Ne_fit_aia_A, Tm_fit_aia_A, fitflag_aia_A,scN_fit_aia_A,scT_fit_aia_A,$
+     rad_fit_euvia_A, Ne_fit_euvia_A, Tm_fit_euvia_A, fitflag_euvia_A,scN_fit_euvia_A,scT_fit_euvia_A,$
+     rad_fit_euvib_A, Ne_fit_euvib_A, Tm_fit_euvib_A, fitflag_euvib_A,scN_fit_euvib_A,scT_fit_euvib_A,$
+     rad_fit_eit_A, Ne_fit_eit_A, Tm_fit_eit_A, fitflag_eit_A,scN_fit_eit_A,scT_fit_eit_A,$
      rad_fit_c2_A, Ne_fit_c2_A, fitflag_c2_A,scN_fit_c2_A,$
      rad_fit_mk4_A, Ne_fit_mk4_A, fitflag_mk4_A,scN_fit_mk4_A,$
-     fit_F_Ne_aia,fit_F_Ne_mk4,fit_F_Ne_c2,$
      N0_fit_aia_A,lN_fit_aia_A,T0_fit_aia_A,dTdr_fit_aia_A,$
+     N0_fit_euvia_A,lN_fit_euvia_A,T0_fit_euvia_A,dTdr_fit_euvia_A,$
+     N0_fit_euvib_A,lN_fit_euvib_A,T0_fit_euvib_A,dTdr_fit_euvib_A,$
+     N0_fit_eit_A,lN_fit_eit_A,T0_fit_eit_A,dTdr_fit_eit_A,$
+     N1_fit_aia_A,N2_fit_aia_A,p1_fit_aia_A,p2_fit_aia_A,$
+     N1_fit_euvia_A,N2_fit_euvia_A,p1_fit_euvia_A,p2_fit_euvia_A,$
+     N1_fit_euvib_A,N2_fit_euvib_A,p1_fit_euvib_A,p2_fit_euvib_A,$
+     N1_fit_eit_A,N2_fit_eit_A,p1_fit_eit_A,p2_fit_eit_A,$
+     N0_fit_mk4_A,lN_fit_mk4_A,$
      N1_fit_mk4_A,N2_fit_mk4_A,p1_fit_mk4_A,p2_fit_mk4_A,$
      N1_fit_c2_A,N2_fit_c2_A,p1_fit_c2_A,p2_fit_c2_A,$
-     N1_fit_aia_A,N2_fit_aia_A,p1_fit_aia_A,p2_fit_aia_A
+     lN_fit_c2_A,$
+     fit_F_Ne_aia,fit_F_Ne_mk4,fit_F_Ne_c2,$
+     fit_F_Ne_euvia,fit_F_Ne_euvib,fit_F_eit_c2
 
 print,'-------------------------------'
 print
@@ -111,67 +128,68 @@ print,'          ifl = 0'
 print,'          tmp = reform(index_sampling_euvia_A(ifl,*))'
 print,' ind_samp_aia = where(tmp eq 1)'
 print,' window, 0'
-print,' plot,rad_A(ifl,ind_samp_aia),Ne_aia_A(ifl,ind_samp_aia)'
+print,' plot,rad_A(ifl,ind_samp_euvia),Ne_euvia_A(ifl,ind_samp_euvia)'
 print, 'Press SPACE BAR to see the plot.'
 pause
 Device, retain = 2, true_color = 24, decomposed = 0
 
 window,0
 ifl=0
-tmp = reform(index_sampling_aia_A(ifl,*))
-ind_samp_aia = where(tmp eq 1)
-plot,rad_A(ifl,ind_samp_aia),Ne_aia_A(ifl,ind_samp_aia),charsize=2,xtitle='r [Rsun]',title='AIA-DEMT Ne(r) [cm!U-3!N]',psym=4,th=4, /nodata, yr=[0,1.e8], ystyle=1, xr=[1,1.3], xstyle=1
+tmp = reform(index_sampling_euvia_A(ifl,*))
+ind_samp_euvia = where(tmp eq 1)
+plot,rad_A(ifl,ind_samp_euvia),Ne_euvia_A(ifl,ind_samp_euvia),charsize=2,xtitle='r [Rsun]',title='EUVIA-DEMT Ne(r) [cm!U-3!N]',psym=4,th=4, /nodata, $
+     yr=[0,3.e8], ystyle=1, xr=[1,1.3], xstyle=1
 loadct,12
-Ne_fit_aia_avg = 0. * rad_fit_aia_A
+Ne_fit_euvia_avg = 0. * rad_fit_euvia_A
 for ifl=0,N_fl-1 do begin
    print, 'Press SPACE BAR to plot next line.'
    pause
-  tmp = reform(index_sampling_aia_A(ifl,*))
-  ind_samp_aia = where(tmp eq 1)
+  tmp = reform(index_sampling_euvia_A(ifl,*))
+  ind_samp_euvia = where(tmp eq 1)
   col = (ifl+1)*40
-  oplot,rad_A(ifl,ind_samp_aia),Ne_aia_A(ifl,ind_samp_aia),psym=4,th=2,color=col
-  if fitflag_AIA_A(ifl) eq +1. then begin
-    oplot,rad_fit_aia_A,Ne_fit_aia_A(ifl,*),color=col
-    Ne_fit_aia_avg = Ne_fit_aia_avg + reform(Ne_fit_aia_A(ifl,*))
-    print,'Fit Score:',scN_fit_aia_A(ifl)
+  oplot,rad_A(ifl,ind_samp_euvia),Ne_euvia_A(ifl,ind_samp_euvia),psym=4,th=2,color=col
+  if fitflag_EUVIA_A(ifl) eq +1. then begin
+    oplot,rad_fit_euvia_A,Ne_fit_euvia_A(ifl,*),color=col
+    Ne_fit_euvia_avg = Ne_fit_euvia_avg + reform(Ne_fit_euvia_A(ifl,*))
+    print,'Fit Score:',scN_fit_euvia_A(ifl)
   endif
 endfor
    print, 'Press SPACE BAR to plot average trend.'
    pause
-  N_fits = n_elements( where(fitflag_AIA_A eq +1.) )
-  Ne_fit_aia_avg = Ne_fit_aia_avg / float(N_fits)
+  N_fits = n_elements( where(fitflag_EUVIA_A eq +1.) )
+  Ne_fit_euvia_avg = Ne_fit_euvia_avg / float(N_fits)
   loadct,0
-  oplot,rad_fit_aia_A,Ne_fit_aia_avg,th=4
+  oplot,rad_fit_euvia_A,Ne_fit_euvia_avg,th=4
 
 window,1
 ifl=0
-tmp = reform(index_sampling_aia_A(ifl,*))
-ind_samp_aia = where(tmp eq 1)
+tmp = reform(index_sampling_euvia_A(ifl,*))
+ind_samp_euvia = where(tmp eq 1)
 MK = 1.e6 ; K
-plot,rad_A(ifl,ind_samp_aia),Tm_aia_A(ifl,ind_samp_aia)/MK,charsize=2,xtitle='r [Rsun]',title='AIA-DEMT Te(r) [MK]',psym=4,th=4, /nodata, yr=[0.5,1.5], ystyle=1, xr=[1,1.3], xstyle=1
+plot,rad_A(ifl,ind_samp_euvia),Tm_euvia_A(ifl,ind_samp_euvia)/MK,charsize=2,xtitle='r [Rsun]',title='EUVIA-DEMT Te(r) [MK]',psym=4,th=4, /nodata, yr=[0.5,1.5], ystyle=1, xr=[1,1.3], xstyle=1
 loadct,12
-Tm_fit_aia_avg = 0. * rad_fit_aia_A
+Tm_fit_euvia_avg = 0. * rad_fit_euvia_A
 for ifl=0,N_fl-1 do begin
    print, 'Press SPACE BAR to plot next line.'
    pause
-  tmp = reform(index_sampling_aia_A(ifl,*))
-  ind_samp_aia = where(tmp eq 1)
+  tmp = reform(index_sampling_euvia_A(ifl,*))
+  ind_samp_euvia = where(tmp eq 1)
   col = (ifl+1)*40
-  oplot,rad_A(ifl,ind_samp_aia),Tm_aia_A(ifl,ind_samp_aia)/MK,psym=4,th=2,color=col
-  if fitflag_AIA_A(ifl) eq +1. then begin
-    oplot,rad_fit_aia_A,Tm_fit_aia_A(ifl,*)/MK,color=col
-    Tm_fit_aia_avg = Tm_fit_aia_avg + reform(Tm_fit_aia_A(ifl,*))
-    print,'Fit Score:',scT_fit_aia_A(ifl)
+  oplot,rad_A(ifl,ind_samp_euvia),Tm_euvia_A(ifl,ind_samp_euvia)/MK,psym=4,th=2,color=col
+  if fitflag_EUVIA_A(ifl) eq +1. then begin
+    oplot,rad_fit_euvia_A,Tm_fit_euvia_A(ifl,*)/MK,color=col
+    Tm_fit_euvia_avg = Tm_fit_euvia_avg + reform(Tm_fit_euvia_A(ifl,*))
+    print,'Fit Score:',scT_fit_euvia_A(ifl)
   endif
 endfor
    print, 'Press SPACE BAR to plot average trend.'
    pause
-  N_fits = n_elements( where(fitflag_AIA_A eq +1.) )
-  Tm_fit_aia_avg = Tm_fit_aia_avg / float(N_fits)
+  N_fits = n_elements( where(fitflag_EUVIA_A eq +1.) )
+  Tm_fit_euvia_avg = Tm_fit_euvia_avg / float(N_fits)
   loadct,0
-  oplot,rad_fit_aia_A,Tm_fit_aia_avg/MK,th=4
+  oplot,rad_fit_euvia_A,Tm_fit_euvia_avg/MK,th=4
 
-  
+  STOP
 print
 print, 'Press SPACE BAR to continue.'
 pause

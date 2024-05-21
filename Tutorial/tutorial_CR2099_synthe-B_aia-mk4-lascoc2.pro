@@ -31,13 +31,15 @@ pro mini_tutorial
 ; 1) Declare the DIR where the structure is located, and the filename.
 
 dir = './'
-structure_filename = 'list_synth.txt-tracing-structure-merge_aia_mk4_lascoc2.sav'
+structure_filename = 'CR2099_Synth-lines_tracing-structure-merge_aia_mk4_lascoc2.sav'
 
 ; 2) Load structure into memory and extract all available arrays from it.
 
 load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /aia, /mk4, /lascoc2
 
-stop
+print, 'Press SPACE BAR to continue.'
+pause
+
 ; 3) See the full contents of the structure.
 print
 print, 'Bellow is the list of the full contents of the structure, named "trace_data", loaded into memory by the command:'
