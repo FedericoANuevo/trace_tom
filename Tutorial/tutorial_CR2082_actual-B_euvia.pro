@@ -36,7 +36,8 @@ pro mini_tutorial
 ; 2) Load structure into memory and extract all available arrays from it.
 
  load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /euvia
-
+ goto,plots
+ 
 print, 'Press SPACE BAR to continue.'
 pause
 
@@ -66,7 +67,8 @@ print
 print, 'Besides loading into memory the structure above, the command "load_traced_data_structure...'
 print, 'also creates in memory several variables and arrays with the results stored in the structure,'
 print, 'so they are convenientely ready to be used.'
-print, 'Let us see the output of the command "help" for all variables and arrays created from the structure for which there is data:'
+print
+print, 'Let us see the output of the command "help" for all variables and arrays that MAY BE created from the structure:'
 print
 print, 'Press SPACE BAR to continue.'
 pause
@@ -105,6 +107,8 @@ print,'-------------------------------'
 print
 
 ; 5) Some explanations follow.
+print,'In this case only arrays wih filed line geometry, or pertaining EUVI-A, are defined,'
+print
 print,'In this case there are "N_fl=124" field lines that were traced in the height range'
 print,'print, min(rad_A(where(rad_A gt 0.))), max(rad_A(where(rad_A gt 0.)))'
 print, min(rad_A(where(rad_A gt 0.))), max(rad_A(where(rad_A gt 0.)))
@@ -133,6 +137,7 @@ print, 'Press SPACE BAR to see the plot.'
 pause
 Device, retain = 2, true_color = 24, decomposed = 0
 
+plots:
 window,0
 ifl=0
 tmp = reform(index_sampling_euvia_A(ifl,*))
@@ -140,23 +145,29 @@ ind_samp_euvia = where(tmp eq 1)
 plot,rad_A(ifl,ind_samp_euvia),Ne_euvia_A(ifl,ind_samp_euvia),charsize=2,xtitle='r [Rsun]',title='EUVIA-DEMT Ne(r) [cm!U-3!N]',psym=4,th=4, /nodata, $
      yr=[0,3.e8], ystyle=1, xr=[1,1.3], xstyle=1
 loadct,12
+ifl_A  = [5,30,60,100]
+col_A  = ifl_A*2
+Nlines = n_elements(ifl_A)
 Ne_fit_euvia_avg = 0. * rad_fit_euvia_A
-for ifl=0,N_fl-1 do begin
-   print, 'Press SPACE BAR to plot next line.'
-   pause
+N_fits = 0
+for i=0,Nlines-1 do begin
+  ifl = ifl_A[i]
+  col = col_A[i]
+  print,i,ifl,col
   tmp = reform(index_sampling_euvia_A(ifl,*))
   ind_samp_euvia = where(tmp eq 1)
-  col = (ifl+1)*40
   oplot,rad_A(ifl,ind_samp_euvia),Ne_euvia_A(ifl,ind_samp_euvia),psym=4,th=2,color=col
   if fitflag_EUVIA_A(ifl) eq +1. then begin
     oplot,rad_fit_euvia_A,Ne_fit_euvia_A(ifl,*),color=col
     Ne_fit_euvia_avg = Ne_fit_euvia_avg + reform(Ne_fit_euvia_A(ifl,*))
+    N_fits = N_fits+1
     print,'Fit Score:',scN_fit_euvia_A(ifl)
+  print, 'Press SPACE BAR to plot next line.'
+  pause
   endif
 endfor
-   print, 'Press SPACE BAR to plot average trend.'
-   pause
-  N_fits = n_elements( where(fitflag_EUVIA_A eq +1.) )
+  print, 'Press SPACE BAR to plot average trend.'
+  pause
   Ne_fit_euvia_avg = Ne_fit_euvia_avg / float(N_fits)
   loadct,0
   oplot,rad_fit_euvia_A,Ne_fit_euvia_avg,th=4
@@ -166,124 +177,31 @@ ifl=0
 tmp = reform(index_sampling_euvia_A(ifl,*))
 ind_samp_euvia = where(tmp eq 1)
 MK = 1.e6 ; K
-plot,rad_A(ifl,ind_samp_euvia),Tm_euvia_A(ifl,ind_samp_euvia)/MK,charsize=2,xtitle='r [Rsun]',title='EUVIA-DEMT Te(r) [MK]',psym=4,th=4, /nodata, yr=[0.5,1.5], ystyle=1, xr=[1,1.3], xstyle=1
+plot,rad_A(ifl,ind_samp_euvia),Tm_euvia_A(ifl,ind_samp_euvia)/MK,charsize=2,xtitle='r [Rsun]',title='EUVIA-DEMT Te(r) [MK]',psym=4,th=4, /nodata, yr=[0.,2.], ystyle=1, xr=[1,1.3], xstyle=1
 loadct,12
 Tm_fit_euvia_avg = 0. * rad_fit_euvia_A
-for ifl=0,N_fl-1 do begin
-   print, 'Press SPACE BAR to plot next line.'
-   pause
+N_fits = 0
+for i=0,Nlines-1 do begin
+  ifl = ifl_A[i]
+  col = col_A[i]
   tmp = reform(index_sampling_euvia_A(ifl,*))
   ind_samp_euvia = where(tmp eq 1)
-  col = (ifl+1)*40
   oplot,rad_A(ifl,ind_samp_euvia),Tm_euvia_A(ifl,ind_samp_euvia)/MK,psym=4,th=2,color=col
   if fitflag_EUVIA_A(ifl) eq +1. then begin
     oplot,rad_fit_euvia_A,Tm_fit_euvia_A(ifl,*)/MK,color=col
     Tm_fit_euvia_avg = Tm_fit_euvia_avg + reform(Tm_fit_euvia_A(ifl,*))
+    N_fits = N_fits+1
     print,'Fit Score:',scT_fit_euvia_A(ifl)
   endif
+  print, 'Press SPACE BAR to plot next line.'
+  pause
 endfor
-   print, 'Press SPACE BAR to plot average trend.'
-   pause
-  N_fits = n_elements( where(fitflag_EUVIA_A eq +1.) )
+  print, 'Press SPACE BAR to plot average trend.'
+  pause
   Tm_fit_euvia_avg = Tm_fit_euvia_avg / float(N_fits)
   loadct,0
   oplot,rad_fit_euvia_A,Tm_fit_euvia_avg/MK,th=4
 
   STOP
-print
-print, 'Press SPACE BAR to continue.'
-pause
-print
-print,'Similarly, to plot the c2 results for the SAME field line, one does:'
-print
-print,'         ifl = 0'
-print,'         tmp = reform(index_sampling_c2_A(ifl,*))'
-print,' ind_samp_c2 = where(tmp eq 1)'
-print,' window, 2'
-print,' plot,rad_A(ifl,ind_samp_c2),Ne_c2_A(ifl,ind_samp_c2)'
-print, 'Press SPACE BAR to see the plot.'
-pause
-c2:
-ifl=0
-tmp = reform(index_sampling_c2_A(ifl,*))
-ind_samp_c2 = where(tmp eq 1)
-window,2
- plot,rad_A(ifl,ind_samp_c2),Ne_c2_A(ifl,ind_samp_c2),charsize=2,xtitle='r [Rsun]',title='C2-SRT Ne(r) [cm!U-3!N]',psym=4,th=4,/nodata, xr=[2.5,6.0], xstyle=1, yr=[0,7.e4], ystyle=1
-loadct,12
-Ne_fit_c2_avg = 0. * rad_fit_c2_A
-for ifl=0,N_fl-1 do begin
-   print, 'Press SPACE BAR to plot next line.'
-   pause
-  tmp = reform(index_sampling_c2_A(ifl,*))
-  ind_samp_c2 = where(tmp eq 1)
-  col = (ifl+1)*40
-  oplot,rad_A(ifl,ind_samp_c2),Ne_c2_A(ifl,ind_samp_c2),psym=4,th=2,color=col
-  if fitflag_c2_A(ifl) eq +1. then begin
-    oplot,rad_fit_c2_A,Ne_fit_c2_A(ifl,*),color=col
-    Ne_fit_c2_avg = Ne_fit_c2_avg + reform(Ne_fit_c2_A(ifl,*))
-    print,'Fit Score:',scN_fit_c2_A(ifl)
-  endif
-endfor
-
-   print, 'Press SPACE BAR to plot average trend.'
-   pause
-  N_fits = n_elements( where(fitflag_c2_A eq +1.) )
-  Ne_fit_c2_avg = Ne_fit_c2_avg / float(N_fits)
-  loadct,0
-  oplot,rad_fit_c2_A,Ne_fit_c2_avg,th=4
-
-print
-print, 'Press SPACE BAR to continue.'
-pause
-print
-print,'Similarly, to plot the Mk4 results for the SAME field line, one does:'
-print
-print,'         ifl = 0'
-print,'         tmp = reform(index_sampling_mk4_A(ifl,*))'
-print,' ind_samp_mk4 = where(tmp eq 1)'
-print,' window, 3'
-print,' plot,rad_A(ifl,ind_samp_mk4),Ne_mk4_A(ifl,ind_samp_c2)'
-print, 'Press SPACE BAR to see the plot.'
-pause
-lastgraph:
-ifl=0
-tmp = reform(index_sampling_mk4_A(ifl,*))
-ind_samp_mk4 = where(tmp eq 1)
-window,3
- plot,rad_A(ifl,ind_samp_mk4),Ne_mk4_A(ifl,ind_samp_mk4),charsize=2,xtitle='r [Rsun]',title='MK4-SRT Ne(r) [cm!U-3!N]',psym=4,th=4,/nodata, xr=[1.15,1.5], xstyle=1, yr=[0,8.e7], ystyle=1
-loadct,12
-Ne_fit_mk4_avg = 0. * rad_fit_mk4_A
-for ifl=0,N_fl-1 do begin
-   print, 'Press SPACE BAR to plot next line.'
-   pause
-  tmp = reform(index_sampling_mk4_A(ifl,*))
-  ind_samp_mk4 = where(tmp eq 1)
-  col = (ifl+1)*40
-  oplot,rad_A(ifl,ind_samp_mk4),Ne_mk4_A(ifl,ind_samp_mk4),psym=4,th=2,color=col
-  if fitflag_mk4_A(ifl) eq +1. then begin
-    oplot,rad_fit_mk4_A,Ne_fit_mk4_A(ifl,*),color=col
-    Ne_fit_mk4_avg = Ne_fit_mk4_avg + reform(Ne_fit_mk4_A(ifl,*))
-    print,'Fit Chisq:',scN_fit_mk4_A(ifl)
-  endif
-endfor
-   print, 'Press SPACE BAR to plot average trend.'
-   pause
-  N_fits = n_elements( where(fitflag_mk4_A eq +1.) )
-  Ne_fit_mk4_avg = Ne_fit_mk4_avg / float(N_fits)
-  loadct,0
-  oplot,rad_fit_mk4_A,Ne_fit_mk4_avg,th=4
-
-print
-print,'Note that rad_A is NOT associated to an instrument.'
-print
-print,'Note that the aia, or lascoc2, sampled points are MUCH less than Npt_max=15000:'
-print
-help, ind_samp_aia, rad_A(ifl,ind_samp_aia),Ne_aia_A(ifl,ind_samp_aia)
-help, ind_samp_c2, rad_A(ifl,ind_samp_c2),Ne_c2_A(ifl,ind_samp_c2)
-print
-print,'This concludes this mini-tutorial, to show the core part of our approach. We can pass you a plotting routine we are building that, based on this idea explained above, easily and flexibly combines any provided instruments on a single graph, computes average trends, etc. Let us first know what you think of the approach and data format.'
-print
-
-  stop
   return
 end
