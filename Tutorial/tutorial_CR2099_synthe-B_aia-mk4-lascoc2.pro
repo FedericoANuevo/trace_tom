@@ -117,20 +117,13 @@ print,'There is a KEY array, provided for each instrument, that deserves a separ
 print
 print, 'Press SPACE BAR to continue.'
 pause
-print
-print,'Let us see an example of result from the structure.'
-print,'Say one wants to plot the AIA results along field line ifl=0, then one does this:'
-print
-print,'          ifl = 0'
-print,'          tmp = reform(index_sampling_aia_A(ifl,*))'
-print,' ind_samp_aia = where(tmp eq 1)'
-print,' window, 0'
-print,' plot,rad_A(ifl,ind_samp_aia),Ne_aia_A(ifl,ind_samp_aia)'
-print, 'Press SPACE BAR to see the plot.'
-pause
 
 plots:
+
+; Set up graph options.
 Device, retain = 2, true_color = 24, decomposed = 0
+!p.color=0
+!p.background=255
 
 window,5,xs=1000,ys=1000
 !p.multi=[0,1,2]
@@ -139,8 +132,6 @@ irmax=intarr(N_FL)
 for i=0,N_FL-1 do irmax(i)=where(    rad_A(i,*)  eq max(    rad_A(i,*)) )
 for i=0,N_FL-1 do irmin(i)=where(abs(rad_A(i,*)) eq min(abs(rad_A(i,*))))
 loadct,0
-!p.color=0
-!p.background=255
 plot,lon_A,lat_A,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=2,title='r = 1.0 Rs',ytitle='Carrington Latitude [deg]'
 loadct,12
 for ifl=0,N_FL-1 do oplot,[lon_A(ifl,irmin[ifl])],[lat_A(ifl,irmin[ifl])],psym=4,color=ifl*32
@@ -154,8 +145,17 @@ stop
 print, 'Press SPACE BAR to see the plot.'
 pause
 
-
-
+print
+print,'Let us see an example of result from the structure.'
+print,'Say one wants to plot the AIA results along field line ifl=0, then one does this:'
+print
+print,'          ifl = 0'
+print,'          tmp = reform(index_sampling_aia_A(ifl,*))'
+print,' ind_samp_aia = where(tmp eq 1)'
+print,' window, 0'
+print,' plot,rad_A(ifl,ind_samp_aia),Ne_aia_A(ifl,ind_samp_aia)'
+print, 'Press SPACE BAR to see the plot.'
+pause
 window,0
 ifl=0
 tmp = reform(index_sampling_aia_A(ifl,*))

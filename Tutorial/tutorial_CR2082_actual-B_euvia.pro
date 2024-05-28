@@ -30,11 +30,12 @@ pro mini_tutorial
 
 ; 1) Declare the DIR where the structure is located, and the filename.
   dir = './'
-  structure_filename = 'CR2082_AWsOM-lines-1_tracing-structure-merge_euvia.sav'
-
+  structure_filename = 'CR2082_AWSoM-map1_tracing-structure-merge_euvia.sav'
+  structure_filename = 'CR2082_AWSoM-map7_tracing-structure-merge_euvia.sav'
+  
 ; 2) Load structure into memory and extract all available arrays from it.
   load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /euvia
-  ;goto,plots
+  goto,plots
  
 print, 'Press SPACE BAR to continue.'
 pause
@@ -122,6 +123,58 @@ print,'There is a KEY array, provided for each instrument, that deserves a separ
 print
 print, 'Press SPACE BAR to continue.'
 pause
+
+plots:
+
+; Set up graph options.
+Device, retain = 2, true_color = 24, decomposed = 0
+
+window,5,xs=1000,ys=1000
+!p.multi=[0,1,2]
+loadct,0
+!p.color=0
+!p.background=255
+; color table for colored symbols:
+ctbl = 25;11
+
+; 1D Arrays of radial index for Rmin and Rmax 
+irmin=intarr(N_FL)
+irmax=intarr(N_FL)
+for i=0,N_FL-1 do irmax(i)=where(    rad_A(i,*)  eq max(    rad_A(i,*)) )
+for i=0,N_FL-1 do irmin(i)=where(abs(rad_A(i,*)) eq min(abs(rad_A(i,*))))
+; 1D Arrays of Footpoint and Terminal Lon and Lat
+Footpoint_Lon = fltarr(N_FL)
+Footpoint_Lat = fltarr(N_FL)
+ Terminal_Lon = fltarr(N_FL)
+ Terminal_Lat = fltarr(N_FL)
+for ifl = 0,N_FL-1 do Footpoint_Lon(ifl) = lon_A(ifl,irmin[ifl])
+for ifl = 0,N_FL-1 do Footpoint_Lat(ifl) = lat_A(ifl,irmin[ifl])
+for ifl = 0,N_FL-1 do  Terminal_Lon(ifl) = lon_A(ifl,irmax[ifl])
+for ifl = 0,N_FL-1 do  Terminal_Lat(ifl) = lat_A(ifl,irmax[ifl])
+
+
+; Order arrays by increasing Terminal Longitude
+  refer_array =  Terminal_Lon
+ Terminal_Lon =  Terminal_Lon(sort(refer_array))
+ Terminal_Lat =  Terminal_Lat(sort(refer_array))
+Footpoint_Lon = Footpoint_Lon(sort(refer_array))
+Footpoint_Lat = Footpoint_Lat(sort(refer_array))
+
+factor  = 255./float(N_FL-1)
+colors  = factor*indgen(N_FL)
+
+plot,lon_A,lat_A,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=2,title=strmid(structure_filename,0,17)+'  r = 1.0 Rs',ytitle='Carrington Latitude [deg]'
+loadct,ctbl
+for ifl=0,N_FL-1 do oplot,[Footpoint_Lon(ifl)],[Footpoint_Lat(ifl)],psym=4,color=colors(ifl)
+loadct,0
+plot,lon_A,lat_A,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=2,xtitle='Carrington Longitude [deg]',title='r = 23.68 Rs',ytitle='Carrington Latitude [deg]'
+loadct,ctbl
+for ifl=0,N_FL-1 do oplot,[Terminal_Lon(ifl)],[Terminal_Lat(ifl)],psym=4,color=colors(ifl)
+loadct,0
+!p.multi=0
+print, 'Press SPACE BAR to see the plot.'
+;pause
+
 print
 print,'Let us see an example of result from the structure.'
 print,'Say one wants to plot the AIA results along field line ifl=0, then one does this:'
@@ -132,43 +185,25 @@ print,' ind_samp_aia = where(tmp eq 1)'
 print,' window, 0'
 print,' plot,rad_A(ifl,ind_samp_euvia),Ne_euvia_A(ifl,ind_samp_euvia)'
 print, 'Press SPACE BAR to see the plot.'
-pause
-
-
-plots:
-Device, retain = 2, true_color = 24, decomposed = 0
-
-window,5,xs=1000,ys=1000
+;pause
+window,0,xs=1000,ys=1000
 !p.multi=[0,1,2]
-irmin=intarr(N_FL)
-irmax=intarr(N_FL)
-for i=0,N_FL-1 do irmax(i)=where(    rad_A(i,*)  eq max(    rad_A(i,*)) )
-for i=0,N_FL-1 do irmin(i)=where(abs(rad_A(i,*)) eq min(abs(rad_A(i,*))))
-loadct,0
-!p.color=0
-!p.background=255
-plot,lon_A,lat_A,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=2,title='r = 1.0 Rs',ytitle='Carrington Latitude [deg]'
-loadct,39
-for ifl=0,N_FL-1 do oplot,[lon_A(ifl,irmin[ifl])],[lat_A(ifl,irmin[ifl])],psym=4,color=ifl*2
-loadct,0
-plot,lon_A,lat_A,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=2,xtitle='Carrington Longitude [deg]',title='r = 23.68 Rs',ytitle='Carrington Latitude [deg]'
-loadct,39
-for ifl=0,N_FL-1 do oplot,[lon_A(ifl,irmax[ifl])],[lat_A(ifl,irmax[ifl])],psym=4,color=ifl*2
-loadct,0
-!p.multi=0
-print, 'Press SPACE BAR to see the plot.'
-pause
-
-window,0
 ifl=0
 tmp = reform(index_sampling_euvia_A(ifl,*))
 ind_samp_euvia = where(tmp eq 1)
 plot,rad_A(ifl,ind_samp_euvia),Ne_euvia_A(ifl,ind_samp_euvia),charsize=2,xtitle='r [Rsun]',title='EUVIA-DEMT Ne(r) [cm!U-3!N]',psym=4,th=4, /nodata, $
      yr=[0,3.e8], ystyle=1, xr=[1,1.3], xstyle=1
-loadct,12
-ifl_A  = [0,50,80,70]
-print,lon_A(index,irmin[index])
-col_A  = ifl_A*2
+loadct,ctbl
+; Let us custom find 4 field lines of interest:
+sample= 10
+ifl_A = [median(where(Terminal_Lon gt   0. AND Terminal_Lon lt 100.)),$
+         median(where(Terminal_Lon gt 100. AND Terminal_Lon lt 180.)),$
+         median(where(Terminal_Lon gt 180. AND Terminal_Lon lt 270.)),$
+         median(where(Terminal_Lon gt 270. AND Terminal_Lon lt 360.))]
+print,Terminal_Lon(ifl_A)
+
+col_A  = colors(ifl_A)
+
 Nlines = n_elements(ifl_A)
 Ne_fit_euvia_avg = 0. * rad_fit_euvia_A
 N_fits = 0
@@ -185,22 +220,21 @@ for i=0,Nlines-1 do begin
     N_fits = N_fits+1
     print,'Fit Score:',scN_fit_euvia_A(ifl)
   print, 'Press SPACE BAR to plot next line.'
-  pause
+ ;pause
   endif
 endfor
   print, 'Press SPACE BAR to plot average trend.'
-  pause
+ ;pause
   Ne_fit_euvia_avg = Ne_fit_euvia_avg / float(N_fits)
   loadct,0
-  oplot,rad_fit_euvia_A,Ne_fit_euvia_avg,th=4
+ ;oplot,rad_fit_euvia_A,Ne_fit_euvia_avg,th=4
 
-window,1
 ifl=0
 tmp = reform(index_sampling_euvia_A(ifl,*))
 ind_samp_euvia = where(tmp eq 1)
 MK = 1.e6 ; K
 plot,rad_A(ifl,ind_samp_euvia),Tm_euvia_A(ifl,ind_samp_euvia)/MK,charsize=2,xtitle='r [Rsun]',title='EUVIA-DEMT Te(r) [MK]',psym=4,th=4, /nodata, yr=[0.,2.], ystyle=1, xr=[1,1.3], xstyle=1
-loadct,12
+loadct,ctbl
 Tm_fit_euvia_avg = 0. * rad_fit_euvia_A
 N_fits = 0
 for i=0,Nlines-1 do begin
@@ -216,14 +250,29 @@ for i=0,Nlines-1 do begin
     print,'Fit Score:',scT_fit_euvia_A(ifl)
   endif
   print, 'Press SPACE BAR to plot next line.'
-  pause
+ ;pause
 endfor
   print, 'Press SPACE BAR to plot average trend.'
-  pause
+ ;pause
   Tm_fit_euvia_avg = Tm_fit_euvia_avg / float(N_fits)
   loadct,0
-  oplot,rad_fit_euvia_A,Tm_fit_euvia_avg/MK,th=4
-
+ ;oplot,rad_fit_euvia_A,Tm_fit_euvia_avg/MK,th=4
+  !p.multi=0
+  
   STOP
   return
+end
+
+
+pro record_jpg,dir,filename
+
+; set graph stuff
+device, retain     = 2
+device, true_color = 24
+device, decomposed = 0
+
+image24 = TVRD(True=1)
+image2d = Color_Quan(image24, 1, r, g, b)
+write_jpeg,dir+filename,image24,quality=100,true=1
+return
 end
