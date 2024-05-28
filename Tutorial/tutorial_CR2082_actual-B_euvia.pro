@@ -34,7 +34,7 @@ pro mini_tutorial
 
 ; 2) Load structure into memory and extract all available arrays from it.
   load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /euvia
- ;goto,plots
+  ;goto,plots
  
 print, 'Press SPACE BAR to continue.'
 pause
@@ -45,7 +45,7 @@ print, 'Bellow is the list of the full contents of the structure, named "trace_d
 print
 print, 'load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /instruments....'
 print
-print, 'Everything that says *NullPointer* does not exist. For this particular structure only EUVI-A results exist.'
+print, 'For this particular structure only EUVI-A results exist.'
 print
 print,'-------------------------------'
 print,'help, trace_data, /str'
@@ -133,9 +133,32 @@ print,' window, 0'
 print,' plot,rad_A(ifl,ind_samp_euvia),Ne_euvia_A(ifl,ind_samp_euvia)'
 print, 'Press SPACE BAR to see the plot.'
 pause
-Device, retain = 2, true_color = 24, decomposed = 0
+
 
 plots:
+Device, retain = 2, true_color = 24, decomposed = 0
+
+window,5,xs=1000,ys=1000
+!p.multi=[0,1,2]
+irmin=intarr(N_FL)
+irmax=intarr(N_FL)
+for i=0,N_FL-1 do irmax(i)=where(    rad_A(i,*)  eq max(    rad_A(i,*)) )
+for i=0,N_FL-1 do irmin(i)=where(abs(rad_A(i,*)) eq min(abs(rad_A(i,*))))
+loadct,0
+!p.color=0
+!p.background=255
+plot,lon_A,lat_A,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=2,title='r = 1.0 Rs',ytitle='Carrington Latitude [deg]'
+loadct,39
+for ifl=0,N_FL-1 do oplot,[lon_A(ifl,irmin[ifl])],[lat_A(ifl,irmin[ifl])],psym=4,color=ifl*2
+loadct,0
+plot,lon_A,lat_A,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=2,xtitle='Carrington Longitude [deg]',title='r = 23.68 Rs',ytitle='Carrington Latitude [deg]'
+loadct,39
+for ifl=0,N_FL-1 do oplot,[lon_A(ifl,irmax[ifl])],[lat_A(ifl,irmax[ifl])],psym=4,color=ifl*2
+loadct,0
+!p.multi=0
+print, 'Press SPACE BAR to see the plot.'
+pause
+
 window,0
 ifl=0
 tmp = reform(index_sampling_euvia_A(ifl,*))
@@ -143,7 +166,8 @@ ind_samp_euvia = where(tmp eq 1)
 plot,rad_A(ifl,ind_samp_euvia),Ne_euvia_A(ifl,ind_samp_euvia),charsize=2,xtitle='r [Rsun]',title='EUVIA-DEMT Ne(r) [cm!U-3!N]',psym=4,th=4, /nodata, $
      yr=[0,3.e8], ystyle=1, xr=[1,1.3], xstyle=1
 loadct,12
-ifl_A  = [5,30,60,100]
+ifl_A  = [0,50,80,70]
+print,lon_A(index,irmin[index])
 col_A  = ifl_A*2
 Nlines = n_elements(ifl_A)
 Ne_fit_euvia_avg = 0. * rad_fit_euvia_A
