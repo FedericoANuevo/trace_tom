@@ -31,7 +31,7 @@ pro mini_tutorial
 ; 1) Declare the DIR where the structure is located, and the filename.
   dir = './'
   structure_filename = 'CR2082_AWSoM-map1_tracing-structure-merge_euvia.sav'
-  structure_filename = 'CR2082_AWSoM-map7_tracing-structure-merge_euvia.sav'
+ ;structure_filename = 'CR2082_AWSoM-map7_tracing-structure-merge_euvia.sav'
   
 ; 2) Load structure into memory and extract all available arrays from it.
   load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /euvia
@@ -129,13 +129,14 @@ plots:
 ; Set up graph options.
 Device, retain = 2, true_color = 24, decomposed = 0
 
-window,5,xs=1000,ys=1000
+window,0,xs=1000,ys=1000
 !p.multi=[0,1,2]
 loadct,0
 !p.color=0
 !p.background=255
-; color table for colored symbols:
-ctbl = 25;11
+
+; color table for fieldlines
+ctbl = 12 ; 16-LEVEL
 
 ; 1D Arrays of radial index for Rmin and Rmax 
 irmin=intarr(N_FL)
@@ -152,114 +153,95 @@ for ifl = 0,N_FL-1 do Footpoint_Lat(ifl) = lat_A(ifl,irmin[ifl])
 for ifl = 0,N_FL-1 do  Terminal_Lon(ifl) = lon_A(ifl,irmax[ifl])
 for ifl = 0,N_FL-1 do  Terminal_Lat(ifl) = lat_A(ifl,irmax[ifl])
 
+; ID the groups of field lines by means of user-defined
+; critinal terminal Longitudes to discriminate groups.
+TermCritLon = [0.,100.,180.,270.,360.]
+Ngroups     = n_elements(TermCritLon)-1
+; ID each field line.
+line_groupID  = intarr(N_FL)
+for ig=0,Ngroups-1 do begin
+   ifl_A = where(Terminal_Lon gt TermcritLon(ig) AND Terminal_Lon lt TermCritLon(ig+1))
+   line_groupID(ifl_A) = ig
+endfor
 
-; Order arrays by increasing Terminal Longitude
-  refer_array =  Terminal_Lon
- Terminal_Lon =  Terminal_Lon(sort(refer_array))
- Terminal_Lat =  Terminal_Lat(sort(refer_array))
-Footpoint_Lon = Footpoint_Lon(sort(refer_array))
-Footpoint_Lat = Footpoint_Lat(sort(refer_array))
+; Use the 16-level color table to color each group:
+colors = 16 + 190 * (indgen(Ngroups))/float(Ngroups-1)
 
-factor  = 255./float(N_FL-1)
-colors  = factor*indgen(N_FL)
-
+; Lat/Lon plots of FootPoint and TerminalPoint
 plot,lon_A,lat_A,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=2,title=strmid(structure_filename,0,17)+'  r = 1.0 Rs',ytitle='Carrington Latitude [deg]'
 loadct,ctbl
-for ifl=0,N_FL-1 do oplot,[Footpoint_Lon(ifl)],[Footpoint_Lat(ifl)],psym=4,color=colors(ifl)
+for ifl=0,N_FL-1 do oplot,[Footpoint_Lon(ifl)],[Footpoint_Lat(ifl)],psym=4,color=colors(line_groupID(ifl)),th=2
 loadct,0
 plot,lon_A,lat_A,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=2,xtitle='Carrington Longitude [deg]',title='r = 23.68 Rs',ytitle='Carrington Latitude [deg]'
 loadct,ctbl
-for ifl=0,N_FL-1 do oplot,[Terminal_Lon(ifl)],[Terminal_Lat(ifl)],psym=4,color=colors(ifl)
+for ifl=0,N_FL-1 do oplot,[Terminal_Lon(ifl)],[Terminal_Lat(ifl)],psym=4,color=colors(line_groupID(ifl)),th=2
 loadct,0
 !p.multi=0
 print, 'Press SPACE BAR to see the plot.'
 ;pause
 
-print
-print,'Let us see an example of result from the structure.'
-print,'Say one wants to plot the AIA results along field line ifl=0, then one does this:'
-print
-print,'          ifl = 0'
-print,'          tmp = reform(index_sampling_euvia_A(ifl,*))'
-print,' ind_samp_aia = where(tmp eq 1)'
-print,' window, 0'
-print,' plot,rad_A(ifl,ind_samp_euvia),Ne_euvia_A(ifl,ind_samp_euvia)'
-print, 'Press SPACE BAR to see the plot.'
-;pause
-window,0,xs=1000,ys=1000
+; Store average trends of Ne(r) and Tm(r) of each group in two 2D arrays.
+Nrad_fit = n_elements(rad_fit_euvia_A)
+Ne_avg = fltarr(Ngroups,Nrad_fit)
+Tm_avg = fltarr(Ngroups,Nrad_fit)
+for ig=0,Ngroups-1 do begin
+   ;Get average trends for group ig.
+   Nlines = 0
+   Ne_fit_euvia_avg = fltarr(Nrad_fit)
+   Tm_fit_euvia_avg = fltarr(Nrad_fit)
+   for ifl = 0,N_FL-1 do begin
+      if line_groupID(ifl) eq ig AND fitflag_EUVIA_A(ifl) eq +1. then begin
+         Nlines = Nlines+1
+         Ne_fit_euvia_avg = Ne_fit_euvia_avg + reform(Ne_fit_euvia_A(ifl,*))
+         Tm_fit_euvia_avg = Tm_fit_euvia_avg + reform(Tm_fit_euvia_A(ifl,*))
+      endif
+   endfor
+   Ne_avg(ig,*) = Ne_fit_euvia_avg / float(Nlines)
+   Tm_avg(ig,*) = Tm_fit_euvia_avg / float(Nlines)
+endfor
+
+; Plot median fieldline and average trend of each group
+window,1,xs=1000,ys=1000
 !p.multi=[0,1,2]
 ifl=0
 tmp = reform(index_sampling_euvia_A(ifl,*))
 ind_samp_euvia = where(tmp eq 1)
-plot,rad_A(ifl,ind_samp_euvia),Ne_euvia_A(ifl,ind_samp_euvia),charsize=2,xtitle='r [Rsun]',title='EUVIA-DEMT Ne(r) [cm!U-3!N]',psym=4,th=4, /nodata, $
-     yr=[0,3.e8], ystyle=1, xr=[1,1.3], xstyle=1
+loadct,0
+plot,rad_fit_euvia_A,Ne_avg(0,*),charsize=2,xtitle='r [Rsun]',title='EUVIA-DEMT Ne(r) [cm!U-3!N]',$
+     psym=4,th=4, /nodata, yr=[0,3.e8], ystyle=1, xr=[1,1.3], xstyle=1
 loadct,ctbl
-; Let us custom find 4 field lines of interest:
-sample= 10
-ifl_A = [median(where(Terminal_Lon gt   0. AND Terminal_Lon lt 100.)),$
-         median(where(Terminal_Lon gt 100. AND Terminal_Lon lt 180.)),$
-         median(where(Terminal_Lon gt 180. AND Terminal_Lon lt 270.)),$
-         median(where(Terminal_Lon gt 270. AND Terminal_Lon lt 360.))]
-print,Terminal_Lon(ifl_A)
-
-col_A  = colors(ifl_A)
-
-Nlines = n_elements(ifl_A)
-Ne_fit_euvia_avg = 0. * rad_fit_euvia_A
-N_fits = 0
-for i=0,Nlines-1 do begin
-  ifl = ifl_A[i]
-  col = col_A[i]
-  print,i,ifl,col
-  tmp = reform(index_sampling_euvia_A(ifl,*))
-  ind_samp_euvia = where(tmp eq 1)
-  oplot,rad_A(ifl,ind_samp_euvia),Ne_euvia_A(ifl,ind_samp_euvia),psym=4,th=2,color=col
-  if fitflag_EUVIA_A(ifl) eq +1. then begin
-    oplot,rad_fit_euvia_A,Ne_fit_euvia_A(ifl,*),color=col
-    Ne_fit_euvia_avg = Ne_fit_euvia_avg + reform(Ne_fit_euvia_A(ifl,*))
-    N_fits = N_fits+1
-    print,'Fit Score:',scN_fit_euvia_A(ifl)
-  print, 'Press SPACE BAR to plot next line.'
- ;pause
-  endif
+for ig=0,Ngroups-1 do begin
+   ; overplot Avg trend of group ig as a thick-line.
+   oplot,rad_fit_euvia_A,Ne_avg(ig,*),color=colors(ig),th=4
+   ; overplot Median line of group ig, data as diamonds and fit as a thin-line.
+   ifl_A    = where(line_groupID eq ig AND fitflag_EUVIA_A eq +1.)
+   ifl      = median(ifl_A)
+   tmp      = reform(index_sampling_euvia_A(ifl,*))
+   ind_samp = where(tmp eq 1)
+   oplot,rad_A(ifl,ind_samp),Ne_euvia_A(ifl,ind_samp),color=colors(ig),psym=4 ; DEMT data points
+   oplot,rad_fit_euvia_A,Ne_fit_euvia_A(ifl,*),color=colors(ig)               ; fit
 endfor
-  print, 'Press SPACE BAR to plot average trend.'
- ;pause
-  Ne_fit_euvia_avg = Ne_fit_euvia_avg / float(N_fits)
-  loadct,0
- ;oplot,rad_fit_euvia_A,Ne_fit_euvia_avg,th=4
 
-ifl=0
-tmp = reform(index_sampling_euvia_A(ifl,*))
-ind_samp_euvia = where(tmp eq 1)
+loadct,0
 MK = 1.e6 ; K
-plot,rad_A(ifl,ind_samp_euvia),Tm_euvia_A(ifl,ind_samp_euvia)/MK,charsize=2,xtitle='r [Rsun]',title='EUVIA-DEMT Te(r) [MK]',psym=4,th=4, /nodata, yr=[0.,2.], ystyle=1, xr=[1,1.3], xstyle=1
+plot,rad_fit_euvia_A,Tm_avg(0,*)/MK,charsize=2,xtitle='r [Rsun]',title='EUVIA-DEMT Tm(r) [MK]',$
+     psym=4,th=4, /nodata, yr=[0.,2.], ystyle=1, xr=[1,1.3], xstyle=1
 loadct,ctbl
-Tm_fit_euvia_avg = 0. * rad_fit_euvia_A
-N_fits = 0
-for i=0,Nlines-1 do begin
-  ifl = ifl_A[i]
-  col = col_A[i]
-  tmp = reform(index_sampling_euvia_A(ifl,*))
-  ind_samp_euvia = where(tmp eq 1)
-  oplot,rad_A(ifl,ind_samp_euvia),Tm_euvia_A(ifl,ind_samp_euvia)/MK,psym=4,th=2,color=col
-  if fitflag_EUVIA_A(ifl) eq +1. then begin
-    oplot,rad_fit_euvia_A,Tm_fit_euvia_A(ifl,*)/MK,color=col
-    Tm_fit_euvia_avg = Tm_fit_euvia_avg + reform(Tm_fit_euvia_A(ifl,*))
-    N_fits = N_fits+1
-    print,'Fit Score:',scT_fit_euvia_A(ifl)
-  endif
-  print, 'Press SPACE BAR to plot next line.'
- ;pause
+for ig=0,Ngroups-1 do begin
+   ; overplot Avg trend of group ig as a thick-line.
+   oplot,rad_fit_euvia_A,Tm_avg(ig,*)/MK,color=colors(ig),th=4
+   ; overplot Median line of group ig, data as diamonds and fit as a thin-line.
+   ifl_A    = where(line_groupID eq ig AND fitflag_EUVIA_A eq +1.)
+   ifl      = median(ifl_A)
+   tmp      = reform(index_sampling_euvia_A(ifl,*))
+   ind_samp = where(tmp eq 1)
+   oplot,rad_A(ifl,ind_samp),Tm_euvia_A(ifl,ind_samp)/MK,color=colors(ig),psym=4 ; DEMT data points
+   oplot,rad_fit_euvia_A,Tm_fit_euvia_A(ifl,*)/MK,color=colors(ig)               ; fit
 endfor
-  print, 'Press SPACE BAR to plot average trend.'
- ;pause
-  Tm_fit_euvia_avg = Tm_fit_euvia_avg / float(N_fits)
-  loadct,0
- ;oplot,rad_fit_euvia_A,Tm_fit_euvia_avg/MK,th=4
-  !p.multi=0
-  
-  STOP
+loadct,0
+
+
+stop
   return
 end
 
