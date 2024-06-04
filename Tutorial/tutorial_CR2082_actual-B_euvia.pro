@@ -31,7 +31,7 @@ pro mini_tutorial
 ; 1) Declare the DIR where the structure is located, and the filename.
   dir = './'
   structure_filename = 'CR2082_AWSoM-map1_tracing-structure-merge_euvia.sav'
- ;structure_filename = 'CR2082_AWSoM-map7_tracing-structure-merge_euvia.sav'
+  structure_filename = 'CR2082_AWSoM-map7_tracing-structure-merge_euvia.sav'
   
 ; 2) Load structure into memory and extract all available arrays from it.
   load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /euvia
@@ -180,6 +180,9 @@ loadct,0
 print, 'Press SPACE BAR to see the plot.'
 ;pause
 
+; Set a chisq threshold to select field lines:
+chsq_threshold = 0.25
+
 ; Store average trends of Ne(r) and Tm(r) of each group in two 2D arrays.
 Nrad_fit = n_elements(rad_fit_euvia_A)
 Ne_avg = fltarr(Ngroups,Nrad_fit)
@@ -190,7 +193,7 @@ for ig=0,Ngroups-1 do begin
    Ne_fit_euvia_avg = fltarr(Nrad_fit)
    Tm_fit_euvia_avg = fltarr(Nrad_fit)
    for ifl = 0,N_FL-1 do begin
-      if line_groupID(ifl) eq ig AND fitflag_EUVIA_A(ifl) eq +1. then begin
+      if line_groupID(ifl) eq ig AND fitflag_EUVIA_A(ifl) eq +1. AND scN_fit_EUVIA_A(ifl) lt chsq_threshold AND scT_fit_EUVIA_A(ifl) lt chsq_threshold then begin
          Nlines = Nlines+1
          Ne_fit_euvia_avg = Ne_fit_euvia_avg + reform(Ne_fit_euvia_A(ifl,*))
          Tm_fit_euvia_avg = Tm_fit_euvia_avg + reform(Tm_fit_euvia_A(ifl,*))
@@ -214,7 +217,7 @@ for ig=0,Ngroups-1 do begin
    ; overplot Avg trend of group ig as a thick-line.
    oplot,rad_fit_euvia_A,Ne_avg(ig,*),color=colors(ig),th=4
    ; overplot Median line of group ig, data as diamonds and fit as a thin-line.
-   ifl_A    = where(line_groupID eq ig AND fitflag_EUVIA_A eq +1.)
+   ifl_A    = where(line_groupID eq ig AND fitflag_EUVIA_A eq +1. AND scN_fit_EUVIA_A lt chsq_threshold AND scT_fit_EUVIA_A lt chsq_threshold)
    ifl      = median(ifl_A)
    tmp      = reform(index_sampling_euvia_A(ifl,*))
    ind_samp = where(tmp eq 1)
@@ -231,7 +234,7 @@ for ig=0,Ngroups-1 do begin
    ; overplot Avg trend of group ig as a thick-line.
    oplot,rad_fit_euvia_A,Tm_avg(ig,*)/MK,color=colors(ig),th=4
    ; overplot Median line of group ig, data as diamonds and fit as a thin-line.
-   ifl_A    = where(line_groupID eq ig AND fitflag_EUVIA_A eq +1.)
+   ifl_A    = where(line_groupID eq ig AND fitflag_EUVIA_A eq +1. AND scN_fit_EUVIA_A lt chsq_threshold AND scT_fit_EUVIA_A lt chsq_threshold)
    ifl      = median(ifl_A)
    tmp      = reform(index_sampling_euvia_A(ifl,*))
    ind_samp = where(tmp eq 1)
