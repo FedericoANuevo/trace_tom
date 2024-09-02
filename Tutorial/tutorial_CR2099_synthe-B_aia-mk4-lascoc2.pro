@@ -34,7 +34,8 @@ pro mini_tutorial
 
 ; 2) Load structure into memory and extract all available arrays from it.
   load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /aia, /mk4, /lascoc2
- ;goto,plots
+
+  goto,plots
  
 print, 'Press SPACE BAR to continue.'
 pause

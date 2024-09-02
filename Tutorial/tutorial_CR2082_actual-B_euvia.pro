@@ -153,14 +153,14 @@ for ifl = 0,N_FL-1 do Footpoint_Lat(ifl) = lat_A(ifl,irmin[ifl])
 for ifl = 0,N_FL-1 do  Terminal_Lon(ifl) = lon_A(ifl,irmax[ifl])
 for ifl = 0,N_FL-1 do  Terminal_Lat(ifl) = lat_A(ifl,irmax[ifl])
 
-; ID the groups of field lines by means of user-defined
-; critinal terminal Longitudes to discriminate groups.
-TermCritLon = [0.,100.,180.,270.,360.]
-Ngroups     = n_elements(TermCritLon)-1
+; ID groups of field lines by means of user-defined
+; ranges of terminal Longitudes.
+CritTermLon = [0.,100.,180.,270.,360.]
+Ngroups     = n_elements(CritTermLon)-1
 ; ID each field line.
 line_groupID  = intarr(N_FL)
 for ig=0,Ngroups-1 do begin
-   ifl_A = where(Terminal_Lon gt TermcritLon(ig) AND Terminal_Lon lt TermCritLon(ig+1))
+   ifl_A = where(Terminal_Lon gt CritTermLon(ig) AND Terminal_Lon lt CritTermLon(ig+1))
    line_groupID(ifl_A) = ig
 endfor
 
