@@ -35,10 +35,12 @@ pro call_load_structure
 
 ; Directory, File-name and Window
 ; dir  = '/data1/DATA/fieldlines_judit/CR2099/map1/'
-; file = 'list.map1.txt-tracing-structure-merge_aia_mk4_lascoc2.sav' & win=0
-  dir  = '/data1/DATA/fieldlines_judit/CR2099/map7/'
-  file = 'list.map7.txt-tracing-structure-merge_aia_mk4_lascoc2.sav' & win=0
-
+; file = 'list.map1.txt-tracing-structure-merge_aia_mk4_lascoc2.sav' &win=0
+; dir  = '/data1/DATA/fieldlines_judit/CR2099/map7/'
+; file = 'list.map7.txt-tracing-structure-merge_aia_mk4_lascoc2.sav' &win=0
+  dir  = '/data1/DATA/fieldlines_judit/CR2099/map7_new/'   
+  file = 'list.map7.new.txt-tracing-structure-merge_aia_mk4_lascoc2.sav' & win=0
+  
 ; Load the traced-data-structure (stored in common data )
   load_traced_data_structure,dir=dir,structure_filename=file,/aia,/mk4,/lascoc2
 

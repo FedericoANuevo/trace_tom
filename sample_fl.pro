@@ -15,13 +15,16 @@ pro sample_fl, Ne_l=Ne_l, index_l=index_l, index_sampling_l=index_sampling_l
      il_min     = min(il_range)
      il_max     = max(il_range)
      il         = il_min
-;    06-09-24: Consultar este condicional con Albert...
-;    ---------------------------------------------------------     
-;    if il_max eq n_elements(index_l)-1 then il_max = il_max-2
-;    ---------------------------------------------------------     
      while il le il_max do begin
         il1 = il
-        while index_l(il+1) eq index_l(il1) do il=il+1
+;    06-09-24: Consultar este condicional con Albert...
+;    ---------------------------------------------------------     
+        while (index_l(il+1) eq index_l(il1)) do begin
+           il=il+1
+           if il eq n_elements(index_l)-1 then goto,skip_while
+        endwhile
+        skip_while:
+;    ---------------------------------------------------------             
         il2 = il
         ind_sampling_cell = fix(mean([il1,il2]))
         if Ne_l(ind_sampling_cell) gt 0. then index_sampling_l(ind_sampling_cell) = +1
