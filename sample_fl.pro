@@ -6,6 +6,7 @@
 ; HISTORY: V1.0 AMV, IAFE, November-2023.
 ; HISTORY: V1.0.1 FAN, IAFE, April-2024, goto,skip_sample added
 ; HISTORY: V1.0.1 FAN, ClaSP, May-2024, change GOTO for an IF
+; HISTORY: V1.0.2 FAN, IAFE, Sept-2024, add goto ...
 ;
 pro sample_fl, Ne_l=Ne_l, index_l=index_l, index_sampling_l=index_sampling_l
   
@@ -18,7 +19,8 @@ pro sample_fl, Ne_l=Ne_l, index_l=index_l, index_sampling_l=index_sampling_l
      while il le il_max do begin
         il1 = il
 ;    06-09-24: Consultar este condicional con Albert...
-;    ---------------------------------------------------------     
+;    ---------------------------------------------------------
+;       while (index_l(il+1) eq index_l(il1)) do il=il+1      
         while (index_l(il+1) eq index_l(il1)) do begin
            il=il+1
            if il eq n_elements(index_l)-1 then goto,skip_while
