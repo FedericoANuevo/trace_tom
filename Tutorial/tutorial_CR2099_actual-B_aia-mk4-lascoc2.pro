@@ -153,7 +153,7 @@ for ifl = 0,N_FL-1 do  Terminal_Lat(ifl) = lat_A(ifl,irmax[ifl])
 ; ID groups of field lines by means of user-defined
 ; ranges of terminal Longitudes.
 CritTermLon = [0.,100.,180.,270.,360.]
-CritTermLon = [0.,100.,180.,270.,310.,360.]
+;CritTermLon = [0.,100.,180.,270.,310.,360.]
 Ngroups     = n_elements(CritTermLon)-1
 ; ID each field line.
 line_groupID  = intarr(N_FL)
