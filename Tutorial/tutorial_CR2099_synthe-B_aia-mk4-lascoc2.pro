@@ -143,7 +143,7 @@ for ifl=0,N_FL-1 do oplot,[lon_A(ifl,irmax[ifl])],[lat_A(ifl,irmax[ifl])],psym=4
 loadct,39
 !p.multi=0
 stop
-print, 'Press SPACE BAR to see the plot.'
+print, 'Press SPACE BAR to continue.'
 pause
 
 print

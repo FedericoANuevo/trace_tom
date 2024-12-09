@@ -31,12 +31,12 @@ pro mini_tutorial
 ; 1) Declare the DIR where the structure is located, and the filename.
   dir = './'
   structure_filename = 'CR2099_AWSoM-map1_tracing-structure-merge_aia_mk4_lascoc2.sav'
-  structure_filename = 'CR2099_AWSoM-map7_tracing-structure-merge_aia_mk4_lascoc2.sav'
+ ;structure_filename = 'CR2099_AWSoM-map7_tracing-structure-merge_aia_mk4_lascoc2.sav'
 
 ; 2) Load structure into memory and extract all available arrays from it.
   load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /aia, /mk4, /lascoc2
 
-  goto,plots
+ goto,plots
  
 print, 'Press SPACE BAR to continue.'
 pause
@@ -125,13 +125,6 @@ plots:
 ; Set up graph options.
 Device, retain = 2, true_color = 24, decomposed = 0
 
-window,0,xs=1000,ys=1000
-!p.multi=[0,1,2]
-loadct,0
-!p.color=0
-!p.background=255
-
-
 ; color table for fieldlines
 ctbl = 12 ; 16-LEVEL
 
@@ -150,10 +143,10 @@ for ifl = 0,N_FL-1 do Footpoint_Lat(ifl) = lat_A(ifl,irmin[ifl])
 for ifl = 0,N_FL-1 do  Terminal_Lon(ifl) = lon_A(ifl,irmax[ifl])
 for ifl = 0,N_FL-1 do  Terminal_Lat(ifl) = lat_A(ifl,irmax[ifl])
 
-; ID groups of field lines by means of user-defined
-; ranges of terminal Longitudes.
-CritTermLon = [0.,100.,180.,270.,360.]
-;CritTermLon = [0.,100.,180.,270.,310.,360.]
+; ID groups of field lines by means of user-defined ranges of terminal Longitudes.
+if structure_filename eq 'CR2099_AWSoM-map1_tracing-structure-merge_aia_mk4_lascoc2.sav' then CritTermLon = [0.,100.,180.,270.,360.]
+if structure_filename eq 'CR2099_AWSoM-map7_tracing-structure-merge_aia_mk4_lascoc2.sav' then CritTermLon = [0.,100.,180.,270.,310.,360.]
+
 Ngroups     = n_elements(CritTermLon)-1
 ; ID each field line.
 line_groupID  = intarr(N_FL)
@@ -166,6 +159,11 @@ endfor
 colors = 16 + 190 * (indgen(Ngroups))/float(Ngroups-1)
 
 ; Lat/Lon plots of FootPoint and TerminalPoint
+window,0,xs=1000,ys=1000
+!p.multi=[0,1,2]
+loadct,0
+!p.color=0
+!p.background=255
 plot,lon_A,lat_A,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=2,title=strmid(structure_filename,0,17)+'  r = 1.0 Rs',ytitle='Carrington Latitude [deg]'
 loadct,ctbl
 for ifl=0,N_FL-1 do oplot,[Footpoint_Lon(ifl)],[Footpoint_Lat(ifl)],psym=4,color=colors(line_groupID(ifl)),th=2
@@ -175,26 +173,7 @@ loadct,ctbl
 for ifl=0,N_FL-1 do oplot,[Terminal_Lon(ifl)],[Terminal_Lat(ifl)],psym=4,color=colors(line_groupID(ifl)),th=2
 loadct,0
 !p.multi=0
-print, 'Press SPACE BAR to see the plot.'
-;pause
-stop
-
-irmin=intarr(N_FL)
-irmax=intarr(N_FL)
-for i=0,N_FL-1 do irmax(i)=where(    rad_A(i,*)  eq max(    rad_A(i,*)) )
-for i=0,N_FL-1 do irmin(i)=where(abs(rad_A(i,*)) eq min(abs(rad_A(i,*))))
-loadct,0
-plot,lon_A,lat_A,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=2,title='r = 1.0 Rs',ytitle='Carrington Latitude [deg]'
-loadct,12
-for ifl=0,N_FL-1 do oplot,[lon_A(ifl,irmin[ifl])],[lat_A(ifl,irmin[ifl])],psym=4,color=ifl*32
-loadct,0
-plot,lon_A,lat_A,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=2,xtitle='Carrington Longitude [deg]',title='r = 23.68 Rs',ytitle='Carrington Latitude [deg]'
-loadct,12
-for ifl=0,N_FL-1 do oplot,[lon_A(ifl,irmax[ifl])],[lat_A(ifl,irmax[ifl])],psym=4,color=ifl*32
-loadct,39
-!p.multi=0
-stop
-print, 'Press SPACE BAR to see the plot.'
+print, 'Press SPACE BAR to continue.'
 pause
 
 print
