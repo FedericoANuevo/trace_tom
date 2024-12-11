@@ -122,18 +122,16 @@ pause
 
 plots:
 
-; Set up graph options.
-Device, retain = 2, true_color = 24, decomposed = 0
-
-; color table for fieldlines
-ctbl = 12 ; 16-LEVEL
-
-; 1D Arrays of radial index for Rmin and Rmax 
+;;
+; Determine the Lat and Lon of the footppoint and terminalpoint of each field line.
+; Group field lines according to the Lon of their terminalpoint
+;
+; 1D Arrays: radial index corresponding to Rmin and Rmax for each field line:
 irmin=intarr(N_FL)
 irmax=intarr(N_FL)
 for i=0,N_FL-1 do irmax(i)=where(    rad_A(i,*)  eq max(    rad_A(i,*)) )
 for i=0,N_FL-1 do irmin(i)=where(abs(rad_A(i,*)) eq min(abs(rad_A(i,*))))
-; 1D Arrays of Footpoint and Terminal Lon and Lat
+; 1D Arrays: Footpoint and Terminalpoint Lon and Lat for each field line:
 Footpoint_Lon = fltarr(N_FL)
 Footpoint_Lat = fltarr(N_FL)
  Terminal_Lon = fltarr(N_FL)
@@ -142,19 +140,24 @@ for ifl = 0,N_FL-1 do Footpoint_Lon(ifl) = lon_A(ifl,irmin[ifl])
 for ifl = 0,N_FL-1 do Footpoint_Lat(ifl) = lat_A(ifl,irmin[ifl])
 for ifl = 0,N_FL-1 do  Terminal_Lon(ifl) = lon_A(ifl,irmax[ifl])
 for ifl = 0,N_FL-1 do  Terminal_Lat(ifl) = lat_A(ifl,irmax[ifl])
-
-; ID groups of field lines by means of user-defined ranges of terminal Longitudes.
+;
+; Tag groups of field lines by means of user-defined ranges of terminal Longitudes.
 if structure_filename eq 'CR2099_AWSoM-map1_tracing-structure-merge_aia_mk4_lascoc2.sav' then CritTermLon = [0.,100.,180.,270.,360.]
 if structure_filename eq 'CR2099_AWSoM-map7_tracing-structure-merge_aia_mk4_lascoc2.sav' then CritTermLon = [0.,100.,180.,270.,310.,360.]
-
+;
 Ngroups     = n_elements(CritTermLon)-1
-; ID each field line.
+; Tag each field line (ifl) with the group number (ig) to which it belongs: 
 line_groupID  = intarr(N_FL)
 for ig=0,Ngroups-1 do begin
    ifl_A = where(Terminal_Lon gt CritTermLon(ig) AND Terminal_Lon lt CritTermLon(ig+1))
    line_groupID(ifl_A) = ig
 endfor
+;;
 
+; Set up graph options.
+Device, retain = 2, true_color = 24, decomposed = 0
+; color table for fieldlines
+ctbl = 12 ; 16-LEVEL
 ; Use the 16-level color table to color each group:
 colors = 16 + 190 * (indgen(Ngroups))/float(Ngroups-1)
 
@@ -176,6 +179,8 @@ loadct,0
 print, 'Press SPACE BAR to continue.'
 pause
 
+;;
+; Determine average trends <Ne(r)> and <Te(r)> for each group of field lines:!!!!!!!!!!!
 print
 print,'Let us see an example of result from the structure.'
 print,'Say one wants to plot the AIA results along field line ifl=0, then one does this:'
