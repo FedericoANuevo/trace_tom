@@ -155,198 +155,124 @@ endfor
 ;;
 
 ; Set up graph options.
-Device, retain = 2, true_color = 24, decomposed = 0
 ; color table for fieldlines
-ctbl = 12 ; 16-LEVEL
-; Use the 16-level color table to color each group:
-colors = 16 + 190 * (indgen(Ngroups))/float(Ngroups-1)
 
 ; Lat/Lon plots of FootPoint and TerminalPoint
-window,0,xs=1000,ys=1000
+;window,0,xs=1000,ys=1000
+ps1,'./'+structure_filename+'_connectivity-map.eps'
+np=1000
 !p.multi=[0,1,2]
 loadct,0
 !p.color=0
 !p.background=255
-plot,lon_A,lat_A,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=2,title=strmid(structure_filename,0,17)+'  r = 1.0 Rs',ytitle='Carrington Latitude [deg]'
+csz=1
+plot,lon_A,lat_A,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=csz,title=strmid(structure_filename,0,17)+'  r = 1.0 Rs',ytitle='Carrington Latitude [deg]'
+ctbl = 12 ; 16-LEVEL
+colors = 16 + 190 * (indgen(Ngroups))/float(Ngroups-1)
 loadct,ctbl
 for ifl=0,N_FL-1 do oplot,[Footpoint_Lon(ifl)],[Footpoint_Lat(ifl)],psym=4,color=colors(line_groupID(ifl)),th=2
 loadct,0
-plot,lon_A,lat_A,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=2,xtitle='Carrington Longitude [deg]',title='r = 23.68 Rs',ytitle='Carrington Latitude [deg]'
+plot,lon_A,lat_A,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=csz,xtitle='Carrington Longitude [deg]',title='r = 23.68 Rs',ytitle='Carrington Latitude [deg]'
 loadct,ctbl
 for ifl=0,N_FL-1 do oplot,[Terminal_Lon(ifl)],[Terminal_Lat(ifl)],psym=4,color=colors(line_groupID(ifl)),th=2
 loadct,0
 !p.multi=0
-print, 'Press SPACE BAR to continue.'
-pause
-
+ps2
 ;;
-; Determine average trends <Ne(r)> and <Te(r)> for each group of field lines:!!!!!!!!!!!
-print
-print,'Let us see an example of result from the structure.'
-print,'Say one wants to plot the AIA results along field line ifl=0, then one does this:'
-print
-print,'          ifl = 0'
-print,'          tmp = reform(index_sampling_aia_A(ifl,*))'
-print,' ind_samp_aia = where(tmp eq 1)'
-print,' window, 0'
-print,' plot,rad_A(ifl,ind_samp_aia),Ne_aia_A(ifl,ind_samp_aia)'
-print, 'Press SPACE BAR to see the plot.'
-pause
-window,0
-ifl=0
-tmp = reform(index_sampling_aia_A(ifl,*))
-ind_samp_aia = where(tmp eq 1)
-plot,rad_A(ifl,ind_samp_aia),Ne_aia_A(ifl,ind_samp_aia),charsize=2,xtitle='r [Rsun]',title='AIA-DEMT Ne(r) [cm!U-3!N]',psym=4,th=4, /nodata, yr=[0,1.e8], ystyle=1, xr=[1,1.3], xstyle=1
-loadct,12
-Ne_fit_aia_avg = 0. * rad_fit_aia_A
-
-for ifl=0,N_fl-1 do begin 
-  print, 'Press SPACE BAR to plot next line.'
-  pause
-  tmp = reform(index_sampling_aia_A(ifl,*))
-  ind_samp_aia = where(tmp eq 1)
-  col = (ifl+1)*40
-  oplot,rad_A(ifl,ind_samp_aia),Ne_aia_A(ifl,ind_samp_aia),psym=4,th=2,color=col
-  if fitflag_AIA_A(ifl) eq +1. then begin
-    oplot,rad_fit_aia_A,Ne_fit_aia_A(ifl,*),color=col
-    Ne_fit_aia_avg = Ne_fit_aia_avg + reform(Ne_fit_aia_A(ifl,*))
-    print,'Fit Score:',scN_fit_aia_A(ifl)
-  endif
+; Compute average trends <Ne(r)> and <Te(r)> for each group of field lines:
+if ngroups eq 4 then !p.multi=[0,2,2]
+if ngroups eq 5 then !p.multi=[0,3,2]
+csz  = 0.8
+cltb = 40
+; AIA Ne
+ps1,'./'+structure_filename+'_AIA-DEMT_Ne-profiles.eps'
+Ne_fit_aia_groupavg = fltarr(Ngroups,n_elements(rad_fit_aia_A))
+for ig=0,Ngroups-1 do begin
+   ifl = where(line_groupID eq ig AND fitflag_AIA_A eq +1)
+   if ifl(0) eq -1 then goto,skip_group_aia
+   Ne_fit_aia_groupavg(ig,*) = total( Ne_fit_aia_A(ifl,*) , 1 ) / float(n_elements(ifl))
+   loadct,0
+   plot,rad_fit_aia_A,Ne_fit_aia_groupavg(ig,*),charsize=csz,xtitle='r [Rsun]',title='AIA-DEMT Ne(r) [cm!U-3!N]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=2, xr=[1,1.25], xstyle=1,/nodata
+   loadct,cltb
+   color_index_step = fix(256./n_elements(ifl))
+   for index=0,n_elements(ifl)-1 do begin
+      tmp = reform(index_sampling_aia_A(ifl(index),*))
+      ind_samp_aia = where(tmp eq 1)
+      oplot,rad_fit_aia_A                 ,Ne_fit_aia_A(ifl(index),*)       ,color=(index)*color_index_step
+      oplot,rad_A(ifl(index),ind_samp_aia),Ne_aia_A(ifl(index),ind_samp_aia),color=(index)*color_index_step,psym=4
+   endfor
+   loadct,0
+   oplot,rad_fit_aia_A,Ne_fit_aia_groupavg(ig,*),th=4
+   skip_group_aia:
 endfor
-   print, 'Press SPACE BAR to plot average trend.'
-   pause
-  N_fits = n_elements( where(fitflag_AIA_A eq +1.) )
-  Ne_fit_aia_avg = Ne_fit_aia_avg / float(N_fits)
-  loadct,0
-  oplot,rad_fit_aia_A,Ne_fit_aia_avg,th=4
-
-   print, 'Press SPACE BAR to see the Te(r) plot for the same field lines.'
-   pause
-
-window,1
-ifl=0
-tmp = reform(index_sampling_aia_A(ifl,*))
-ind_samp_aia = where(tmp eq 1)
-MK = 1.e6 ; K
-plot,rad_A(ifl,ind_samp_aia),Tm_aia_A(ifl,ind_samp_aia)/MK,charsize=2,xtitle='r [Rsun]',title='AIA-DEMT Te(r) [MK]',psym=4,th=4, /nodata, yr=[0.,2.], ystyle=1, xr=[1,1.3], xstyle=1
-loadct,12
-Tm_fit_aia_avg = 0. * rad_fit_aia_A
-for ifl=0,N_fl-1 do begin
-   print, 'Press SPACE BAR to plot next line.'
-   pause
-  tmp = reform(index_sampling_aia_A(ifl,*))
-  ind_samp_aia = where(tmp eq 1)
-  col = (ifl+1)*40
-  oplot,rad_A(ifl,ind_samp_aia),Tm_aia_A(ifl,ind_samp_aia)/MK,psym=4,th=2,color=col
-  if fitflag_AIA_A(ifl) eq +1. then begin
-    oplot,rad_fit_aia_A,Tm_fit_aia_A(ifl,*)/MK,color=col
-    Tm_fit_aia_avg = Tm_fit_aia_avg + reform(Tm_fit_aia_A(ifl,*))
-    print,'Fit Score:',scT_fit_aia_A(ifl)
-  endif
+ps2
+; C2 Ne
+ps1,'./'+structure_filename+'_C2-SRT_Ne-profiles.eps'
+Ne_fit_c2_groupavg = fltarr(Ngroups,n_elements(rad_fit_c2_A))
+for ig=0,Ngroups-1 do begin
+   ifl = where(line_groupID eq ig AND fitflag_C2_A eq +1)
+   if ifl(0) eq -1 then goto,skip_group_c2
+   Ne_fit_c2_groupavg(ig,*) = total( Ne_fit_c2_A(ifl,*) , 1 ) / float(n_elements(ifl))
+   loadct,0
+   plot,rad_fit_c2_A,Ne_fit_c2_groupavg(ig,*),charsize=csz,xtitle='r [Rsun]',title='C2-DEMT Ne(r) [cm!U-3!N]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=2, xr=[2.5,6.0], xstyle=1,/nodata
+   loadct,cltb
+   color_index_step = fix(256./n_elements(ifl))
+   for index=0,n_elements(ifl)-1 do begin
+      tmp = reform(index_sampling_c2_A(ifl(index),*))
+      ind_samp_c2 = where(tmp eq 1)
+      oplot,rad_fit_c2_A                 ,Ne_fit_c2_A(ifl(index),*)      ,color=(index)*color_index_step
+      oplot,rad_A(ifl(index),ind_samp_c2),Ne_c2_A(ifl(index),ind_samp_c2),color=(index)*color_index_step,psym=4
+   endfor
+   loadct,0
+   oplot,rad_fit_c2_A,Ne_fit_c2_groupavg(ig,*),th=4
+   skip_group_c2:
 endfor
-   print, 'Press SPACE BAR to plot average trend.'
-   pause
-  N_fits = n_elements( where(fitflag_AIA_A eq +1.) )
-  Tm_fit_aia_avg = Tm_fit_aia_avg / float(N_fits)
-  loadct,0
-  oplot,rad_fit_aia_A,Tm_fit_aia_avg/MK,th=4
-
-  
-print
-print, 'Press SPACE BAR to continue.'
-pause
-print
-print,'Similarly, to plot the c2 results for the SAME field line, one does:'
-print
-print,'         ifl = 0'
-print,'         tmp = reform(index_sampling_c2_A(ifl,*))'
-print,' ind_samp_c2 = where(tmp eq 1)'
-print,' window, 2'
-print,' plot,rad_A(ifl,ind_samp_c2),Ne_c2_A(ifl,ind_samp_c2)'
-print, 'Press SPACE BAR to see the plot.'
-pause
-c2:
-ifl=0
-tmp = reform(index_sampling_c2_A(ifl,*))
-ind_samp_c2 = where(tmp eq 1)
-
-window,2
- plot,rad_A(ifl,ind_samp_c2),Ne_c2_A(ifl,ind_samp_c2),charsize=2,xtitle='r [Rsun]',title='C2-SRT Ne(r) [cm!U-3!N]',psym=4,th=4,/nodata, xr=[2.5,6.0], xstyle=1, yr=[0,7.e4], ystyle=1
-loadct,12
-Ne_fit_c2_avg = 0. * rad_fit_c2_A
-for ifl=0,N_fl-1 do begin
-   print, 'Press SPACE BAR to plot next line.'
-   pause
-  tmp = reform(index_sampling_c2_A(ifl,*))
-  ind_samp_c2 = where(tmp eq 1)
-  col = (ifl+1)*40
-  oplot,rad_A(ifl,ind_samp_c2),Ne_c2_A(ifl,ind_samp_c2),psym=4,th=2,color=col
-  if fitflag_c2_A(ifl) eq +1. then begin
-    oplot,rad_fit_c2_A,Ne_fit_c2_A(ifl,*),color=col
-    Ne_fit_c2_avg = Ne_fit_c2_avg + reform(Ne_fit_c2_A(ifl,*))
-    print,'Fit Score:',scN_fit_c2_A(ifl)
-  endif
+ps2
+; Mk4 Ne
+ps1,'./'+structure_filename+'_Mk4-SRT_Ne-profiles.eps'
+Ne_fit_mk4_groupavg = fltarr(Ngroups,n_elements(rad_fit_mk4_A))
+for ig=0,Ngroups-1 do begin
+   ifl = where(line_groupID eq ig AND fitflag_mk4_A eq +1)
+   if ifl(0) eq -1 then goto,skip_group_mk4
+   Ne_fit_mk4_groupavg(ig,*) = total( Ne_fit_mk4_A(ifl,*) , 1 ) / float(n_elements(ifl))
+   loadct,0
+   plot,rad_fit_mk4_A,Ne_fit_mk4_groupavg(ig,*),charsize=csz,xtitle='r [Rsun]',title='Mk4-DEMT Ne(r) [cm!U-3!N]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=2, xr=[1.15,1.5], xstyle=1,/nodata
+   loadct,ctbl
+   color_index_step = fix(256./n_elements(ifl))
+   for index=0,n_elements(ifl)-1 do begin
+      tmp = reform(index_sampling_mk4_A(ifl(index),*))
+      ind_samp_mk4 = where(tmp eq 1)
+      oplot,rad_fit_mk4_A                 ,Ne_fit_mk4_A(ifl(index),*)       ,color=(index)*color_index_step
+      oplot,rad_A(ifl(index),ind_samp_mk4),Ne_mk4_A(ifl(index),ind_samp_mk4),color=(index)*color_index_step,psym=4
+   endfor
+   loadct,0
+   oplot,rad_fit_mk4_A,Ne_fit_mk4_groupavg(ig,*),th=4
+   skip_group_mk4:
 endfor
-
-   print, 'Press SPACE BAR to plot average trend.'
-   pause
-  N_fits = n_elements( where(fitflag_c2_A eq +1.) )
-  Ne_fit_c2_avg = Ne_fit_c2_avg / float(N_fits)
-  loadct,0
-  oplot,rad_fit_c2_A,Ne_fit_c2_avg,th=4
-
-print
-print, 'Press SPACE BAR to continue.'
-pause
-print
-print,'Similarly, to plot the Mk4 results for the SAME field line, one does:'
-print
-print,'         ifl = 0'
-print,'         tmp = reform(index_sampling_mk4_A(ifl,*))'
-print,' ind_samp_mk4 = where(tmp eq 1)'
-print,' window, 3'
-print,' plot,rad_A(ifl,ind_samp_mk4),Ne_mk4_A(ifl,ind_samp_c2)'
-print, 'Press SPACE BAR to see the plot.'
-pause
-lastgraph:
-ifl=0
-tmp = reform(index_sampling_mk4_A(ifl,*))
-ind_samp_mk4 = where(tmp eq 1)
-window,3
- plot,rad_A(ifl,ind_samp_mk4),Ne_mk4_A(ifl,ind_samp_mk4),charsize=2,xtitle='r [Rsun]',title='MK4-SRT Ne(r) [cm!U-3!N]',psym=4,th=4,/nodata, xr=[1.15,1.5], xstyle=1, yr=[0,8.e7], ystyle=1
-loadct,12
-Ne_fit_mk4_avg = 0. * rad_fit_mk4_A
-for ifl=0,N_fl-1 do begin
-   print, 'Press SPACE BAR to plot next line.'
-   pause
-  tmp = reform(index_sampling_mk4_A(ifl,*))
-  ind_samp_mk4 = where(tmp eq 1)
-  col = (ifl+1)*40
-  oplot,rad_A(ifl,ind_samp_mk4),Ne_mk4_A(ifl,ind_samp_mk4),psym=4,th=2,color=col
-  if fitflag_mk4_A(ifl) eq +1. then begin
-    oplot,rad_fit_mk4_A,Ne_fit_mk4_A(ifl,*),color=col
-    Ne_fit_mk4_avg = Ne_fit_mk4_avg + reform(Ne_fit_mk4_A(ifl,*))
-    print,'Fit Chisq:',scN_fit_mk4_A(ifl)
-  endif
+ps2
+; AIA Te
+ps1,'./'+structure_filename+'_AIA-DEMT_Te-profiles.eps'
+Tm_fit_aia_groupavg = fltarr(Ngroups,n_elements(rad_fit_aia_A))
+for ig=0,Ngroups-1 do begin
+   ifl = where(line_groupID eq ig AND fitflag_AIA_A eq +1)
+   if ifl(0) eq -1 then goto,skip_group_aia_Te
+   Tm_fit_aia_groupavg(ig,*) = total( Tm_fit_aia_A(ifl,*) , 1 ) / float(n_elements(ifl))
+   loadct,0
+   plot,rad_fit_aia_A,Tm_fit_aia_groupavg(ig,*),charsize=csz,xtitle='r [Rsun]',title='AIA-DEMT Te(r) [MK]. Group #'+strmid(string(ig+1),7,1),th=4, yr=[0.5e6,3.0e6], ystyle=1, xr=[1,1.25], xstyle=1,/nodata
+   loadct,cltb
+   color_index_step = fix(256./n_elements(ifl))
+   for index=0,n_elements(ifl)-1 do begin
+      tmp = reform(index_sampling_aia_A(ifl(index),*))
+      ind_samp_aia = where(tmp eq 1)
+      oplot,rad_fit_aia_A                 ,Tm_fit_aia_A(ifl(index),*)       ,color=(index)*color_index_step
+      oplot,rad_A(ifl(index),ind_samp_aia),Tm_aia_A(ifl(index),ind_samp_aia),color=(index)*color_index_step,psym=4
+   endfor
+   loadct,0
+   oplot,rad_fit_aia_A,Tm_fit_aia_groupavg(ig,*),th=4
+   skip_group_aia_Te:
 endfor
-   print, 'Press SPACE BAR to plot average trend.'
-   pause
-  N_fits = n_elements( where(fitflag_mk4_A eq +1.) )
-  Ne_fit_mk4_avg = Ne_fit_mk4_avg / float(N_fits)
-  loadct,0
-  oplot,rad_fit_mk4_A,Ne_fit_mk4_avg,th=4
+ps2
 
-print
-print,'Note that rad_A is NOT associated to an instrument.'
-print
-print,'Note that the aia, or lascoc2, sampled points are MUCH less than Npt_max=15000:'
-print
-help, ind_samp_aia, rad_A(ifl,ind_samp_aia),Ne_aia_A(ifl,ind_samp_aia)
-help, ind_samp_c2, rad_A(ifl,ind_samp_c2),Ne_c2_A(ifl,ind_samp_c2)
-print
-print,'This concludes this mini-tutorial, to show the core part of our approach. We can pass you a plotting routine we are building that, based on this idea explained above, easily and flexibly combines any provided instruments on a single graph, computes average trends, etc. Let us first know what you think of the approach and data format.'
-print
-
-  stop
+  STOP
   return
 end
