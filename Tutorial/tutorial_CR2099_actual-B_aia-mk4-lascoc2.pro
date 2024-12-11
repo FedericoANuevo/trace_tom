@@ -180,11 +180,14 @@ loadct,0
 ps2
 ;;
 ; Compute average trends <Ne(r)> and <Te(r)> for each group of field lines:
-if ngroups eq 4 then !p.multi=[0,2,2]
-if ngroups eq 5 then !p.multi=[0,3,2]
+
+if ngroups eq 4 then nx=2
+if ngroups eq 5 then nx=3
+                     ny=2
 csz  = 0.8
 cltb = 40
 ; AIA Ne
+!p.multi=[0,nx,ny]
 ps1,'./'+structure_filename+'_AIA-DEMT_Ne-profiles.eps'
 Ne_fit_aia_groupavg = fltarr(Ngroups,n_elements(rad_fit_aia_A))
 for ig=0,Ngroups-1 do begin
@@ -207,6 +210,7 @@ for ig=0,Ngroups-1 do begin
 endfor
 ps2
 ; C2 Ne
+!p.multi=[0,nx,ny]
 ps1,'./'+structure_filename+'_C2-SRT_Ne-profiles.eps'
 Ne_fit_c2_groupavg = fltarr(Ngroups,n_elements(rad_fit_c2_A))
 for ig=0,Ngroups-1 do begin
@@ -236,6 +240,7 @@ for ig=0,Ngroups-1 do begin
 endfor
 ps2
 ; Mk4 Ne
+!p.multi=[0,nx,ny]
 ps1,'./'+structure_filename+'_Mk4-SRT_Ne-profiles.eps'
 Ne_fit_mk4_groupavg = fltarr(Ngroups,n_elements(rad_fit_mk4_A))
 for ig=0,Ngroups-1 do begin
@@ -258,6 +263,7 @@ for ig=0,Ngroups-1 do begin
 endfor
 ps2
 ; AIA Te
+!p.multi=[0,nx,ny]
 ps1,'./'+structure_filename+'_AIA-DEMT_Te-profiles.eps'
 Tm_fit_aia_groupavg = fltarr(Ngroups,n_elements(rad_fit_aia_A))
 for ig=0,Ngroups-1 do begin
@@ -279,6 +285,7 @@ for ig=0,Ngroups-1 do begin
    skip_group_aia_Te:
 endfor
 ps2
+
 
   STOP
   return
