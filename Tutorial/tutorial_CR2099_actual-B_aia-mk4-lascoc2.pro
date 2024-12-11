@@ -31,7 +31,7 @@ pro mini_tutorial
 ; 1) Declare the DIR where the structure is located, and the filename.
   dir = './'
   structure_filename = 'CR2099_AWSoM-map1_tracing-structure-merge_aia_mk4_lascoc2.sav'
- ;structure_filename = 'CR2099_AWSoM-map7_tracing-structure-merge_aia_mk4_lascoc2.sav'
+  structure_filename = 'CR2099_AWSoM-map7_tracing-structure-merge_aia_mk4_lascoc2.sav'
 
 ; 2) Load structure into memory and extract all available arrays from it.
   load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /aia, /mk4, /lascoc2
@@ -212,6 +212,13 @@ Ne_fit_c2_groupavg = fltarr(Ngroups,n_elements(rad_fit_c2_A))
 for ig=0,Ngroups-1 do begin
    ifl = where(line_groupID eq ig AND fitflag_C2_A eq +1)
    if ifl(0) eq -1 then goto,skip_group_c2
+;----
+   tag_pos = fltarr(n_elements(ifl))
+   for index=0,n_elements(ifl)-1 do begin
+      if min( Ne_fit_c2_A(ifl(index),*) gt 0.) then tag_pos(index)=+1
+   endfor
+   ifl = ifl(where(tag_pos eq +1))
+;----
    Ne_fit_c2_groupavg(ig,*) = total( Ne_fit_c2_A(ifl,*) , 1 ) / float(n_elements(ifl))
    loadct,0
    plot,rad_fit_c2_A,Ne_fit_c2_groupavg(ig,*),charsize=csz,xtitle='r [Rsun]',title='C2-DEMT Ne(r) [cm!U-3!N]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=2, xr=[2.5,6.0], xstyle=1,/nodata
