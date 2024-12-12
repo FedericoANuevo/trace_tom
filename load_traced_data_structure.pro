@@ -12,8 +12,10 @@
 ; several arrays and variables: all listed in COMMON BLOCK 'DATA'.
 ;
 ; FLAGS:
-; /aia,.../lascoc2, set them to define in memory arrays with results
-; from every instrument.
+; /aia,.../lascoc2, set one flag for each specific instrument whose
+; results is to be loaded into memory. The available instruments for a
+; particular SAV file are explicitly indicated as suffixes of its
+; filename.
 ;
 ; HISTORY: V1.0, AMV, November 2023, IAFE.
 ;          V1.1, AMV, January  2024, IAFE. Added fitted results.

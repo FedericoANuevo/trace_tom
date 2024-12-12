@@ -17,10 +17,11 @@
 ; particular SAV file are explicitly indicated as suffixes of its
 ; filename.
 ;
-; HISTORY: V1.0, AMV, Nov 2023, IAFE.
-;          V1.1, AMV, Jan 2024, IAFE. Added fitted results.
-;          V1.2, AMV, Jan 2024, IAFE. Added fits' parameters.
-;          V1.3, FAN, May 2024, ClaSP. Added euvia, euvib, and eit.
+; HISTORY: V1.0, AMV, November 2023, IAFE.
+;          V1.1, AMV, January  2024, IAFE. Added fitted results.
+;          V1.2, AMV, January  2024, IAFE. Added fits' parameters.
+;          V1.3, FAN, May      2024, ClaSP. Added euvia, euvib, and
+;          eit keywords.
 ;
 pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, $
                                 aia = aia, euvia = euvia, euvib = euvib, eit = eit, $
