@@ -31,7 +31,7 @@ pro mini_tutorial
 ; 1) Declare the DIR where the structure is located, and the filename.
   dir = './'
   structure_filename = 'CR2099_AWSoM-map1_tracing-structure-merge_aia_mk4_lascoc2.sav'
-  structure_filename = 'CR2099_AWSoM-map7_tracing-structure-merge_aia_mk4_lascoc2.sav'
+ ;structure_filename = 'CR2099_AWSoM-map7_tracing-structure-merge_aia_mk4_lascoc2.sav'
 
 ; 2) Load structure into memory and extract all available arrays from it.
   load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /aia, /mk4, /lascoc2
@@ -190,8 +190,14 @@ cltb = 40
 !p.multi=[0,nx,ny]
 ps1,'./'+structure_filename+'_AIA-DEMT_Ne-profiles.eps'
 Ne_fit_aia_groupavg = fltarr(Ngroups,n_elements(rad_fit_aia_A))
+;---- Tag field lines for which the fit is positive at all heights ----
+   tag_pos = fltarr(N_fl)
+   for ifl=0,N_fl-1 do begin
+      if min(Ne_fit_aia_A(ifl,*)) gt 0. then tag_pos(ifl)=+1
+   endfor
+;----------------------------------------------------------------------
 for ig=0,Ngroups-1 do begin
-   ifl = where(line_groupID eq ig AND fitflag_AIA_A eq +1)
+   ifl = where(line_groupID eq ig AND fitflag_AIA_A eq +1 AND tag_pos eq +1 AND scN_fit_aia_A ne -678.)
    if ifl(0) eq -1 then goto,skip_group_aia
    Ne_fit_aia_groupavg(ig,*) = total( Ne_fit_aia_A(ifl,*) , 1 ) / float(n_elements(ifl))
    loadct,0
@@ -213,16 +219,15 @@ ps2
 !p.multi=[0,nx,ny]
 ps1,'./'+structure_filename+'_C2-SRT_Ne-profiles.eps'
 Ne_fit_c2_groupavg = fltarr(Ngroups,n_elements(rad_fit_c2_A))
-for ig=0,Ngroups-1 do begin
-   ifl = where(line_groupID eq ig AND fitflag_C2_A eq +1)
-   if ifl(0) eq -1 then goto,skip_group_c2
-;----
-   tag_pos = fltarr(n_elements(ifl))
-   for index=0,n_elements(ifl)-1 do begin
-      if min( Ne_fit_c2_A(ifl(index),*) gt 0.) then tag_pos(index)=+1
+;---- Tag field lines for which the fit is positive at all heights ----
+   tag_pos = fltarr(N_fl)
+   for ifl=0,N_fl-1 do begin
+      if min(Ne_fit_c2_A(ifl,*)) gt 0. then tag_pos(ifl)=+1
    endfor
-   ifl = ifl(where(tag_pos eq +1))
-;----
+;----------------------------------------------------------------------
+for ig=0,Ngroups-1 do begin
+   ifl = where(line_groupID eq ig AND fitflag_C2_A eq +1 AND tag_pos eq +1 AND scN_fit_c2_A ne -678.)
+   if ifl(0) eq -1 then goto,skip_group_c2
    Ne_fit_c2_groupavg(ig,*) = total( Ne_fit_c2_A(ifl,*) , 1 ) / float(n_elements(ifl))
    loadct,0
    plot,rad_fit_c2_A,Ne_fit_c2_groupavg(ig,*),charsize=csz,xtitle='r [Rsun]',title='C2-DEMT Ne(r) [cm!U-3!N]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=2, xr=[2.5,6.0], xstyle=1,/nodata
@@ -236,6 +241,7 @@ for ig=0,Ngroups-1 do begin
    endfor
    loadct,0
    oplot,rad_fit_c2_A,Ne_fit_c2_groupavg(ig,*),th=4
+  ;if ig eq 3 then stop
    skip_group_c2:
 endfor
 ps2
@@ -243,8 +249,14 @@ ps2
 !p.multi=[0,nx,ny]
 ps1,'./'+structure_filename+'_Mk4-SRT_Ne-profiles.eps'
 Ne_fit_mk4_groupavg = fltarr(Ngroups,n_elements(rad_fit_mk4_A))
+;---- Tag field lines for which the fit is positive at all heights ----
+   tag_pos = fltarr(N_fl)
+   for ifl=0,N_fl-1 do begin
+      if min(Ne_fit_mk4_A(ifl,*)) gt 0. then tag_pos(ifl)=+1
+   endfor
+;----------------------------------------------------------------------
 for ig=0,Ngroups-1 do begin
-   ifl = where(line_groupID eq ig AND fitflag_mk4_A eq +1)
+   ifl = where(line_groupID eq ig AND fitflag_mk4_A eq +1 AND tag_pos eq +1 AND scN_fit_mk4_A ne -678.)
    if ifl(0) eq -1 then goto,skip_group_mk4
    Ne_fit_mk4_groupavg(ig,*) = total( Ne_fit_mk4_A(ifl,*) , 1 ) / float(n_elements(ifl))
    loadct,0
@@ -266,8 +278,14 @@ ps2
 !p.multi=[0,nx,ny]
 ps1,'./'+structure_filename+'_AIA-DEMT_Te-profiles.eps'
 Tm_fit_aia_groupavg = fltarr(Ngroups,n_elements(rad_fit_aia_A))
+;---- Tag field lines for which the fit is positive at all heights ----
+   tag_pos = fltarr(N_fl)
+   for ifl=0,N_fl-1 do begin
+      if min(Tm_fit_aia_A(ifl,*)) gt 0. then tag_pos(ifl)=+1
+   endfor
+;----------------------------------------------------------------------
 for ig=0,Ngroups-1 do begin
-   ifl = where(line_groupID eq ig AND fitflag_AIA_A eq +1)
+   ifl = where(line_groupID eq ig AND fitflag_AIA_A eq +1 AND tag_pos eq +1 AND scT_fit_aia_A ne -678.)
    if ifl(0) eq -1 then goto,skip_group_aia_Te
    Tm_fit_aia_groupavg(ig,*) = total( Tm_fit_aia_A(ifl,*) , 1 ) / float(n_elements(ifl))
    loadct,0
