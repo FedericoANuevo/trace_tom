@@ -31,7 +31,7 @@ pro mini_tutorial
 ; 1) Declare the DIR where the structure is located, and the filename.
   dir = './'
   structure_filename = 'CR2099_AWSoM-map1_tracing-structure-merge_aia_mk4_lascoc2.sav'
- ;structure_filename = 'CR2099_AWSoM-map7_tracing-structure-merge_aia_mk4_lascoc2.sav'
+  structure_filename = 'CR2099_AWSoM-map7_tracing-structure-merge_aia_mk4_lascoc2.sav'
 
 ; 2) Load structure into memory and extract all available arrays from it.
   load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /aia, /mk4, /lascoc2
@@ -178,9 +178,9 @@ for ifl=0,N_FL-1 do oplot,[Terminal_Lon(ifl)],[Terminal_Lat(ifl)],psym=4,color=c
 loadct,0
 !p.multi=0
 ps2
+
 ;;
 ; Compute average trends <Ne(r)> and <Te(r)> for each group of field lines:
-
 if ngroups eq 4 then nx=2
 if ngroups eq 5 then nx=3
                      ny=2
@@ -197,11 +197,11 @@ Ne_fit_aia_groupavg = fltarr(Ngroups,n_elements(rad_fit_aia_A))
    endfor
 ;----------------------------------------------------------------------
 for ig=0,Ngroups-1 do begin
-   ifl = where(line_groupID eq ig AND fitflag_AIA_A eq +1 AND tag_pos eq +1 AND scN_fit_aia_A ne -678.)
+   ifl = where(line_groupID eq ig AND fitflag_AIA_A eq +1 AND tag_pos eq +1 AND scN_fit_aia_A le 1.)
    if ifl(0) eq -1 then goto,skip_group_aia
    Ne_fit_aia_groupavg(ig,*) = total( Ne_fit_aia_A(ifl,*) , 1 ) / float(n_elements(ifl))
    loadct,0
-   plot,rad_fit_aia_A,Ne_fit_aia_groupavg(ig,*),charsize=csz,xtitle='r [Rsun]',title='AIA-DEMT Ne(r) [cm!U-3!N]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=2, xr=[1,1.25], xstyle=1,/nodata
+   plot,rad_fit_aia_A,Ne_fit_aia_groupavg(ig,*),charsize=csz,xtitle='r [Rsun]',title='AIA-DEMT Ne(r) [cm!U-3!N]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=2, xr=[1.02,1.25], xstyle=1,/nodata
    loadct,cltb
    color_index_step = fix(256./n_elements(ifl))
    for index=0,n_elements(ifl)-1 do begin
@@ -226,11 +226,14 @@ Ne_fit_c2_groupavg = fltarr(Ngroups,n_elements(rad_fit_c2_A))
    endfor
 ;----------------------------------------------------------------------
 for ig=0,Ngroups-1 do begin
-   ifl = where(line_groupID eq ig AND fitflag_C2_A eq +1 AND tag_pos eq +1 AND scN_fit_c2_A ne -678.)
+   ifl = where(line_groupID eq ig AND fitflag_C2_A eq +1 AND tag_pos eq +1 AND scN_fit_c2_A le 0.5)
    if ifl(0) eq -1 then goto,skip_group_c2
+   print,ifl
+   print,scN_fit_c2_A(ifl)
    Ne_fit_c2_groupavg(ig,*) = total( Ne_fit_c2_A(ifl,*) , 1 ) / float(n_elements(ifl))
+   print,max(Ne_fit_c2_groupavg(ig,*))
    loadct,0
-   plot,rad_fit_c2_A,Ne_fit_c2_groupavg(ig,*),charsize=csz,xtitle='r [Rsun]',title='C2-DEMT Ne(r) [cm!U-3!N]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=2, xr=[2.5,6.0], xstyle=1,/nodata
+   plot,rad_fit_c2_A,Ne_fit_c2_groupavg(ig,*),charsize=csz,xtitle='r [Rsun]',title='C2-SRT Ne(r) [cm!U-3!N]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=2, xr=[2.5,6.0], xstyle=1,/nodata
    loadct,cltb
    color_index_step = fix(256./n_elements(ifl))
    for index=0,n_elements(ifl)-1 do begin
@@ -256,11 +259,11 @@ Ne_fit_mk4_groupavg = fltarr(Ngroups,n_elements(rad_fit_mk4_A))
    endfor
 ;----------------------------------------------------------------------
 for ig=0,Ngroups-1 do begin
-   ifl = where(line_groupID eq ig AND fitflag_mk4_A eq +1 AND tag_pos eq +1 AND scN_fit_mk4_A ne -678.)
+   ifl = where(line_groupID eq ig AND fitflag_mk4_A eq +1 AND tag_pos eq +1 AND scN_fit_mk4_A le 0.5)
    if ifl(0) eq -1 then goto,skip_group_mk4
    Ne_fit_mk4_groupavg(ig,*) = total( Ne_fit_mk4_A(ifl,*) , 1 ) / float(n_elements(ifl))
    loadct,0
-   plot,rad_fit_mk4_A,Ne_fit_mk4_groupavg(ig,*),charsize=csz,xtitle='r [Rsun]',title='Mk4-DEMT Ne(r) [cm!U-3!N]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=2, xr=[1.15,1.5], xstyle=1,/nodata
+   plot,rad_fit_mk4_A,Ne_fit_mk4_groupavg(ig,*),charsize=csz,xtitle='r [Rsun]',title='Mk4-SRT Ne(r) [cm!U-3!N]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=2, xr=[1.15,1.5], xstyle=1,/nodata
    loadct,ctbl
    color_index_step = fix(256./n_elements(ifl))
    for index=0,n_elements(ifl)-1 do begin
@@ -283,13 +286,18 @@ Tm_fit_aia_groupavg = fltarr(Ngroups,n_elements(rad_fit_aia_A))
    for ifl=0,N_fl-1 do begin
       if min(Tm_fit_aia_A(ifl,*)) gt 0. then tag_pos(ifl)=+1
    endfor
+;---- Tag field lines for which the fit is positive at all heights ----
+   tag_pos = fltarr(N_fl)
+   for ifl=0,N_fl-1 do begin
+      if min(Ne_fit_aia_A(ifl,*)) gt 0. then tag_pos(ifl)=+1
+   endfor
 ;----------------------------------------------------------------------
 for ig=0,Ngroups-1 do begin
-   ifl = where(line_groupID eq ig AND fitflag_AIA_A eq +1 AND tag_pos eq +1 AND scT_fit_aia_A ne -678.)
+   ifl = where(line_groupID eq ig AND fitflag_AIA_A eq +1 AND tag_pos eq +1 AND scN_fit_aia_A le 1.)
    if ifl(0) eq -1 then goto,skip_group_aia_Te
    Tm_fit_aia_groupavg(ig,*) = total( Tm_fit_aia_A(ifl,*) , 1 ) / float(n_elements(ifl))
    loadct,0
-   plot,rad_fit_aia_A,Tm_fit_aia_groupavg(ig,*),charsize=csz,xtitle='r [Rsun]',title='AIA-DEMT Te(r) [MK]. Group #'+strmid(string(ig+1),7,1),th=4, yr=[0.5e6,3.0e6], ystyle=1, xr=[1,1.25], xstyle=1,/nodata
+   plot,rad_fit_aia_A,Tm_fit_aia_groupavg(ig,*),charsize=csz,xtitle='r [Rsun]',title='AIA-DEMT Te(r) [MK]. Group #'+strmid(string(ig+1),7,1),th=4, yr=[0.5e6,3.0e6], ystyle=1, xr=[1.02,1.25], xstyle=1,/nodata
    loadct,cltb
    color_index_step = fix(256./n_elements(ifl))
    for index=0,n_elements(ifl)-1 do begin
