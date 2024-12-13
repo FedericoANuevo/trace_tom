@@ -31,7 +31,7 @@ pro mini_tutorial
 ; 1) Declare the DIR where the structure is located, and the filename.
   dir = './'
   structure_filename = 'CR2099_AWSoM-map1_tracing-structure-merge_aia_mk4_lascoc2.sav'
-  structure_filename = 'CR2099_AWSoM-map7_tracing-structure-merge_aia_mk4_lascoc2.sav'
+ ;structure_filename = 'CR2099_AWSoM-map7_tracing-structure-merge_aia_mk4_lascoc2.sav'
 
 ; 2) Load structure into memory and extract all available arrays from it.
   load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /aia, /mk4, /lascoc2
@@ -181,14 +181,14 @@ ps2
 
 ;;
 ; Compute average trends <Ne(r)> and <Te(r)> for each group of field lines:
-if ngroups eq 4 then nx=2
-if ngroups eq 5 then nx=3
-                     ny=2
-csz  = 0.8
+;if ngroups eq 4 then nx=2
+;if ngroups eq 5 then nx=3
+nx = ngroups
+ny = 2
+csz  = 0.75
 cltb = 40
+
 ; AIA Ne
-!p.multi=[0,nx,ny]
-ps1,'./'+structure_filename+'_AIA-DEMT_Ne-profiles.eps'
 Ne_fit_aia_groupavg = fltarr(Ngroups,n_elements(rad_fit_aia_A))
 ;---- Tag field lines for which the fit is positive at all heights ----
    tag_pos = fltarr(N_fl)
@@ -196,9 +196,15 @@ Ne_fit_aia_groupavg = fltarr(Ngroups,n_elements(rad_fit_aia_A))
       if min(Ne_fit_aia_A(ifl,*)) gt 0. then tag_pos(ifl)=+1
    endfor
 ;----------------------------------------------------------------------
+scN_crit = 0.5
+!p.multi=[0,nx,ny]
+ps1,'./'+structure_filename+'_AIA-DEMT_Ne-profiles.eps'
 for ig=0,Ngroups-1 do begin
-   ifl = where(line_groupID eq ig AND fitflag_AIA_A eq +1 AND tag_pos eq +1 AND scN_fit_aia_A le 1.)
-   if ifl(0) eq -1 then goto,skip_group_aia
+   ifl = where(line_groupID eq ig AND fitflag_AIA_A eq +1 AND tag_pos eq +1 AND scN_fit_aia_A le scN_crit)
+   if ifl(0) eq -1 then begin
+      plot,rad_fit_aia_A,Ne_fit_aia_groupavg(ig,*),charsize=csz,xtitle='r [Rsun]',title='AIA-DEMT Ne(r) [cm!U-3!N]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=2, xr=[1.02,1.25], xstyle=1,/nodata
+      goto,skip_group_aia_Ne
+   endif
    Ne_fit_aia_groupavg(ig,*) = total( Ne_fit_aia_A(ifl,*) , 1 ) / float(n_elements(ifl))
    loadct,0
    plot,rad_fit_aia_A,Ne_fit_aia_groupavg(ig,*),charsize=csz,xtitle='r [Rsun]',title='AIA-DEMT Ne(r) [cm!U-3!N]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=2, xr=[1.02,1.25], xstyle=1,/nodata
@@ -212,45 +218,29 @@ for ig=0,Ngroups-1 do begin
    endfor
    loadct,0
    oplot,rad_fit_aia_A,Ne_fit_aia_groupavg(ig,*),th=4
-   skip_group_aia:
+   skip_group_aia_Ne:
 endfor
-ps2
-; C2 Ne
-!p.multi=[0,nx,ny]
-ps1,'./'+structure_filename+'_C2-SRT_Ne-profiles.eps'
-Ne_fit_c2_groupavg = fltarr(Ngroups,n_elements(rad_fit_c2_A))
-;---- Tag field lines for which the fit is positive at all heights ----
-   tag_pos = fltarr(N_fl)
-   for ifl=0,N_fl-1 do begin
-      if min(Ne_fit_c2_A(ifl,*)) gt 0. then tag_pos(ifl)=+1
-   endfor
-;----------------------------------------------------------------------
 for ig=0,Ngroups-1 do begin
-   ifl = where(line_groupID eq ig AND fitflag_C2_A eq +1 AND tag_pos eq +1 AND scN_fit_c2_A le 0.5)
-   if ifl(0) eq -1 then goto,skip_group_c2
-   print,ifl
-   print,scN_fit_c2_A(ifl)
-   Ne_fit_c2_groupavg(ig,*) = total( Ne_fit_c2_A(ifl,*) , 1 ) / float(n_elements(ifl))
-   print,max(Ne_fit_c2_groupavg(ig,*))
+   ifl = where(line_groupID eq ig AND fitflag_AIA_A eq +1 AND tag_pos eq +1 AND scN_fit_AIA_A le scN_crit)
+   if ifl(0) eq -1 then begin
+      plot,CritTermLon(ig:ig+1),[1.02,1.25],charsize=csz,xtitle='Lon [deg]',title='Rad [Rsun]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=1,xstyle=1,/nodata
+      goto,skip_group_aia_geo
+   endif
    loadct,0
-   plot,rad_fit_c2_A,Ne_fit_c2_groupavg(ig,*),charsize=csz,xtitle='r [Rsun]',title='C2-SRT Ne(r) [cm!U-3!N]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=2, xr=[2.5,6.0], xstyle=1,/nodata
-   loadct,cltb
+   plot,CritTermLon(ig:ig+1),[1.02,1.25],charsize=csz,xtitle='Lon [deg]',title='Rad [Rsun]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=1,xstyle=1,/nodata
+   loadct,ctbl
    color_index_step = fix(256./n_elements(ifl))
    for index=0,n_elements(ifl)-1 do begin
-      tmp = reform(index_sampling_c2_A(ifl(index),*))
-      ind_samp_c2 = where(tmp eq 1)
-      oplot,rad_fit_c2_A                 ,Ne_fit_c2_A(ifl(index),*)      ,color=(index)*color_index_step
-      oplot,rad_A(ifl(index),ind_samp_c2),Ne_c2_A(ifl(index),ind_samp_c2),color=(index)*color_index_step,psym=4
+      tmp = reform(index_sampling_aia_A(ifl(index),*))
+      ind_samp_aia = where(tmp eq 1)
+      oplot,lon_A(ifl(index),ind_samp_aia),rad_A(ifl(index),ind_samp_aia),color=(index)*color_index_step
    endfor
    loadct,0
-   oplot,rad_fit_c2_A,Ne_fit_c2_groupavg(ig,*),th=4
-  ;if ig eq 3 then stop
-   skip_group_c2:
+   skip_group_aia_geo:
 endfor
 ps2
+
 ; Mk4 Ne
-!p.multi=[0,nx,ny]
-ps1,'./'+structure_filename+'_Mk4-SRT_Ne-profiles.eps'
 Ne_fit_mk4_groupavg = fltarr(Ngroups,n_elements(rad_fit_mk4_A))
 ;---- Tag field lines for which the fit is positive at all heights ----
    tag_pos = fltarr(N_fl)
@@ -258,9 +248,15 @@ Ne_fit_mk4_groupavg = fltarr(Ngroups,n_elements(rad_fit_mk4_A))
       if min(Ne_fit_mk4_A(ifl,*)) gt 0. then tag_pos(ifl)=+1
    endfor
 ;----------------------------------------------------------------------
+scN_crit = 0.5
+!p.multi=[0,nx,ny]
+ps1,'./'+structure_filename+'_Mk4-SRT_Ne-profiles.eps'
 for ig=0,Ngroups-1 do begin
-   ifl = where(line_groupID eq ig AND fitflag_mk4_A eq +1 AND tag_pos eq +1 AND scN_fit_mk4_A le 0.5)
-   if ifl(0) eq -1 then goto,skip_group_mk4
+   ifl = where(line_groupID eq ig AND fitflag_mk4_A eq +1 AND tag_pos eq +1 AND scN_fit_mk4_A le scN_crit)
+   if ifl(0) eq -1 then begin
+      plot,rad_fit_mk4_A,Ne_fit_mk4_groupavg(ig,*),charsize=csz,xtitle='r [Rsun]',title='Mk4-SRT Ne(r) [cm!U-3!N]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=2, xr=[1.15,1.5], xstyle=1,/nodata
+      goto,skip_group_mk4_Ne
+   endif
    Ne_fit_mk4_groupavg(ig,*) = total( Ne_fit_mk4_A(ifl,*) , 1 ) / float(n_elements(ifl))
    loadct,0
    plot,rad_fit_mk4_A,Ne_fit_mk4_groupavg(ig,*),charsize=csz,xtitle='r [Rsun]',title='Mk4-SRT Ne(r) [cm!U-3!N]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=2, xr=[1.15,1.5], xstyle=1,/nodata
@@ -274,12 +270,81 @@ for ig=0,Ngroups-1 do begin
    endfor
    loadct,0
    oplot,rad_fit_mk4_A,Ne_fit_mk4_groupavg(ig,*),th=4
-   skip_group_mk4:
+   skip_group_mk4_Ne:
+endfor
+for ig=0,Ngroups-1 do begin
+   ifl = where(line_groupID eq ig AND fitflag_mk4_A eq +1 AND tag_pos eq +1 AND scN_fit_mk4_A le ScN_crit)
+   if ifl(0) eq -1 then begin
+      plot,CrittermLon(ig:ig+1),[1.15,1.5],charsize=csz,xtitle='Lon [deg]',title='Rad [Rsun]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=1,xstyle=1,/nodata
+      goto,skip_group_mk4_geo
+   endif
+   loadct,0
+   plot,CrittermLon(ig:ig+1),[1.15,1.5],charsize=csz,xtitle='Lon [deg]',title='Rad [Rsun]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=1,xstyle=1,/nodata
+   loadct,ctbl
+   color_index_step = fix(256./n_elements(ifl))
+   for index=0,n_elements(ifl)-1 do begin
+      tmp = reform(index_sampling_mk4_A(ifl(index),*))
+      ind_samp_mk4 = where(tmp eq 1)
+      oplot,lon_A(ifl(index),ind_samp_mk4),rad_A(ifl(index),ind_samp_mk4),color=(index)*color_index_step
+   endfor
+   loadct,0
+   skip_group_mk4_geo:
 endfor
 ps2
-; AIA Te
+
+; C2 Ne
+Ne_fit_c2_groupavg = fltarr(Ngroups,n_elements(rad_fit_c2_A))
+;---- Tag field lines for which the fit is positive at all heights ----
+   tag_pos = fltarr(N_fl)
+   for ifl=0,N_fl-1 do begin
+      if min(Ne_fit_c2_A(ifl,*)) gt 0. then tag_pos(ifl)=+1
+   endfor
+;----------------------------------------------------------------------
+scN_crit = 0.5
 !p.multi=[0,nx,ny]
-ps1,'./'+structure_filename+'_AIA-DEMT_Te-profiles.eps'
+ps1,'./'+structure_filename+'_C2-SRT_Ne-profiles.eps'
+for ig=0,Ngroups-1 do begin
+   ifl = where(line_groupID eq ig AND fitflag_C2_A eq +1 AND tag_pos eq +1 AND scN_fit_c2_A le scN_crit)
+   if ifl(0) eq -1 then begin
+         plot,rad_fit_c2_A,Ne_fit_c2_groupavg(ig,*),charsize=csz,xtitle='r [Rsun]',title='C2-SRT Ne(r) [cm!U-3!N]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=2, xr=[2.5,6.0], xstyle=1,/nodata
+      goto,skip_group_c2_Ne
+   endif
+   Ne_fit_c2_groupavg(ig,*) = total( Ne_fit_c2_A(ifl,*) , 1 ) / float(n_elements(ifl))
+   loadct,0
+   plot,rad_fit_c2_A,Ne_fit_c2_groupavg(ig,*),charsize=csz,xtitle='r [Rsun]',title='C2-SRT Ne(r) [cm!U-3!N]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=2, xr=[2.5,6.0], xstyle=1,/nodata
+   loadct,cltb
+   color_index_step = fix(256./n_elements(ifl))
+   for index=0,n_elements(ifl)-1 do begin
+      tmp = reform(index_sampling_c2_A(ifl(index),*))
+      ind_samp_c2 = where(tmp eq 1)
+      oplot,rad_fit_c2_A                 ,Ne_fit_c2_A(ifl(index),*)      ,color=(index)*color_index_step
+      oplot,rad_A(ifl(index),ind_samp_c2),Ne_c2_A(ifl(index),ind_samp_c2),color=(index)*color_index_step,psym=4
+   endfor
+   loadct,0
+   oplot,rad_fit_c2_A,Ne_fit_c2_groupavg(ig,*),th=4
+   skip_group_c2_Ne:
+endfor
+for ig=0,Ngroups-1 do begin
+   ifl = where(line_groupID eq ig AND fitflag_c2_A eq +1 AND tag_pos eq +1 AND scN_fit_c2_A le scN_crit)
+   if ifl(0) eq -1 then begin
+      plot,CritTermLon(ig:ig+1),[2.5,6.0],charsize=csz,xtitle='Lon [deg]',title='Rad [Rsun]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=1,xstyle=1,/nodata
+      goto,skip_group_c2_geo
+   endif
+   loadct,0
+   plot,CritTermLon(ig:ig+1),[2.5,6.0],charsize=csz,xtitle='Lon [deg]',title='Rad [Rsun]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=1,xstyle=1,/nodata
+   loadct,ctbl
+   color_index_step = fix(256./n_elements(ifl))
+   for index=0,n_elements(ifl)-1 do begin
+      tmp = reform(index_sampling_c2_A(ifl(index),*))
+      ind_samp_c2 = where(tmp eq 1)
+      oplot,lon_A(ifl(index),ind_samp_c2),rad_A(ifl(index),ind_samp_c2),color=(index)*color_index_step
+   endfor
+   loadct,0
+   skip_group_c2_geo:
+endfor
+ps2
+
+; AIA Te
 Tm_fit_aia_groupavg = fltarr(Ngroups,n_elements(rad_fit_aia_A))
 ;---- Tag field lines for which the fit is positive at all heights ----
    tag_pos = fltarr(N_fl)
@@ -292,9 +357,15 @@ Tm_fit_aia_groupavg = fltarr(Ngroups,n_elements(rad_fit_aia_A))
       if min(Ne_fit_aia_A(ifl,*)) gt 0. then tag_pos(ifl)=+1
    endfor
 ;----------------------------------------------------------------------
+scT_crit = 0.5
+!p.multi=[0,nx,ny]
+ps1,'./'+structure_filename+'_AIA-DEMT_Te-profiles.eps'
 for ig=0,Ngroups-1 do begin
-   ifl = where(line_groupID eq ig AND fitflag_AIA_A eq +1 AND tag_pos eq +1 AND scN_fit_aia_A le 1.)
-   if ifl(0) eq -1 then goto,skip_group_aia_Te
+   ifl = where(line_groupID eq ig AND fitflag_AIA_A eq +1 AND tag_pos eq +1 AND scN_fit_aia_A le scT_crit)
+   if ifl(0) eq -1 then begin
+      plot,CritTermLon(ig:ig+1),[1.02,1.25],charsize=csz,xtitle='Lon [deg]',title='Rad [Rsun]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=1,xstyle=1,/nodata
+      goto,skip_group_aia_Te
+   endif
    Tm_fit_aia_groupavg(ig,*) = total( Tm_fit_aia_A(ifl,*) , 1 ) / float(n_elements(ifl))
    loadct,0
    plot,rad_fit_aia_A,Tm_fit_aia_groupavg(ig,*),charsize=csz,xtitle='r [Rsun]',title='AIA-DEMT Te(r) [MK]. Group #'+strmid(string(ig+1),7,1),th=4, yr=[0.5e6,3.0e6], ystyle=1, xr=[1.02,1.25], xstyle=1,/nodata
@@ -309,6 +380,24 @@ for ig=0,Ngroups-1 do begin
    loadct,0
    oplot,rad_fit_aia_A,Tm_fit_aia_groupavg(ig,*),th=4
    skip_group_aia_Te:
+endfor
+for ig=0,Ngroups-1 do begin
+   ifl = where(line_groupID eq ig AND fitflag_AIA_A eq +1 AND tag_pos eq +1 AND scN_fit_AIA_A le scN_crit)
+   if ifl(0) eq -1 then begin
+      plot,CritTermLon(ig:ig+1),[1.02,1.25],charsize=csz,xtitle='Lon [deg]',title='Rad [Rsun]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=1,xstyle=1,/nodata
+      goto,skip_group_aia_geoT
+   endif
+   loadct,0
+   plot,CritTermLon(ig:ig+1),[1.02,1.25],charsize=csz,xtitle='Lon [deg]',title='Rad [Rsun]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=1,xstyle=1,/nodata
+   loadct,ctbl
+   color_index_step = fix(256./n_elements(ifl))
+   for index=0,n_elements(ifl)-1 do begin
+      tmp = reform(index_sampling_aia_A(ifl(index),*))
+      ind_samp_aia = where(tmp eq 1)
+      oplot,lon_A(ifl(index),ind_samp_aia),rad_A(ifl(index),ind_samp_aia),color=(index)*color_index_step
+   endfor
+   loadct,0
+   skip_group_aia_geoT:
 endfor
 ps2
 
