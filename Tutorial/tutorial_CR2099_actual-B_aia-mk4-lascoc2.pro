@@ -31,7 +31,7 @@ pro mini_tutorial
 ; 1) Declare the DIR where the structure is located, and the filename.
   dir = './'
   structure_filename = 'CR2099_AWSoM-map1_tracing-structure-merge_aia_mk4_lascoc2.sav'
- ;structure_filename = 'CR2099_AWSoM-map7_tracing-structure-merge_aia_mk4_lascoc2.sav'
+  structure_filename = 'CR2099_AWSoM-map7_tracing-structure-merge_aia_mk4_lascoc2.sav'
 
 ; 2) Load structure into memory and extract all available arrays from it.
   load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /aia, /mk4, /lascoc2
@@ -154,11 +154,7 @@ for ig=0,Ngroups-1 do begin
 endfor
 ;;
 
-; Set up graph options.
-; color table for fieldlines
-
 ; Lat/Lon plots of FootPoint and TerminalPoint
-;window,0,xs=1000,ys=1000
 ps1,'./'+structure_filename+'_connectivity-map.eps'
 np=1000
 !p.multi=[0,1,2]
@@ -180,13 +176,13 @@ loadct,0
 ps2
 
 ;;
-; Compute average trends <Ne(r)> and <Te(r)> for each group of field lines:
-;if ngroups eq 4 then nx=2
-;if ngroups eq 5 then nx=3
-nx = ngroups
-ny = 2
-csz  = 0.75
-cltb = 40
+; Compute and plot average trends <Ne(r)> and <Te(r)> for each group of field lines:
+
+; Set up graphical stuff
+nx   = ngroups ; number of horizontal panels
+ny   = 2       ; number of vertical   panels
+csz  = 0.75    ; charsize for plots
+ctbl = 40      ; color table to use for individual field lines
 
 ; AIA Ne
 Ne_fit_aia_groupavg = fltarr(Ngroups,n_elements(rad_fit_aia_A))
@@ -208,7 +204,7 @@ for ig=0,Ngroups-1 do begin
    Ne_fit_aia_groupavg(ig,*) = total( Ne_fit_aia_A(ifl,*) , 1 ) / float(n_elements(ifl))
    loadct,0
    plot,rad_fit_aia_A,Ne_fit_aia_groupavg(ig,*),charsize=csz,xtitle='r [Rsun]',title='AIA-DEMT Ne(r) [cm!U-3!N]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=2, xr=[1.02,1.25], xstyle=1,/nodata
-   loadct,cltb
+   loadct,ctbl
    color_index_step = fix(256./n_elements(ifl))
    for index=0,n_elements(ifl)-1 do begin
       tmp = reform(index_sampling_aia_A(ifl(index),*))
@@ -312,7 +308,7 @@ for ig=0,Ngroups-1 do begin
    Ne_fit_c2_groupavg(ig,*) = total( Ne_fit_c2_A(ifl,*) , 1 ) / float(n_elements(ifl))
    loadct,0
    plot,rad_fit_c2_A,Ne_fit_c2_groupavg(ig,*),charsize=csz,xtitle='r [Rsun]',title='C2-SRT Ne(r) [cm!U-3!N]. Group #'+strmid(string(ig+1),7,1),th=4, ystyle=2, xr=[2.5,6.0], xstyle=1,/nodata
-   loadct,cltb
+   loadct,ctbl
    color_index_step = fix(256./n_elements(ifl))
    for index=0,n_elements(ifl)-1 do begin
       tmp = reform(index_sampling_c2_A(ifl(index),*))
@@ -369,7 +365,7 @@ for ig=0,Ngroups-1 do begin
    Tm_fit_aia_groupavg(ig,*) = total( Tm_fit_aia_A(ifl,*) , 1 ) / float(n_elements(ifl))
    loadct,0
    plot,rad_fit_aia_A,Tm_fit_aia_groupavg(ig,*),charsize=csz,xtitle='r [Rsun]',title='AIA-DEMT Te(r) [MK]. Group #'+strmid(string(ig+1),7,1),th=4, yr=[0.5e6,3.0e6], ystyle=1, xr=[1.02,1.25], xstyle=1,/nodata
-   loadct,cltb
+   loadct,ctbl
    color_index_step = fix(256./n_elements(ifl))
    for index=0,n_elements(ifl)-1 do begin
       tmp = reform(index_sampling_aia_A(ifl(index),*))
