@@ -401,3 +401,16 @@ ps2
   STOP
   return
 end
+ 
+PRO ps1,archivo
+set_plot,'ps'
+device,filename=archivo,bits_per_pixel=8,/color,/encapsulated
+return
+end
+
+PRO ps2
+device,/close
+set_plot,'x'
+!p.multi=0
+return
+end
