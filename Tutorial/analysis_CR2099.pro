@@ -1,4 +1,4 @@
-pro mini_tutorial
+pro mini_tutorial, critical = critical
   common data, N_fl, Npt_max, Npt_v, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, WT_aia_A, ldem_flag_aia_A, index_aia_A, index_sampling_aia_A,$
      Ne_euvia_A, Tm_euvia_A,  WT_euvia_A, ldem_flag_euvia_A, index_euvia_A, index_sampling_euvia_A,$
@@ -27,11 +27,11 @@ pro mini_tutorial
      lN_fit_c2_A,$
      fit_F_Ne_aia,fit_F_Ne_mk4,fit_F_Ne_c2,$
      fit_F_Ne_euvia,fit_F_Ne_euvib,fit_F_eit_c2
-  
+
 ; 1) Declare the DIR where the structure is located, and the filename.
   dir = './'
   structure_filename = 'CR2099_AWSoM-map1_tracing-structure-merge_aia_mk4_lascoc2.sav'
-  structure_filename = 'CR2099_AWSoM-map7_tracing-structure-merge_aia_mk4_lascoc2.sav'
+ ;structure_filename = 'CR2099_AWSoM-map7_tracing-structure-merge_aia_mk4_lascoc2.sav'
 
 ; 2) Load structure into memory and extract all available arrays from it.
   load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /aia, /mk4, /lascoc2
@@ -192,7 +192,7 @@ Ne_fit_aia_groupavg = fltarr(Ngroups,n_elements(rad_fit_aia_A))
       if min(Ne_fit_aia_A(ifl,*)) gt 0. then tag_pos(ifl)=+1
    endfor
 ;----------------------------------------------------------------------
-scN_crit = 0.5
+scN_crit = critical
 !p.multi=[0,nx,ny]
 ps1,'./'+structure_filename+'_AIA-DEMT_Ne-profiles.eps'
 for ig=0,Ngroups-1 do begin
@@ -244,7 +244,7 @@ Ne_fit_mk4_groupavg = fltarr(Ngroups,n_elements(rad_fit_mk4_A))
       if min(Ne_fit_mk4_A(ifl,*)) gt 0. then tag_pos(ifl)=+1
    endfor
 ;----------------------------------------------------------------------
-scN_crit = 0.5
+scN_crit = critical
 !p.multi=[0,nx,ny]
 ps1,'./'+structure_filename+'_Mk4-SRT_Ne-profiles.eps'
 for ig=0,Ngroups-1 do begin
@@ -296,7 +296,7 @@ Ne_fit_c2_groupavg = fltarr(Ngroups,n_elements(rad_fit_c2_A))
       if min(Ne_fit_c2_A(ifl,*)) gt 0. then tag_pos(ifl)=+1
    endfor
 ;----------------------------------------------------------------------
-scN_crit = 0.5
+scN_crit = critical
 !p.multi=[0,nx,ny]
 ps1,'./'+structure_filename+'_C2-SRT_Ne-profiles.eps'
 for ig=0,Ngroups-1 do begin
@@ -353,7 +353,7 @@ Tm_fit_aia_groupavg = fltarr(Ngroups,n_elements(rad_fit_aia_A))
       if min(Ne_fit_aia_A(ifl,*)) gt 0. then tag_pos(ifl)=+1
    endfor
 ;----------------------------------------------------------------------
-scT_crit = 0.5
+scT_crit = critical
 !p.multi=[0,nx,ny]
 ps1,'./'+structure_filename+'_AIA-DEMT_Te-profiles.eps'
 for ig=0,Ngroups-1 do begin
