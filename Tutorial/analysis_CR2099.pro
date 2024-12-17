@@ -1,4 +1,4 @@
-pro mini_tutorial, critical = critical
+pro line_groups_analysis, rel_sqrt_chisqr_crit=rel_sqrt_chisqr_crit, map1=map1, map7=map7
   common data, N_fl, Npt_max, Npt_v, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, WT_aia_A, ldem_flag_aia_A, index_aia_A, index_sampling_aia_A,$
      Ne_euvia_A, Tm_euvia_A,  WT_euvia_A, ldem_flag_euvia_A, index_euvia_A, index_sampling_euvia_A,$
@@ -30,14 +30,13 @@ pro mini_tutorial, critical = critical
 
 ; 1) Declare the DIR where the structure is located, and the filename.
   dir = './'
-  structure_filename = 'CR2099_AWSoM-map1_tracing-structure-merge_aia_mk4_lascoc2.sav'
- ;structure_filename = 'CR2099_AWSoM-map7_tracing-structure-merge_aia_mk4_lascoc2.sav'
+  if keyword_set(map1) then structure_filename = 'CR2099_AWSoM-map1_tracing-structure-merge_aia_mk4_lascoc2.sav'
+  if keyword_set(map7) then structure_filename = 'CR2099_AWSoM-map7_tracing-structure-merge_aia_mk4_lascoc2.sav'
 
 ; 2) Load structure into memory and extract all available arrays from it.
   load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /aia, /mk4, /lascoc2
 
- goto,plots
- 
+;goto,plots
 print, 'Press SPACE BAR to continue.'
 pause
 
@@ -106,11 +105,11 @@ print,'-------------------------------'
 print
 
 ; 5) Some explanations follow.
-print,'In this case only arrays wih filed line geometry, or pertaining AIA, Mk4 or C2, are defined.'
+print,'In this case only arrays concerning filed line geometry, or pertaining AIA, Mk4 or C2, are defined.'
 print
-print,'In this case there are "N_fl=4" field lines that were traced between rmin=1 Rs and rmax=10 Rs. For each field line a maximum of "Npt_max=10100" points is allowed. This number will be optimized later on, depending on what we find to be a typical number of points for Judit field lines. For now we just set it as very large number. These are synthetic radial field lines with a uniform radial step of 0.0015 Rs, so that these four lines contain "Npt_v = [6000, 6000, 6000, 6000]" points (because (10-1)/0.0015=6000.'
+print,'In this case there are N_fl='+strmid(string(N_fl),4,4)+' field lines that were traced. For each field line a maximum of "Npt_max=10100" points is allowed. This number will be optimized later on, depending on what we find to be a typical number of points for Judit field lines. For now we just set it as very large number.'
 print
-print,'All variables named "name_A" are 2D arrays of dimensions "(N_fl,Npt_max)". For example: "rad_A(ifl,*)" contains the radial points of field line "ifl (=0,..,3 in this example)". Similarly, "Ne_aia_A(ifl,*)" contains the AIA-based DEMT result for Ne at points "rad_A(ifl,*)". Etc.'
+print,'All variables named "name_A" are 2D arrays of dimensions "(N_fl,Npt_max)". For example: "rad_A(ifl,*)" contains the radial points of field line "ifl (=0,..,N_fl-1)". Similarly, "Ne_aia_A(ifl,*)" contains the AIA-based DEMT result for Ne at points "rad_A(ifl,*)". Etc.'
 print
 print, 'Press SPACE BAR to continue.'
 pause
@@ -124,7 +123,7 @@ plots:
 
 ;;
 ; Determine the Lat and Lon of the footppoint and terminalpoint of each field line.
-; Group field lines according to the Lon of their terminalpoint
+; Group field lines according to the Carrington Longitude of their terminalpoint.
 ;
 ; 1D Arrays: radial index corresponding to Rmin and Rmax for each field line:
 irmin=intarr(N_FL)
@@ -192,7 +191,7 @@ Ne_fit_aia_groupavg = fltarr(Ngroups,n_elements(rad_fit_aia_A))
       if min(Ne_fit_aia_A(ifl,*)) gt 0. then tag_pos(ifl)=+1
    endfor
 ;----------------------------------------------------------------------
-scN_crit = critical
+scN_crit = rel_sqrt_chisqr_crit
 !p.multi=[0,nx,ny]
 ps1,'./'+structure_filename+'_AIA-DEMT_Ne-profiles.eps'
 for ig=0,Ngroups-1 do begin
@@ -244,7 +243,7 @@ Ne_fit_mk4_groupavg = fltarr(Ngroups,n_elements(rad_fit_mk4_A))
       if min(Ne_fit_mk4_A(ifl,*)) gt 0. then tag_pos(ifl)=+1
    endfor
 ;----------------------------------------------------------------------
-scN_crit = critical
+scN_crit = rel_sqrt_chisqr_crit
 !p.multi=[0,nx,ny]
 ps1,'./'+structure_filename+'_Mk4-SRT_Ne-profiles.eps'
 for ig=0,Ngroups-1 do begin
@@ -296,7 +295,7 @@ Ne_fit_c2_groupavg = fltarr(Ngroups,n_elements(rad_fit_c2_A))
       if min(Ne_fit_c2_A(ifl,*)) gt 0. then tag_pos(ifl)=+1
    endfor
 ;----------------------------------------------------------------------
-scN_crit = critical
+scN_crit = rel_sqrt_chisqr_crit
 !p.multi=[0,nx,ny]
 ps1,'./'+structure_filename+'_C2-SRT_Ne-profiles.eps'
 for ig=0,Ngroups-1 do begin
@@ -353,7 +352,7 @@ Tm_fit_aia_groupavg = fltarr(Ngroups,n_elements(rad_fit_aia_A))
       if min(Ne_fit_aia_A(ifl,*)) gt 0. then tag_pos(ifl)=+1
    endfor
 ;----------------------------------------------------------------------
-scT_crit = critical
+scT_crit = rel_sqrt_chisqr_crit
 !p.multi=[0,nx,ny]
 ps1,'./'+structure_filename+'_AIA-DEMT_Te-profiles.eps'
 for ig=0,Ngroups-1 do begin
@@ -397,8 +396,7 @@ for ig=0,Ngroups-1 do begin
 endfor
 ps2
 
-
-  STOP
+STOP
   return
 end
  
