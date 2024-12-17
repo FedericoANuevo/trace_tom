@@ -35,7 +35,7 @@ pro line_groups_analysis, rel_sqrt_chisqr_crit=rel_sqrt_chisqr_crit, map1=map1, 
 
 ; 2) Load structure into memory and extract all available arrays from it.
   load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /aia, /mk4, /lascoc2
-
+stop
 ;goto,plots
 print, 'Press SPACE BAR to continue.'
 pause
