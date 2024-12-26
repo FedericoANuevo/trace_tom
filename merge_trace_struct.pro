@@ -20,6 +20,8 @@
 ;          V2.0 AMV, IAFE, January 2024. Added fit to tomographic resuls.
 ;          V2.1 AMV, CLASP, May 2024. pointers for each instrument are
 ;          defined only if its data is used.
+;          V2.2 FAN, CLASP, May 2024. Added WT and LDEM_FLAG to the
+;          traced result.
 ;
 
 pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
