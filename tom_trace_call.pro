@@ -20,9 +20,9 @@ pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
 ; dir      = 'CR2099/map12/'& fl_list  = 'list.map12.txt'
 ; dir      = 'CR2082/map1/' & fl_list  = 'list.map1.txt'
 ; dir      = 'CR2082/map1_new/' & fl_list  = 'list.map1.new.txt'
-; dir      = 'CR2082/map7_new/' & fl_list  = 'list.map7.new.txt'
+  dir      = 'CR2082/map7_new/' & fl_list  = 'list.map7.new.txt'
 ; dir      = 'CR2099/map7_new/' & fl_list  = 'list.map7.new.txt'
-  dir      = 'CR2099/map1_new/' & fl_list  = 'list.map1.new.txt' 
+; dir      = 'CR2099/map1_new/' & fl_list  = 'list.map1.new.txt' 
   fl_dir   = base_dir + dir
 
 
@@ -48,7 +48,8 @@ pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
   if keyword_set(lasco) then begin
      instr    = 'lascoc2'
      tom_dir  = '/data1/tomography/bindata/'
-     tom_file = 'x_LascoC2pB_CR2099_shifted_std-grid_Rmin2.5_Rmax8.5_IRmin2.5_IRmax6.0_60x60x120_BF4_L6.e-6'
+ ;   tom_file = 'x_LascoC2pB_CR2099_shifted_std-grid_Rmin2.5_Rmax8.5_IRmin2.5_IRmax6.0_60x60x120_BF4_L6.e-6'
+     tom_file = 'x_LascoC2pB_CR2082_Rmin2.5_Rmax8.5_IRmin2.5_IRmax6.0_60x60x120_BF4_L8.2e-6'
      nr       = 60
      nt       = 60
      np       = 2*nt
