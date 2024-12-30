@@ -16,9 +16,9 @@ pro merge_trace_struct_call
 ; dir_fl  = '/data1/DATA/fieldlines_judit/CR2099/map1_new/'         & fl_list = 'list.map1.new.txt' 
 ; merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list,/aia,/mk4,/lascoc2
 ; dir_fl  = '/data1/DATA/fieldlines_judit/CR2082/map1/'             & fl_list = 'list.map1.txt'
-; dir_fl  = '/data1/DATA/fieldlines_judit/CR2082/map1_new/'         & fl_list = 'list.map1.new.txt'
-  dir_fl  = '/data1/DATA/fieldlines_judit/CR2082/map7_new/'         & fl_list = 'list.map7.new.txt'
-  merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list,/euvia,/lascoc2
+  dir_fl  = '/data1/DATA/fieldlines_judit/CR2082/map1_new/'         & fl_list = 'list.map1.new.txt' &  structure_filename = 'CR2082_AWSoM-map1'
+; dir_fl  = '/data1/DATA/fieldlines_judit/CR2082/map7_new/'         & fl_list = 'list.map7.new.txt' &  structure_filename = 'CR2082_AWSoM-map7'
+  merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list,/euvia,/lascoc2,struture_filename = structure_filename
   
   return
 end
