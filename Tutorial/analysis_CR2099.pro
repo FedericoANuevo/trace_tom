@@ -1,4 +1,5 @@
-pro line_groups_analysis, rel_sqrt_chisqr_crit=rel_sqrt_chisqr_crit, map1=map1, map7=map7
+pro line_groups_analysis, rel_sqrt_chisqr_crit=rel_sqrt_chisqr_crit, map_number=map_number, cr_number=cr_number
+  
   common data, N_fl, Npt_max, Npt_v, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, WT_aia_A, ldem_flag_aia_A, index_aia_A, index_sampling_aia_A,$
      Ne_euvia_A, Tm_euvia_A,  WT_euvia_A, ldem_flag_euvia_A, index_euvia_A, index_sampling_euvia_A,$
@@ -28,15 +29,41 @@ pro line_groups_analysis, rel_sqrt_chisqr_crit=rel_sqrt_chisqr_crit, map1=map1, 
      fit_F_Ne_aia,fit_F_Ne_mk4,fit_F_Ne_c2,$
      fit_F_Ne_euvia,fit_F_Ne_euvib,fit_F_eit_c2
 
-; 1) Declare the DIR where the structure is located, and the filename.
-  dir = './'
-  if keyword_set(map1) then structure_filename = 'CR2099_AWSoM-map1_tracing-structure-merge_aia_mk4_lascoc2.sav'
-  if keyword_set(map7) then structure_filename = 'CR2099_AWSoM-map7_tracing-structure-merge_aia_mk4_lascoc2.sav'
 
-; 2) Load structure into memory and extract all available arrays from it.
-  load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /aia, /mk4, /lascoc2
-stop
-;goto,plots
+  if not keyword_set(rel_sqrt_chisqr_crit) then rel_sqrt_chisqr_crit = 0.25
+  
+; 1) Load structure corresponding to selected CR_NUM and MAP_NUM.
+;    Also define groups of field lines according to terminal longitude.
+  dir = './'
+  if cr_number eq '2082' then begin
+     if map_number eq 1 then begin
+        structure_filename = 'CR2082_AWSoM-map1-tracing-structure-merge_euvia_lascoc2.sav'
+        CritTermLon = [0.,100.,180.,270.,360.]
+     endif  
+     if map_number eq 7 then begin
+        structure_filename = 'CR2082_AWSoM-map7-tracing-structure-merge_euvia_lascoc2.sav'
+        CritTermLon = [0.,100.,180.,270.,360.]
+     endif
+     load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /euvia, /lascoc2
+  endif
+  if cr_number eq '2099' then begin
+     if map_number eq 1 then begin
+        structure_filename = 'CR2099_AWSoM-map1_tracing-structure-merge_aia_mk4_lascoc2.sav'
+        CritTermLon = [0.,100.,180.,270.,360.]
+     endif  
+     if map_number eq 7 then begin
+        structure_filename = 'CR2099_AWSoM-map7_tracing-structure-merge_aia_mk4_lascoc2.sav'
+        CritTermLon = [0.,100.,180.,270.,310.,360.]
+     endif
+     load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, /aia, /mk4, /lascoc2
+  endif
+  if keyword_set(structure_filename) eq -1 then begin
+     print, 'Invalid CR numnber'
+     return
+  endif
+  
+;stop
+goto,plots
 print, 'Press SPACE BAR to continue.'
 pause
 
@@ -141,9 +168,6 @@ for ifl = 0,N_FL-1 do  Terminal_Lon(ifl) = lon_A(ifl,irmax[ifl])
 for ifl = 0,N_FL-1 do  Terminal_Lat(ifl) = lat_A(ifl,irmax[ifl])
 ;
 ; Tag groups of field lines by means of user-defined ranges of terminal Longitudes.
-if structure_filename eq 'CR2099_AWSoM-map1_tracing-structure-merge_aia_mk4_lascoc2.sav' then CritTermLon = [0.,100.,180.,270.,360.]
-if structure_filename eq 'CR2099_AWSoM-map7_tracing-structure-merge_aia_mk4_lascoc2.sav' then CritTermLon = [0.,100.,180.,270.,310.,360.]
-;
 Ngroups     = n_elements(CritTermLon)-1
 ; Tag each field line (ifl) with the group number (ig) to which it belongs: 
 line_groupID  = intarr(N_FL)
@@ -173,7 +197,7 @@ for ifl=0,N_FL-1 do oplot,[Terminal_Lon(ifl)],[Terminal_Lat(ifl)],psym=4,color=c
 loadct,0
 !p.multi=0
 ps2
-
+stop
 ;;
 ; Compute and plot average trends <Ne(r)> and <Te(r)> for each group of field lines:
 
