@@ -2,15 +2,15 @@
 ;;
 ; Calling sequence examples:
 ;
-; line_groups_analysis, cr_number = 2082, map_number = 1, /euvia, /lascoc2
-; line_groups_analysis, cr_number = 2082, map_number = 7, /euvia, /lascoc2
-; line_groups_analysis, cr_number = 2099, map_number = 1, /aia  , /lascoc2, /mk4
-; line_groups_analysis, cr_number = 2099, map_number = 7, /aia  , /lascoc2, /mk4
+; line_analysis, cr_number = 2082, map_number = 1, /euvia, /lascoc2
+; line_analysis, cr_number = 2082, map_number = 7, /euvia, /lascoc2
+; line_analysis, cr_number = 2099, map_number = 1, /aia  , /lascoc2, /mk4
+; line_analysis, cr_number = 2099, map_number = 7, /aia  , /lascoc2, /mk4
 ;;
 
-pro line_groups_analysis, rel_sqrt_chisqr_crit=rel_sqrt_chisqr_crit,$
-                          map_number=map_number, cr_number=cr_number, $
-                          aia = aia, euvia = euvia, euvib = euvib, eit = eit, mk4 = mk4, kcor = kcor, lascoc2 = lascoc2
+pro line_analysis, rel_sqrt_chisqr_crit=rel_sqrt_chisqr_crit,$
+                   map_number=map_number, cr_number=cr_number, $
+                   aia = aia, euvia = euvia, euvib = euvib, eit = eit, mk4 = mk4, kcor = kcor, lascoc2 = lascoc2
   
   common data, N_fl, Npt_max, Npt_v, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, WT_aia_A, ldem_flag_aia_A, index_aia_A, index_sampling_aia_A,$
