@@ -8,11 +8,19 @@
 ; HISTORY: V1.0 FAN & AMV, CLaSP, October 2023.
 ;
 
-pro read_fieldline_and_trace_demt,instr,dir,file,rad,lat,lon,nr,nt,np,N_e,T_e,W_T,ldem_flag
+pro read_fieldline_and_trace_demt,instr,dir,file,rad,lat,lon,nr,nt,np,N_e,T_e,W_T,ldem_flag, csv = csv
 ; Define name of output file
-  outfile = file+'_'+instr+'.out'  
-; Read the ASCII fieldline file with readcol (SolarSoft)  
-  readcol,dir+file,x_l,y_l,z_l,FORMAT='D,D,D'  
+  outfile = file+'_'+instr+'.out'
+  if not keyword_set(csv) then begin
+;    Read the ASCII fieldline file with readcol (SolarSoft) 
+     readcol,dir+file,x_l,y_l,z_l,FORMAT='D,D,D'
+  endif else begin
+     data = read_csv(dir+file,header = header)
+     x_l  = reform(data.field2)
+     y_l  = reform(data.field3)
+     z_l  = reform(data.field4)
+  endif
+  
 ; elements of 1D vector with field-line coord. 
   N    = n_elements(x_l)
 ; Define the fieldline spherical coordinate arrays  
