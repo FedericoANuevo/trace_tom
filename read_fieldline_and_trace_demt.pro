@@ -8,7 +8,7 @@
 ; HISTORY: V1.0 FAN & AMV, CLaSP, October 2023.
 ;
 
-pro read_fieldline_and_trace_demt,instr,dir,file,rad,lat,lon,nr,nt,np,N_e,T_e,W_T,ldem_flag, csv = csv
+pro read_fieldline_and_trace_demt,instr,dir,file,rad,lat,lon,nr,nt,np,N_e,T_e,W_T,ldem_flag,csv=csv
 ; Define name of output file
   outfile = file+'_'+instr+'.out'
   if not keyword_set(csv) then begin
