@@ -15,6 +15,7 @@ pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
 
 ; base_dir = '/data1/DATA/fieldlines_judit/'
   base_dir = '/data1/DATA/'
+  base_dir = '/media/Data1/data1/DATA/'
 ; dir      = 'radial_synth_fieldlines/' & fl_list='list_synth.txt'
 ; dir      = 'CR2099/map1/' & fl_list  = 'list.map1.txt' 
 ; dir      = 'CR2099/map7/' & fl_list  = 'list.map7.txt'
@@ -25,11 +26,9 @@ pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
 ; dir      = 'CR2082/map7_new/' & fl_list  = 'list.map7.new.txt'
 ; dir      = 'CR2099/map7_new/' & fl_list  = 'list.map7.new.txt'
 ; dir      = 'CR2099/map1_new/' & fl_list  = 'list.map1.new.txt' 
+
   fl_dir   = base_dir + dir
 
-
-
-  
   if keyword_set(demt) then begin
      tom_dir  = '/data1/DATA/ldem_files/'
     ;tom_file = 'CR2082_HOLLOW_compound2.dat' & instr = 'euvia'

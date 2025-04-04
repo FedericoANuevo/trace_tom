@@ -1,5 +1,4 @@
 pro expand_csv_for_sam_and_yeimy
-
   
     common data, N_fl, Npt_max, Npt_v, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
        Ne_aia_A, Tm_aia_A, WT_aia_A, ldem_flag_aia_A, index_aia_A, index_sampling_aia_A,$
@@ -31,14 +30,14 @@ pro expand_csv_for_sam_and_yeimy
        fit_F_Ne_euvia,fit_F_Ne_euvib,fit_F_eit_c2
 
 ; Directory and File-name 
-  dir  = '/data1/DATA/flines_Sam-Yeimy/'
+  dir  = '/media/Data1/data1/DATA/flines_Sam-Yeimy/'
   file = 'April2024_PFSS-tracing-structure-merge_aia_lascoc2.sav'  
 ; Load the traced-data-structure (stored in common data )
   load_traced_data_structure,dir=dir,structure_filename=file,/aia,/lascoc2
 
-
   for ifl = 0,N_fl-1 do begin
 
+     id_l = indgen(Npt_v(ifl))
      x_l = reform(x_A(ifl,0:Npt_v(ifl)-1))
      y_l = reform(y_A(ifl,0:Npt_v(ifl)-1))
      z_l = reform(z_A(ifl,0:Npt_v(ifl)-1))
@@ -52,14 +51,15 @@ pro expand_csv_for_sam_and_yeimy
      Ne_c2_l = reform(Ne_c2_A(ifl,0:Npt_v(ifl)-1))
      index    = where(tmp le 0)
      Ne_c2_l(index) = -1
-     if ifl lt 10                then index_str = '00'+strmid(string(ifl),7,1)
-     if ifl ge 10 and ifl lt 100 then index_str = '0' +strmid(string(ifl),6,2)
-     if ifl ge 100               then index_str =      strmid(string(ifl),5,3)
+     if ifl lt   10                 then index_str = '000' + strmid(string(ifl),7,1)
+     if ifl ge   10 and ifl lt  100 then index_str = '00'  + strmid(string(ifl),6,2)
+     if ifl ge  100 and ifl lt 1000 then index_str =  '0'  + strmid(string(ifl),5,3)
+     if ifl ge 1000                 then index_str =         strmid(string(ifl),4,4)
      
-     output_file = '~/Downloads/'+'fline_'+index_str+'.TOM.csv'
+     output_file = dir+'fline_'+index_str+'_tom.csv'
      table_hdr = ['x [Rsun]','y [Rsun]','z [Rsun]','Ne AIA [cm-3]','Te AIA [K]','Ne C2 [cm-3]']
 ;    La Keyword table_header solo se puede usar con IDL 8.0     
-     write_csv,output_file,x_l,y_l,z_l,Ne_aia_l,Tm_aia_l,Ne_c2_l;,table_header = table_hdr
+     write_csv,output_file,id_l,x_l,y_l,z_l,Ne_aia_l,Tm_aia_l,Ne_c2_l;,table_header = table_hdr
 ;    STOP
   endfor
 
