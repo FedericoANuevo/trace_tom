@@ -52,9 +52,9 @@ pro expand_csv_for_sam_and_yeimy
      Ne_c2_l = reform(Ne_c2_A(ifl,0:Npt_v(ifl)-1))
      index    = where(tmp le 0)
      Ne_c2_l(index) = -1
-     if ifl lt 10                then index_str = strmid(string(ifl),7,1)
-     if ifl ge 10 and ifl lt 100 then index_str = strmid(string(ifl),6,2)
-     if ifl ge 100               then index_str = strmid(string(ifl),5,3)
+     if ifl lt 10                then index_str = '00'+strmid(string(ifl),7,1)
+     if ifl ge 10 and ifl lt 100 then index_str = '0' +strmid(string(ifl),6,2)
+     if ifl ge 100               then index_str =      strmid(string(ifl),5,3)
      
      output_file = '~/Downloads/'+'fline_'+index_str+'.TOM.csv'
      table_hdr = ['x [Rsun]','y [Rsun]','z [Rsun]','Ne AIA [cm-3]','Te AIA [K]','Ne C2 [cm-3]']
