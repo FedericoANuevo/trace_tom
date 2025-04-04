@@ -57,7 +57,7 @@ pro expand_csv_for_sam_and_yeimy
      if ifl ge 100               then index_str = strmid(string(ifl),5,3)
      
      output_file = '~/Downloads/'+'fline_'+index_str+'.TOM.csv'
-     table_hdr = ['x','y','z','Ne AIA [cm-3]','Te AIA [K]','Ne C2 [cm-3]']
+     table_hdr = ['x [Rsun]','y [Rsun]','z [Rsun]','Ne AIA [cm-3]','Te AIA [K]','Ne C2 [cm-3]']
 ;    La Keyword table_header solo se puede usar con IDL 8.0     
      write_csv,output_file,x_l,y_l,z_l,Ne_aia_l,Tm_aia_l,Ne_c2_l;,table_header = table_hdr
 ;    STOP
