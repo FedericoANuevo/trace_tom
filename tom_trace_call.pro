@@ -13,13 +13,15 @@
 
 pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
 
-  base_dir = '/data1/DATA/fieldlines_judit/'
+; base_dir = '/data1/DATA/fieldlines_judit/'
+  base_dir = '/data1/DATA/'
 ; dir      = 'radial_synth_fieldlines/' & fl_list='list_synth.txt'
 ; dir      = 'CR2099/map1/' & fl_list  = 'list.map1.txt' 
 ; dir      = 'CR2099/map7/' & fl_list  = 'list.map7.txt'
 ; dir      = 'CR2099/map12/'& fl_list  = 'list.map12.txt'
 ; dir      = 'CR2082/map1/' & fl_list  = 'list.map1.txt'
-  dir      = 'CR2082/map1_new/' & fl_list  = 'list.map1.new.txt'
+  dir      = 'flines_Sam-Yeimy/' & fl_list  = 'list.txt'
+; dir      = 'CR2082/map1_new/' & fl_list  = 'list.map1.new.txt'
 ; dir      = 'CR2082/map7_new/' & fl_list  = 'list.map7.new.txt'
 ; dir      = 'CR2099/map7_new/' & fl_list  = 'list.map7.new.txt'
 ; dir      = 'CR2099/map1_new/' & fl_list  = 'list.map1.new.txt' 
@@ -33,7 +35,8 @@ pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
     ;tom_file = 'CR2082_HOLLOW_compound2.dat' & instr = 'euvia'
     ;tom_file = 'LDEM.CR2099_aia_Hollow_3Bands_gauss1_lin_Norm-median_singlStart' & instr = 'aia'
     ;tom_file = 'CR2099_AIA_compound1.dat'    & instr = 'aia'
-     tom_file = 'CR2099_AIA_compound2.dat'    & instr = 'aia'
+    ;tom_file = 'CR2099_AIA_compound2.dat'    & instr = 'aia'
+     tom_file = 'LDEM.April-2024_aia_Hollow_3Bands_gauss1_lin_Norm-median_singlStart' & instr = 'aia'
      nr       = 30
      nt       = 90
      np       = 2*nt
@@ -42,14 +45,15 @@ pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
      Irmin    = 1.02
      Irmax    = 1.25
      tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_list=fl_list,$
-               nr=nr,nt=nt,np=np,rmin=rmin,rmax=rmax,Irmin=Irmin,Irmax=Irmax
+               nr=nr,nt=nt,np=np,rmin=rmin,rmax=rmax,Irmin=Irmin,Irmax=Irmax,/csv
   endif
 
   if keyword_set(lasco) then begin
      instr    = 'lascoc2'
      tom_dir  = '/data1/tomography/bindata/'
  ;   tom_file = 'x_LascoC2pB_CR2099_shifted_std-grid_Rmin2.5_Rmax8.5_IRmin2.5_IRmax6.0_60x60x120_BF4_L6.e-6'
-     tom_file = 'x_LascoC2pB_CR2082_Rmin2.5_Rmax8.5_IRmin2.5_IRmax6.0_60x60x120_BF4_L8.2e-6'
+ ;   tom_file = 'x_LascoC2pB_CR2082_Rmin2.5_Rmax8.5_IRmin2.5_IRmax6.0_60x60x120_BF4_L8.2e-6'
+     tom_file = 'x_LascoC2pB_April-2024_Rmin2.5_Rmax8.5_IRmin2.5_IRmax6.0_60x60x120_BF4_L1.1e-5'
      nr       = 60
      nt       = 60
      np       = 2*nt
@@ -58,7 +62,7 @@ pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
      Irmin    = 2.5
      Irmax    = 6.0
      tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_list=fl_list,$
-               nr=nr,nt=nt,np=np,rmin=rmin,rmax=rmax,Irmin=Irmin,Irmax=Irmax
+               nr=nr,nt=nt,np=np,rmin=rmin,rmax=rmax,Irmin=Irmin,Irmax=Irmax,/csv
   endif
 
   if keyword_set(mlso) then begin

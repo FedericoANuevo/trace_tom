@@ -1,4 +1,4 @@
-z;
+;
 ; PURPOSE: This code reads a single AWSoM fieldline tracing file
 ;          (which is esentially an ASCII table),
 ;          traces th VL-SRT 3D N_e along it,
@@ -8,7 +8,7 @@ z;
 ; HISTORY: V1.0 FAN & AMV, CLaSP, October 2023.
 ;
 
-pro read_fieldline_and_trace_vlsrt,instr,dir,file,rad,lat,lon,nr,nt,np,N_e,csv=csv
+pro read_fieldline_and_trace_vlsrt,instr,dir,file,rad,lat,lon,nr,nt,np,N_e, csv = csv
 ; Define name of output file
   outfile = file+'_'+instr+'.out'
   if not keyword_set(csv) then begin

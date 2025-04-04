@@ -13,9 +13,9 @@ pro tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_lis
 
 ; Read Tom results to trace
   if instr eq 'aia' or instr eq 'euvia' or instr eq 'euvib' or instr eq 'eit' then $
-     read_demt ,tom_dir,tom_file,nr,nt,np,rmin,rmax,Irmin,Irmax,rad,lat,lon,N_e,T_e,W_T,ldem_flag,csv = csv
+     read_demt ,tom_dir,tom_file,nr,nt,np,rmin,rmax,Irmin,Irmax,rad,lat,lon,N_e,T_e,W_T,ldem_flag
   if instr eq 'lascoc2' or instr eq 'mk4' or instr eq 'kcor' then $
-     read_vlsrt,tom_dir,tom_file,nr,nt,np,rmin,rmax,Irmin,Irmax,rad,lat,lon,N_e, csv =	csv
+     read_vlsrt,tom_dir,tom_file,nr,nt,np,rmin,rmax,Irmin,Irmax,rad,lat,lon,N_e
 ; Read the list with the field-lines  
   N=0
   filename=''

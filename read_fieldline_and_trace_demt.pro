@@ -19,7 +19,7 @@ pro read_fieldline_and_trace_demt,instr,dir,file,rad,lat,lon,nr,nt,np,N_e,T_e,W_
      x_l  = reform(data.field2)
      y_l  = reform(data.field3)
      z_l  = reform(data.field4)
-  endif
+  endelse
   
 ; elements of 1D vector with field-line coord. 
   N    = n_elements(x_l)
