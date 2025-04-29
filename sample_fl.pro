@@ -1,6 +1,6 @@
 ;
-; Purpose: Provided Ne_l and index_l, this routine returns
-; imdex_sampling_l, an array of the same size as index_l, containg -1
+; Purpose: Provided 1D-arrays Ne_l and index_l, this routine returns
+; imdex_sampling_l, a 1D-array bof the same size as index_l, containg -1
 ; or +1. Values +1 indicate sampling indexes.
 ;
 ; HISTORY: V1.0 AMV, IAFE, November-2023.
@@ -18,15 +18,11 @@ pro sample_fl, Ne_l=Ne_l, index_l=index_l, index_sampling_l=index_sampling_l
      il         = il_min
      while il le il_max do begin
         il1 = il
-;    06-09-24: Consultar este condicional con Albert...
-;    ---------------------------------------------------------
-;       while (index_l(il+1) eq index_l(il1)) do il=il+1      
         while (index_l(il+1) eq index_l(il1)) do begin
            il=il+1
+          ;next line: stop if the next pint is the last one.
            if il eq n_elements(index_l)-1 then goto,skip_while
         endwhile
-        skip_while:
-;    ---------------------------------------------------------             
         il2 = il
         ind_sampling_cell = fix(mean([il1,il2]))
         if Ne_l(ind_sampling_cell) gt 0. then index_sampling_l(ind_sampling_cell) = +1
