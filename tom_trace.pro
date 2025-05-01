@@ -6,6 +6,7 @@
 ;          file and it traces the tomographic producs along them.
 ;
 ; HISTORY: V1.0 FAN & AMV, CLaSP, October 2023.
+; HISTORY: V1.0.1 FAN & AMV, CLaSP, May 2025.
 ;
 
 pro tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_list=fl_list,$
@@ -14,7 +15,7 @@ pro tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_lis
 ; Read Tom results to trace
   if instr eq 'aia' or instr eq 'euvia' or instr eq 'euvib' or instr eq 'eit' then $
      read_demt ,tom_dir,tom_file,nr,nt,np,rmin,rmax,Irmin,Irmax,rad,lat,lon,N_e,T_e,W_T,ldem_flag
-  if instr eq 'lascoc2' or instr eq 'mk4' or instr eq 'kcor' then $
+  if instr eq 'lascoc2' or instr eq 'mk4' or instr eq 'kcor' or instr eq 'ucomp' then $
      read_vlsrt,tom_dir,tom_file,nr,nt,np,rmin,rmax,Irmin,Irmax,rad,lat,lon,N_e
 ; Read the list with the field-lines  
   N=0
@@ -26,7 +27,7 @@ pro tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_lis
 ;    Read the fieldline and trace Tom. results along the line
      if instr eq 'aia' or instr eq 'euvia' or instr eq 'euvib' or instr eq 'eit' then $
         read_fieldline_and_trace_demt,instr,fl_dir,filename,rad,lat,lon,nr,nt,np,N_e,T_e,W_T,ldem_flag,csv=csv
-     if instr eq 'lascoc2' or instr eq 'mk4' or instr eq 'kcor' then $
+     if instr eq 'lascoc2' or instr eq 'mk4' or instr eq 'kcor' or instr eq 'ucomp' then $
         read_fieldline_and_trace_vlsrt,instr,fl_dir,filename,rad,lat,lon,nr,nt,np,N_e,csv=csv
   endfor
   close,1

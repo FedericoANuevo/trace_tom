@@ -22,7 +22,7 @@
 
 
 pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
-                    mk4 = mk4, kcor = kcor, lascoc2 = lascoc2
+                    mk4 = mk4, kcor = kcor, ucomp = ucomp, lascoc2 = lascoc2
 
     common to_fit_data, trace_data, $
      N_fl, Npt_max, Npt_v,$
@@ -33,6 +33,7 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
      Ne_eit_A, Tm_eit_A, index_eit_A, index_sampling_eit_A,$
      Ne_mk4_A, index_mk4_A, index_sampling_mk4_A,$
      Ne_kcor_A, index_kcor_A, index_sampling_kcor_A,$
+     Ne_ucomp_A, index_ucomp_A, index_sampling_ucomp_A,$
      Ne_c2_A, index_c2_A, index_sampling_c2_A
 
     common radcrits, radcritA, radcritB
@@ -310,7 +311,125 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                                     'N2_fit_mk4',ptr_new( N2_fit_mk4_A) ,$
                                     'p1_fit_mk4',ptr_new( p1_fit_mk4_A) ,$
                                     'p2_fit_mk4',ptr_new( p2_fit_mk4_A) )
-    endif ; MK4
+    endif                       ; MK4
+
+    if keyword_set(kcor) then begin
+       radmin = 1.15 & radmax = 1.5
+       drad_fit = 0.01
+       Npt_fit = round((radmax-radmin)/drad_fit)
+       fitflag_kcor_A = fltarr(N_fl        ) + default
+        N0_fit_kcor_A = fltarr(N_fl        ) + default
+        lN_fit_kcor_A = fltarr(N_fl        ) + default
+        N1_fit_kcor_A = fltarr(N_fl        ) + default
+        N2_fit_kcor_A = fltarr(N_fl        ) + default
+        p1_fit_kcor_A = fltarr(N_fl        ) + default
+        p2_fit_kcor_A = fltarr(N_fl        ) + default
+       scN_fit_kcor_A = fltarr(N_fl        ) + default
+        Ne_fit_kcor_A = fltarr(N_fl,Npt_fit) + default
+       rad_fit_kcor_A = radmin + drad_fit/2. + drad_fit * findgen(Npt_fit)
+       for ifl=0,N_fl-1 do begin      
+          tmp = reform(index_sampling_kcor_A(ifl,*))
+          ind_samp_kcor = where(tmp eq 1)
+          if ind_samp_kcor[0] ne -1 then begin
+             radsamp = reform(rad_A(ifl,ind_samp_kcor)) ; Rsun
+             test_coverage, radsamp=radsamp, covgflag=covgflag, /kcor
+             if covgflag eq 'yes' then begin
+                fitflag_kcor_A(ifl) = +1.
+                Nesamp = reform(Ne_kcor_A(ifl,ind_samp_kcor))
+                fit_F_Ne_kcor  = 'DPL'
+                double_power_fit, radsamp, Nesamp, A, chisqr ;, /weighted
+                scN_fit_kcor_A(ifl)   = sqrt(chisqr)/mean(Nesamp)
+                N1_fit_kcor_A(ifl)   = A[0]                                                                          ; cm-3
+                p1_fit_kcor_A(ifl)   = A[1]                                                                          ; dimensionless exponent of power law
+                N2_fit_kcor_A(ifl)   = A[2]                                                                          ; cm-3
+                p2_fit_kcor_A(ifl)   = A[3]                                                                          ; dimensionless exponent of power law
+                Ne_fit_kcor_A(ifl,*) = A[0] * rad_fit_kcor_A^(-A[1]) + A[2] * rad_fit_kcor_A^(-A[3])                   ; cm-3
+                dNe_dr              = - A[1]*A[0] * rad_fit_kcor_A^(-A[1]-1) - A[3]*A[2] * rad_fit_kcor_A^(-A[3]-1)   ; cm-3 / Rsun
+                indsamp = where(rad_fit_mk4_A ge min(radsamp) and rad_fit_mk4_A le max(radsamp) AND dNe_dr lt 0.)
+                if indsamp[0] ne -1 then begin
+                   v = abs(dNe_dr(indsamp)/reform(Ne_fit_kcor_A(ifl,indsamp)))^(-1)
+                   lN_fit_kcor_A(ifl)   = int_tabulated(rad_fit_kcor_A(indsamp), v) / (max(rad_fit_kcor_A(indsamp))-min(rad_fit_kcor_A(indsamp))) ; Rsun
+                   ; print,lN_fit_mk4_A(ifl), float(mean(v)), float(median(v))
+                   ; stop
+                endif 
+             endif              ; covgflag = 'yes'
+          endif
+       endfor                   ; field lines loop.
+       trace_data = create_struct( trace_data                          ,$
+                                  'fitflag_kcor',ptr_new(fitflag_kcor_A) ,$
+                                 'fit_F_Ne_kcor',ptr_new( fit_F_Ne_kcor) ,$
+                                  'scN_fit_kcor',ptr_new(scN_fit_kcor_A) ,$
+                                  'rad_fit_kcor',ptr_new(rad_fit_kcor_A) ,$
+                                   'Ne_fit_kcor',ptr_new( Ne_fit_kcor_A) ,$
+                                   'lN_fit_kcor',ptr_new(  lN_fit_kcor_A) )
+       if fit_F_Ne_kcor eq 'DPL' then $
+          trace_data = create_struct( trace_data                        ,$
+                                    'N1_fit_kcor',ptr_new( N1_fit_kcor_A) ,$
+                                    'N2_fit_kcor',ptr_new( N2_fit_kcor_A) ,$
+                                    'p1_fit_kcor',ptr_new( p1_fit_kcor_A) ,$
+                                    'p2_fit_kcor',ptr_new( p2_fit_kcor_A) )
+    endif                       ; KCOR
+
+    if keyword_set(ucomp) then begin
+       radmin = 1.15 & radmax = 1.5
+       drad_fit = 0.01
+       Npt_fit = round((radmax-radmin)/drad_fit)
+       fitflag_ucomp_A = fltarr(N_fl        ) + default
+        N0_fit_ucomp_A = fltarr(N_fl        ) + default
+        lN_fit_ucomp_A = fltarr(N_fl        ) + default
+        N1_fit_ucomp_A = fltarr(N_fl        ) + default
+        N2_fit_ucomp_A = fltarr(N_fl        ) + default
+        p1_fit_ucomp_A = fltarr(N_fl        ) + default
+        p2_fit_ucomp_A = fltarr(N_fl        ) + default
+       scN_fit_ucomp_A = fltarr(N_fl        ) + default
+        Ne_fit_ucomp_A = fltarr(N_fl,Npt_fit) + default
+       rad_fit_ucomp_A = radmin + drad_fit/2. + drad_fit * findgen(Npt_fit)
+       for ifl=0,N_fl-1 do begin      
+          tmp = reform(index_sampling_ucomp_A(ifl,*))
+          ind_samp_ucomp = where(tmp eq 1)
+          if ind_samp_ucomp[0] ne -1 then begin
+             radsamp = reform(rad_A(ifl,ind_samp_ucomp)) ; Rsun
+             test_coverage, radsamp=radsamp, covgflag=covgflag, /ucomp
+             if covgflag eq 'yes' then begin
+                fitflag_ucomp_A(ifl) = +1.
+                Nesamp = reform(Ne_ucomp_A(ifl,ind_samp_ucomp))
+                fit_F_Ne_ucomp  = 'DPL'
+                double_power_fit, radsamp, Nesamp, A, chisqr ;, /weighted
+                scN_fit_ucomp_A(ifl)   = sqrt(chisqr)/mean(Nesamp)
+                N1_fit_ucomp_A(ifl)   = A[0]                                                                          ; cm-3
+                p1_fit_ucomp_A(ifl)   = A[1]                                                                          ; dimensionless exponent of power law
+                N2_fit_ucomp_A(ifl)   = A[2]                                                                          ; cm-3
+                p2_fit_ucomp_A(ifl)   = A[3]                                                                          ; dimensionless exponent of power law
+                Ne_fit_ucomp_A(ifl,*) = A[0] * rad_fit_kcor_A^(-A[1]) + A[2] * rad_fit_kcor_A^(-A[3])                   ; cm-3
+                dNe_dr              = - A[1]*A[0] * rad_fit_ucomp_A^(-A[1]-1) - A[3]*A[2] * rad_fit_ucomp_A^(-A[3]-1)   ; cm-3 / Rsun
+                indsamp = where(rad_fit_ucomp_A ge min(radsamp) and rad_fit_ucomp_A le max(radsamp) AND dNe_dr lt 0.)
+                if indsamp[0] ne -1 then begin
+                   v = abs(dNe_dr(indsamp)/reform(Ne_fit_ucomp_A(ifl,indsamp)))^(-1)
+                   lN_fit_ucomp_A(ifl)   = int_tabulated(rad_fit_ucomp_A(indsamp), v) / (max(rad_fit_ucomp_A(indsamp))-min(rad_fit_ucomp_A(indsamp))) ; Rsun
+                   ; print,lN_fit_mk4_A(ifl), float(mean(v)), float(median(v))
+                   ; stop
+                endif 
+             endif              ; covgflag = 'yes'
+          endif
+       endfor                   ; field lines loop.
+       trace_data = create_struct( trace_data                          ,$
+                                  'fitflag_ucomp',ptr_new(fitflag_ucomp_A) ,$
+                                 'fit_F_Ne_ucomp',ptr_new( fit_F_Ne_ucomp) ,$
+                                  'scN_fit_ucomp',ptr_new(scN_fit_ucomp_A) ,$
+                                  'rad_fit_ucomp',ptr_new(rad_fit_ucomp_A) ,$
+                                   'Ne_fit_ucomp',ptr_new( Ne_fit_ucomp_A) ,$
+                                   'lN_fit_ucomp',ptr_new( lN_fit_ucomp_A) )
+       if fit_F_Ne_kcor eq 'DPL' then $
+          trace_data = create_struct( trace_data                        ,$
+                                    'N1_fit_ucomp',ptr_new( N1_fit_ucomp_A) ,$
+                                    'N2_fit_ucomp',ptr_new( N2_fit_ucomp_A) ,$
+                                    'p1_fit_ucomp',ptr_new( p1_fit_ucomp_A) ,$
+                                    'p2_fit_ucomp',ptr_new( p2_fit_ucomp_A) )
+    endif                       ; UCOMP
+
+
+    
+    
 
     if keyword_set(lascoc2) then begin
        radmin = 2.5 & radmax = 6.0

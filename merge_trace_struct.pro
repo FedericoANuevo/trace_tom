@@ -26,7 +26,7 @@
 
 pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
                         aia = aia, euvia = euvia, euvib = euvib, eit = eit, $
-                        mk4 = mk4, kcor = kcor, lascoc2 = lascoc2, $
+                        mk4 = mk4, kcor = kcor, ucomp = ucomp, lascoc2 = lascoc2, $
                         struture_filename = structure_filename
                         
   
@@ -39,6 +39,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      Ne_eit_A, Tm_eit_A, index_eit_A, index_sampling_eit_A,$
      Ne_mk4_A, index_mk4_A, index_sampling_mk4_A,$
      Ne_kcor_A, index_kcor_A, index_sampling_kcor_A,$
+     Ne_ucomp_A, index_ucomp_A, index_sampling_ucomp_A,$
      Ne_c2_A, index_c2_A, index_sampling_c2_A
   
   if not keyword_set(dir_fl) or not keyword_set(fl_list) then STOP
@@ -108,6 +109,12 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      index_kcor_A = intarr(N_fl,Npt_max) + default
      index_sampling_kcor_A = intarr(N_fl,Npt_max) + default
   endif
+  if keyword_set(ucomp) then begin
+     Ne_ucomp_A    = fltarr(N_fl,Npt_max) + default
+     index_ucomp_A = intarr(N_fl,Npt_max) + default
+     index_sampling_ucomp_A = intarr(N_fl,Npt_max) + default
+  endif
+  
   if keyword_set(lascoc2) then begin
      Ne_c2_A    = fltarr(N_fl,Npt_max) + default
      index_c2_A = intarr(N_fl,Npt_max) + default
@@ -267,6 +274,29 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
         index_sampling_kcor_A(i_fl,0:N_l-1) = index_sampling_l
      endif
 
+   ; UCOMP
+       if keyword_set(ucomp)    then begin
+        file_ucomp   = filename+'_kcor.out'
+        if i_fl eq 0 then structure_filename = structure_filename + '_ucomp'
+        readcol,dir_fl+file_ucomp,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_ucomp_l,$
+                index_ucomp_l ,FORMAT='D,D,D,D,D,D'
+        sample_fl, Ne_l=Ne_ucomp_l, index_l=index_ucomp_l, index_sampling_l=index_sampling_l
+        if initialized eq 'no' then begin
+           N_l         = n_elements(x_l)
+           Npt_v(i_fl) = N_l  
+           initialized = 'yes'
+           x_A   (i_fl,0:N_l-1) = x_l
+           y_A   (i_fl,0:N_l-1) = y_l
+           z_A   (i_fl,0:N_l-1) = z_l
+           rad_A (i_fl,0:N_l-1) = rad_l
+           lat_A (i_fl,0:N_l-1) = lat_l
+           lon_A (i_fl,0:N_l-1) = lon_l  
+        endif
+        Ne_ucomp_A   (i_fl,0:N_l-1) = Ne_ucomp_l
+        index_ucomp_A(i_fl,0:N_l-1) = index_ucomp_l        
+        index_sampling_ucomp_A(i_fl,0:N_l-1) = index_sampling_l
+     endif
+
    ; LASCO-C2
      if keyword_set(lascoc2) then begin
         file_c2    = filename+'_lascoc2.out'
@@ -353,6 +383,12 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
               'index_kcor' , ptr_new(         index_kcor_A) ,$
      'index_sampling_kcor' , ptr_new(index_sampling_kcor_A)  )
   endif
+  if keyword_set(ucomp) then begin
+     trace_data = create_struct( trace_data ,$
+                 'Ne_ucomp' , ptr_new(            Ne_ucomp_A) ,$
+              'index_ucomp' , ptr_new(         index_ucomp_A) ,$
+     'index_sampling_ucomp' , ptr_new(index_sampling_ucomp_A)  )
+  endif
   if keyword_set(lascoc2) then begin
      trace_data = create_struct( trace_data ,$
                    'Ne_c2' , ptr_new(            Ne_c2_A) ,$
@@ -362,7 +398,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
 
 ; Perform fits:
   fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
-                  mk4 = mk4, kcor = kcor, lascoc2 = lascoc2
+                  mk4 = mk4, kcor = kcor, ucomp = ucomp, lascoc2 = lascoc2
   
  ; Save structure in dir_fl:
   save, trace_data, filename = dir_fl + structure_filename + '.sav'
