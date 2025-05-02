@@ -7,6 +7,7 @@
 ;
 ; HISTORY: V1.0 FAN & AMV, CLaSP, October 2023.
 ; HISTORY: V1.0.1 FAN & AMV, CLaSP, May 2025.
+; Write the tom. grid parameters in an ASCII file
 ;
 
 pro tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_list=fl_list,$
@@ -31,6 +32,14 @@ pro tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_lis
         read_fieldline_and_trace_vlsrt,instr,fl_dir,filename,rad,lat,lon,nr,nt,np,N_e,csv=csv
   endfor
   close,1
+
+; Write in an ascii file the tom. grid parameters  
+  openw,1,fl_dir+'tom.grid.'+instr+'.dat'
+  printf,1,nr,nt,np
+  printf,1,rmin,max
+  printf,1,Irmin,Irmax
+  close,1
+
   
   return
 end

@@ -22,7 +22,8 @@
 
 
 pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
-                    mk4 = mk4, kcor = kcor, ucomp = ucomp, lascoc2 = lascoc2
+                    mk4 = mk4, kcor = kcor, ucomp = ucomp, lascoc2 = lascoc2,$
+                    fl_dir = fl_dir
 
     common to_fit_data, trace_data, $
      N_fl, Npt_max, Npt_v,$
@@ -41,7 +42,15 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
     default = -678.
     
     if keyword_set(aia) then begin
-       radmin = 1.0 & radmax = 1.3
+       nr = 0 & nt = 0 & np = 0
+       rmin = 0. & rmax. = 0 & Irmin = 0. & Irmax = 0.
+       openr,1,fl_dir+'tom.grid.aia.dat'
+       readf,1,nr,nt,np
+       readf,1,rmin,max
+       readf,1,Irmin,Irax
+       close,1
+;      radmin = 1.0 & radmax = 1.3
+       radmin = Irmin & radmax = Irmax
        drad_fit = 0.01
        Npt_fit = round((radmax-radmin)/drad_fit)
        fitflag_aia_A = fltarr(N_fl        ) + default
@@ -58,7 +67,9 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
         Ne_fit_aia_A = fltarr(N_fl,Npt_fit) + default
         Tm_fit_aia_A = fltarr(N_fl,Npt_fit) + default
        rad_fit_aia_A = radmin + drad_fit/2. + drad_fit * findgen(Npt_fit)
-       for ifl=0,N_fl-1 do begin      
+       for ifl=0,N_fl-1 do begin
+          appex  = max(rad_A(ifl,*))
+          radmax = min([radmax,appex]) 
           tmp = reform(index_sampling_aia_A(ifl,*))
           ind_samp_aia = where(tmp eq 1)
           if ind_samp_aia[0] ne -1 then begin
