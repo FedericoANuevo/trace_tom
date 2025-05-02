@@ -15,7 +15,7 @@ pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
 
 ; base_dir = '/data1/DATA/fieldlines_judit/'
   base_dir = '/data1/DATA/'
-  base_dir = '/media/Data1/data1/DATA/'
+; base_dir = '/media/Data1/data1/DATA/'
 ; dir      = 'radial_synth_fieldlines/' & fl_list='list_synth.txt'
 ; dir      = 'CR2099/map1/' & fl_list  = 'list.map1.txt' 
 ; dir      = 'CR2099/map7/' & fl_list  = 'list.map7.txt'

@@ -13,6 +13,14 @@
 pro tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_list=fl_list,$
               nr=nr,nt=nt,np=np,rmin=rmin,rmax=rmax,Irmin=Irmin,Irmax=Irmax,csv=csv
 
+
+; Write in an ascii file the tom. grid parameters  
+  openw,1,fl_dir+'tom.grid.'+instr+'.dat'
+  printf,1,nr,nt,np
+  printf,1,rmin,rmax
+  printf,1,Irmin,Irmax
+  close,1
+
 ; Read Tom results to trace
   if instr eq 'aia' or instr eq 'euvia' or instr eq 'euvib' or instr eq 'eit' then $
      read_demt ,tom_dir,tom_file,nr,nt,np,rmin,rmax,Irmin,Irmax,rad,lat,lon,N_e,T_e,W_T,ldem_flag
@@ -33,12 +41,7 @@ pro tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_lis
   endfor
   close,1
 
-; Write in an ascii file the tom. grid parameters  
-  openw,1,fl_dir+'tom.grid.'+instr+'.dat'
-  printf,1,nr,nt,np
-  printf,1,rmin,max
-  printf,1,Irmin,Irmax
-  close,1
+
 
   
   return

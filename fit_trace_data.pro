@@ -23,7 +23,7 @@
 
 pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                     mk4 = mk4, kcor = kcor, ucomp = ucomp, lascoc2 = lascoc2,$
-                    fl_dir = fl_dir
+                    dir_fl =  dir_fl
 
     common to_fit_data, trace_data, $
      N_fl, Npt_max, Npt_v,$
@@ -43,12 +43,13 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
     
     if keyword_set(aia) then begin
        nr = 0 & nt = 0 & np = 0
-       rmin = 0. & rmax. = 0 & Irmin = 0. & Irmax = 0.
-       openr,1,fl_dir+'tom.grid.aia.dat'
+       rmin = 0. & rmax = 0. & Irmin = 0. & Irmax = 0.
+       openr,1,dir_fl+'tom.grid.aia.dat'
        readf,1,nr,nt,np
-       readf,1,rmin,max
-       readf,1,Irmin,Irax
+       readf,1,rmin,rmax
+       readf,1,Irmin,Irmax
        close,1
+       STOP
 ;      radmin = 1.0 & radmax = 1.3
        radmin = Irmin & radmax = Irmax
        drad_fit = 0.01

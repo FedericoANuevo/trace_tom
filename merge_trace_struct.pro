@@ -399,7 +399,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
 ; Perform fits:
   fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                   mk4 = mk4, kcor = kcor, ucomp = ucomp, lascoc2 = lascoc2,$
-                  fl_dir = fl_dir
+                  dir_fl = dir_fl
   
  ; Save structure in dir_fl:
   save, trace_data, filename = dir_fl + structure_filename + '.sav'

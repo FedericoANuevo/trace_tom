@@ -20,9 +20,10 @@ pro sample_fl, Ne_l=Ne_l, index_l=index_l, index_sampling_l=index_sampling_l
         il1 = il
         while (index_l(il+1) eq index_l(il1)) do begin
            il=il+1
-          ;next line: stop if the next pint is the last one.
+          ;next line: stop if the next point is the last one.
            if il eq n_elements(index_l)-1 then goto,skip_while
         endwhile
+        skip_while:
         il2 = il
         ind_sampling_cell = fix(mean([il1,il2]))
         if Ne_l(ind_sampling_cell) gt 0. then index_sampling_l(ind_sampling_cell) = +1
