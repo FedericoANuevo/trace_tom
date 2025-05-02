@@ -69,8 +69,8 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
         Tm_fit_aia_A = fltarr(N_fl,Npt_fit) + default
        rad_fit_aia_A = radmin + drad_fit/2. + drad_fit * findgen(Npt_fit)
        for ifl=0,N_fl-1 do begin
-          appex  = max(rad_A(ifl,*))
-          radmax = min([radmax,appex]) 
+          rad_appex  = max(rad_A(ifl,*))
+          radmax = min([radmax,rad_appex]) 
           tmp = reform(index_sampling_aia_A(ifl,*))
           ind_samp_aia = where(tmp eq 1)
           if ind_samp_aia[0] ne -1 then begin
