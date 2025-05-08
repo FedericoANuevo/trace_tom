@@ -3,34 +3,42 @@
 ; files are provided, as well as all the needed parameters and files
 ; to read the tomographic producs to be traced.
 ;
-; HISTORY: V1.0 FAN & AMV, CLaSP, October 2023.
-;
-
 ; CALLING SEQUENCE EXAMPLES:
 ; tom_trace_call,/demt
 ; tom_trace_call,/lasco
 ; tom_trace_call,/mlso
+;
+; HISTORY: V1.0 FAN & AMV, CLaSP, October 2023.
+;          V1.1 AMV, CLaSP, May-2025, centralized and clearer dir structure.
+;                    Also added /nfs flag.
+;
 
-pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
+pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso,nfs1=nfs1,nfs2=nfs2
 
-; base_dir = '/data1/DATA/fieldlines_judit/'
-  base_dir = '/data1/DATA/'
-; base_dir = '/media/Data1/data1/DATA/'
-; dir      = 'radial_synth_fieldlines/' & fl_list='list_synth.txt'
-; dir      = 'CR2099/map1/' & fl_list  = 'list.map1.txt' 
-; dir      = 'CR2099/map7/' & fl_list  = 'list.map7.txt'
-; dir      = 'CR2099/map12/'& fl_list  = 'list.map12.txt'
-; dir      = 'CR2082/map1/' & fl_list  = 'list.map1.txt'
-; dir      = 'flines_Sam-Yeimy/' & fl_list  = 'list.txt'
-; dir      = 'CR2082/map1_new/' & fl_list  = 'list.map1.new.txt'
-; dir      = 'CR2082/map7_new/' & fl_list  = 'list.map7.new.txt'
-; dir      = 'CR2099/map7_new/' & fl_list  = 'list.map7.new.txt'
-; dir      = 'CR2099/map1_new/' & fl_list  = 'list.map1.new.txt' 
-  dir      = 'fl_fdips/CR2254/' & fl_list  = 'fdips_field_150x180x360_mrmqs220221t2004c2254_000.ubdat_fline-filenames_list.txt'
-  fl_dir   = base_dir + dir
+; Define PROJECT_NAME, a string suffix to construct the full PATHS to the required files.
+  PROJECT_NAME = 'CR2254'
 
+; Provide FL_LIST, the file which informs the number of field lines and the
+; filenames of the ASCII files containing the geometry of each line.
+  fl_list = 'fdips_field_150x180x360_mrmqs220221t2004c2254_000.ubdat_fline-filenames_list.txt'
+
+; --------------------This block should not require edits.---------------------------
+; Set  FL_DIR, where the field-lines geometry files should be located,
+; and TOM_DIR, where the 3D tomography products to trace should be located.
+  base_dir = '/data1/'
+  if keyword_set(nfs1) then base_dir = '/data/Data1/data1/'
+  if keyword_set(nfs2) then base_dir = '/data/Data2/data1/'
+   fl_dir = base_dir+'DATA/trace_tom_files/'+PROJECT_NAME+'/field_lines_geometry/'
+  tom_dir = base_dir+'DATA/trace_tom_files/'+PROJECT_NAME+'/tomography_3Dproducts/' 
+;------------------------------------------------------------------------------------
+    
+; Set TOM_FILE, the filename (or filename suffix in case of DEMT)
+; containing the tomographic 3D products, the instrument label, 
+; and all parameters of the tomography computational ball.
+; Then call tom_trace.
+   
   if keyword_set(demt) then begin
-     tom_dir  = '/data1/DATA/ldem_files/'
+    ;tom_dir  = '/data1/DATA/ldem_files/'
     ;tom_file = 'CR2082_HOLLOW_compound2.dat' & instr = 'euvia'
     ;tom_file = 'LDEM.CR2099_aia_Hollow_3Bands_gauss1_lin_Norm-median_singlStart' & instr = 'aia'
     ;tom_file = 'CR2099_AIA_compound1.dat'    & instr = 'aia'
@@ -50,9 +58,9 @@ pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
 
   if keyword_set(lasco) then begin
      instr    = 'lascoc2'
-     tom_dir  = '/data1/tomography/bindata/'
- ;   tom_file = 'x_LascoC2pB_CR2099_shifted_std-grid_Rmin2.5_Rmax8.5_IRmin2.5_IRmax6.0_60x60x120_BF4_L6.e-6'
- ;   tom_file = 'x_LascoC2pB_CR2082_Rmin2.5_Rmax8.5_IRmin2.5_IRmax6.0_60x60x120_BF4_L8.2e-6'
+    ;tom_dir  = '/data1/tomography/bindata/'
+    ;tom_file = 'x_LascoC2pB_CR2099_shifted_std-grid_Rmin2.5_Rmax8.5_IRmin2.5_IRmax6.0_60x60x120_BF4_L6.e-6'
+    ;tom_file = 'x_LascoC2pB_CR2082_Rmin2.5_Rmax8.5_IRmin2.5_IRmax6.0_60x60x120_BF4_L8.2e-6'
      tom_file = 'x_LascoC2pB_April-2024_Rmin2.5_Rmax8.5_IRmin2.5_IRmax6.0_60x60x120_BF4_L1.1e-5'
      nr       = 60
      nt       = 60
@@ -66,12 +74,11 @@ pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
   endif
 
   if keyword_set(mlso) then begin
-;    instr    = 'mk4'
-;    tom_dir  = '/data1/tomography/bindata/'
-;    tom_file = 'x_Mk4_CR2099_shifted_Rmin1.15_Rmax1.85_IRmin1.15_IRmax1.50_70x90x180_BF2_L5.e-6'
+    ;instr    = 'mk4'
+    ;tom_file = 'x_Mk4_CR2099_shifted_Rmin1.15_Rmax1.85_IRmin1.15_IRmax1.50_70x90x180_BF2_L5.e-6'
      instr    = 'kcor'
-     tom_dir  = '/data1/tomography/bindata/'
      tom_file = 'x_kcor_2022_Feb-Mar_segment2_Rmin1.09_Rmax1.75_IRmin1.09_IRmax1.50_66x60x120_BF2_L2.6e-5'
+    ;tom_dir  = '/data1/tomography/bindata/'
      nr       = 66;70
      nt       = 60;90
      np       = 2*nt
@@ -82,12 +89,10 @@ pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso
      tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_list=fl_list,$
                nr=nr,nt=nt,np=np,rmin=rmin,rmax=rmax,Irmin=Irmin,Irmax=Irmax
   endif
-  
-
 
  if keyword_set(ucomp) then begin
      instr    = 'ucomp'
-     tom_dir  = '/data1/DATA/ldem_files/'
+    ;tom_dir  = '/data1/DATA/ldem_files/'
      tom_file = 'Ne_ratio_ucomp_1074-1079_second_target_segment2.dat'
      nr       = 16
      nt       = 60
