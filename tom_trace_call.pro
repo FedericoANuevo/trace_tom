@@ -6,14 +6,15 @@
 ; CALLING SEQUENCE EXAMPLES:
 ; tom_trace_call,/demt
 ; tom_trace_call,/lasco
-; tom_trace_call,/mlso
+; tom_trace_call,/kcor_mk4
 ;
 ; HISTORY: V1.0 FAN & AMV, CLaSP, October 2023.
 ;          V1.1 AMV, CLaSP, May-2025, centralized and clearer dir structure.
 ;                    Also added /nfs flag.
 ;
 
-pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso,nfs1=nfs1,nfs2=nfs2
+pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
+                   nfs1=nfs1,nfs2=nfs2
 
 ; Define PROJECT_NAME, a string suffix to construct the full PATHS to the required files.
   PROJECT_NAME = 'CR2254'
@@ -38,13 +39,12 @@ pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso,nfs1=nfs1,nfs2=nfs2
 ; Then call tom_trace.
    
   if keyword_set(demt) then begin
-    ;tom_dir  = '/data1/DATA/ldem_files/'
     ;tom_file = 'CR2082_HOLLOW_compound2.dat' & instr = 'euvia'
     ;tom_file = 'LDEM.CR2099_aia_Hollow_3Bands_gauss1_lin_Norm-median_singlStart' & instr = 'aia'
     ;tom_file = 'CR2099_AIA_compound1.dat'    & instr = 'aia'
     ;tom_file = 'CR2099_AIA_compound2.dat'    & instr = 'aia'
     ;tom_file = 'LDEM.April-2024_aia_Hollow_3Bands_gauss1_lin_Norm-median_singlStart' & instr = 'aia'
-     tom_file = 'LDEM.feb-mar_2022_segment2_aia_Hollow_3Bands_ucomp_comparison_gauss1_lin_Norm-median_singlStart'
+     tom_file = 'LDEM.feb-mar_2022_segment2_aia_Hollow_3Bands_ucomp_comparison_gauss1_lin_Norm-median_singlStart' & instr = 'aia'
      nr       = 21;30
      nt       = 60;90
      np       = 2*nt
@@ -57,11 +57,10 @@ pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso,nfs1=nfs1,nfs2=nfs2
   endif
 
   if keyword_set(lasco) then begin
-     instr    = 'lascoc2'
-    ;tom_dir  = '/data1/tomography/bindata/'
     ;tom_file = 'x_LascoC2pB_CR2099_shifted_std-grid_Rmin2.5_Rmax8.5_IRmin2.5_IRmax6.0_60x60x120_BF4_L6.e-6'
     ;tom_file = 'x_LascoC2pB_CR2082_Rmin2.5_Rmax8.5_IRmin2.5_IRmax6.0_60x60x120_BF4_L8.2e-6'
      tom_file = 'x_LascoC2pB_April-2024_Rmin2.5_Rmax8.5_IRmin2.5_IRmax6.0_60x60x120_BF4_L1.1e-5'
+     instr    = 'lascoc2'
      nr       = 60
      nt       = 60
      np       = 2*nt
@@ -73,12 +72,9 @@ pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso,nfs1=nfs1,nfs2=nfs2
                nr=nr,nt=nt,np=np,rmin=rmin,rmax=rmax,Irmin=Irmin,Irmax=Irmax,/csv
   endif
 
-  if keyword_set(mlso) then begin
-    ;instr    = 'mk4'
-    ;tom_file = 'x_Mk4_CR2099_shifted_Rmin1.15_Rmax1.85_IRmin1.15_IRmax1.50_70x90x180_BF2_L5.e-6'
-     instr    = 'kcor'
-     tom_file = 'x_kcor_2022_Feb-Mar_segment2_Rmin1.09_Rmax1.75_IRmin1.09_IRmax1.50_66x60x120_BF2_L2.6e-5'
-    ;tom_dir  = '/data1/tomography/bindata/'
+  if keyword_set(kcor_mk4) then begin
+    ;tom_file = 'x_Mk4_CR2099_shifted_Rmin1.15_Rmax1.85_IRmin1.15_IRmax1.50_70x90x180_BF2_L5.e-6' & instr = 'mk4'
+     tom_file = 'x_kcor_2022_Feb-Mar_segment2_Rmin1.09_Rmax1.75_IRmin1.09_IRmax1.50_66x60x120_BF2_L2.6e-5' & instr = 'kcor'
      nr       = 66;70
      nt       = 60;90
      np       = 2*nt
@@ -91,9 +87,8 @@ pro tom_trace_call,demt=demt,lasco=lasco,mlso=mlso,nfs1=nfs1,nfs2=nfs2
   endif
 
  if keyword_set(ucomp) then begin
-     instr    = 'ucomp'
-    ;tom_dir  = '/data1/DATA/ldem_files/'
      tom_file = 'Ne_ratio_ucomp_1074-1079_second_target_segment2.dat'
+     instr    = 'ucomp'
      nr       = 16
      nt       = 60
      np       = 2*nt

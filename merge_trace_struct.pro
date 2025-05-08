@@ -24,11 +24,10 @@
 ;          traced result.
 ;
 
-pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
-                        aia = aia, euvia = euvia, euvib = euvib, eit = eit, $
-                        mk4 = mk4, kcor = kcor, ucomp = ucomp, lascoc2 = lascoc2, $
-                        struture_filename = structure_filename
-                        
+pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
+                        aia=aia, euvia=euvia, euvib=euvib, eit=eit, $
+                        mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2, $
+                        struture_filename=structure_filename
   
   common to_fit_data, trace_data, $
      N_fl, Npt_max, Npt_v,$
@@ -42,7 +41,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      Ne_ucomp_A, index_ucomp_A, index_sampling_ucomp_A,$
      Ne_c2_A, index_c2_A, index_sampling_c2_A
   
-  if not keyword_set(dir_fl) or not keyword_set(fl_list) then STOP
+  if not keyword_set(fl_dir) or not keyword_set(fl_list) then STOP
 
 ; Set up filename for output structure:
   if not keyword_set(structure_filename) then structure_filename = fl_list
@@ -51,7 +50,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
 ; Read the list with the field-lines  
   N_fl     = 0
   filename = ''
-  openr,1,dir_fl+fl_list
+  openr,1,fl_dir+fl_list
   readf,1,N_fl
 
 ; Maximum number of point along the fieldline  
@@ -129,7 +128,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      if keyword_set(aia)   then begin
         file_aia   = filename+'_aia.out'
         if i_fl eq 0 then structure_filename = structure_filename + '_aia'
-        readcol,dir_fl+file_aia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_aia_l,Tm_aia_l,$
+        readcol,fl_dir+file_aia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_aia_l,Tm_aia_l,$
                 WT_aia_l, ldem_flag_aia_l, index_aia_l  ,FORMAT='D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_aia_l, index_l=index_aia_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
@@ -155,7 +154,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      if keyword_set(euvia)  then begin
         file_euvia = filename+'_euvia.out'
         if i_fl eq 0 then structure_filename = structure_filename + '_euvia'
-        readcol,dir_fl+file_euvia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_euvia_l,Tm_euvia_l,$
+        readcol,fl_dir+file_euvia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_euvia_l,Tm_euvia_l,$
                 WT_euvia_l,ldem_flag_euvia_l,index_euvia_l,FORMAT='D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_euvia_l, index_l=index_euvia_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
@@ -181,7 +180,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      if keyword_set(euvib)  then begin
         file_euvib = filename+'_euvib.out'
         if i_fl eq 0 then structure_filename = structure_filename + '_euvib'
-        readcol,dir_fl+file_aia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_euvib_l,Tm_euvib_l,$
+        readcol,fl_dir+file_aia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_euvib_l,Tm_euvib_l,$
                 WT_euvib_l,ldem_flag_euvib_l,index_euvib_l,FORMAT='D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_euvib_l, index_l=index_euvib_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
@@ -206,7 +205,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      if keyword_set(eit)    then begin
         file_eit = filename+'_eit.out'
         if i_fl eq 0 then structure_filename = structure_filename + '_eit'
-        readcol,dir_fl+file_aia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_eit_l,Tm_eit_l,$
+        readcol,fl_dir+file_aia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_eit_l,Tm_eit_l,$
                 WT_eit_l,ldem_flag_eit_l,index_eit_l,FORMAT='D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_eit_l, index_l=index_eit_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
@@ -232,7 +231,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      if keyword_set(mk4)    then begin
         file_mk4   = filename+'_mk4.out'
         if i_fl eq 0 then structure_filename = structure_filename + '_mk4'
-        readcol,dir_fl+file_mk4,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_mk4_l,$
+        readcol,fl_dir+file_mk4,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_mk4_l,$
                 index_mk4_l  ,FORMAT='D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_mk4_l, index_l=index_mk4_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
@@ -255,7 +254,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      if keyword_set(kcor)    then begin
         file_kcor   = filename+'_kcor.out'
         if i_fl eq 0 then structure_filename = structure_filename + '_kcor'
-        readcol,dir_fl+file_kcor,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_kcor_l,$
+        readcol,fl_dir+file_kcor,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_kcor_l,$
                 index_kcor_l ,FORMAT='D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_kcor_l, index_l=index_kcor_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
@@ -278,7 +277,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
        if keyword_set(ucomp)    then begin
         file_ucomp   = filename+'_kcor.out'
         if i_fl eq 0 then structure_filename = structure_filename + '_ucomp'
-        readcol,dir_fl+file_ucomp,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_ucomp_l,$
+        readcol,fl_dir+file_ucomp,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_ucomp_l,$
                 index_ucomp_l ,FORMAT='D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_ucomp_l, index_l=index_ucomp_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
@@ -301,7 +300,7 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
      if keyword_set(lascoc2) then begin
         file_c2    = filename+'_lascoc2.out'
         if i_fl eq 0 then structure_filename = structure_filename + '_lascoc2'
-        readcol,dir_fl+file_c2 ,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_c2_l,$
+        readcol,fl_dir+file_c2 ,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_c2_l,$
                 index_c2_l   ,FORMAT='D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_c2_l, index_l=index_c2_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
@@ -397,15 +396,15 @@ pro merge_trace_struct, dir_fl = dir_fl, fl_list = fl_list, $
   endif
 
 ; Perform fits:
-  fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
-                  mk4 = mk4, kcor = kcor, ucomp = ucomp, lascoc2 = lascoc2,$
-                  dir_fl = dir_fl
+  fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
+                  mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2,$
+                  fl_dir=fl_dir
   
- ; Save structure in dir_fl:
-  save, trace_data, filename = dir_fl + structure_filename + '.sav'
+ ; Save structure in fl_dir:
+  save, trace_data, filename = fl_dir + structure_filename + '.sav'
 
   print,'Output in:'
-  print,dir_fl + structure_filename + '.sav'
+  print,fl_dir + structure_filename + '.sav'
   
   return
 end
