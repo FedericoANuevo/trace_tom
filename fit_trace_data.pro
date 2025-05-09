@@ -21,9 +21,9 @@
 ;          v1.4.2, FAN, May 2024, ClaSP. euvia keyword added.
 
 
-pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
-                    mk4 = mk4, kcor = kcor, ucomp = ucomp, lascoc2 = lascoc2,$
-                    dir_fl =  dir_fl
+pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
+                    mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2,$
+                    fl_dir=fl+dir
 
     common to_fit_data, trace_data, $
      N_fl, Npt_max, Npt_v,$
@@ -44,10 +44,9 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
     if keyword_set(aia) then begin
        nr = 0 & nt = 0 & np = 0
        rmin = 0. & rmax = 0. & Irmin = 0. & Irmax = 0.
+      ;Read in the tomographic computational ball grid parameters  
        openr,1,dir_fl+'tom.grid.aia.dat'
-       readf,1,nr,nt,np
-       readf,1,rmin,rmax
-       readf,1,Irmin,Irmax
+       readf,1,nr,nt,np,rmin,rmax,Irmin,Irmax
        close,1
        STOP
 ;      radmin = 1.0 & radmax = 1.3
@@ -144,6 +143,10 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
     endif                       ; AIA
 
     if keyword_set(euvia) then begin
+      ;Read in the tomographic computational ball grid parameters  
+       openr,1,dir_fl+'tom.grid.euvia.dat'
+       readf,1,nr,nt,np,rmin,rmax,Irmin,Irmax
+       close,1
        radmin = 1.0 & radmax = 1.3
        drad_fit = 0.01
        Npt_fit = round((radmax-radmin)/drad_fit)
@@ -235,6 +238,10 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
     endif                       ; EUVI-A
 
     if keyword_set(mk4) then begin
+      ;Read in the tomographic computational ball grid parameters  
+       openr,1,dir_fl+'tom.grid.mk4.dat'
+       readf,1,nr,nt,np,rmin,rmax,Irmin,Irmax
+       close,1
        radmin = 1.15 & radmax = 1.5
        drad_fit = 0.01
        Npt_fit = round((radmax-radmin)/drad_fit)
@@ -326,6 +333,10 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
     endif                       ; MK4
 
     if keyword_set(kcor) then begin
+      ;Read in the tomographic computational ball grid parameters  
+       openr,1,dir_fl+'tom.grid.kcor.dat'
+       readf,1,nr,nt,np,rmin,rmax,Irmin,Irmax
+       close,1
        radmin = 1.15 & radmax = 1.5
        drad_fit = 0.01
        Npt_fit = round((radmax-radmin)/drad_fit)
@@ -383,6 +394,10 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
     endif                       ; KCOR
 
     if keyword_set(ucomp) then begin
+      ;Read in the tomographic computational ball grid parameters  
+       openr,1,dir_fl+'tom.grid.ucomp.dat'
+       readf,1,nr,nt,np,rmin,rmax,Irmin,Irmax
+       close,1
        radmin = 1.15 & radmax = 1.5
        drad_fit = 0.01
        Npt_fit = round((radmax-radmin)/drad_fit)
@@ -444,6 +459,10 @@ pro fit_trace_data, aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
     
 
     if keyword_set(lascoc2) then begin
+      ;Read in the tomographic computational ball grid parameters  
+       openr,1,dir_fl+'tom.grid.lascoc2.dat'
+       readf,1,nr,nt,np,rmin,rmax,Irmin,Irmax
+       close,1
        radmin = 2.5 & radmax = 6.0
        drad_fit = 0.1
        Npt_fit = round((radmax-radmin)/drad_fit)
