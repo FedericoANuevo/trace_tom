@@ -24,8 +24,8 @@ pro merge_trace_struct_call, nfs1=nfs1, nfs2=nfs2
    fl_dir = base_dir+'DATA/trace_tom_files/'+PROJECT_NAME+'/field_lines_geometry/'
 ;------------------------------------------------------------------------------------
 
-  merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, /aia, /kcor, /ucomp, struture_filename=structure_filename
-
+ ; merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, /aia, /kcor, /ucomp, struture_filename=structure_filename
+   merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, /aia               , struture_filename=structure_filename
   return
 end
 

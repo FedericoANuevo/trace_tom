@@ -39,22 +39,35 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
 
     common radcrits, radcritA, radcritB
 
+   ;Set a default value for all the elements of all the [NAME]_A arrays
     default = -678.
+
+   ;Read in the tomographic computational ball grid parameters  
+    if keyword_set(aia)     then instr_string = 'aia'
+    if keyword_set(euvia)   then instr_string = 'euvia'
+    if keyword_set(eit)     then instr_string = 'eit'
+    if keyword_set(mk4)     then instr_string = 'mk4'
+    if keyword_set(kcor)    then instr_string = 'kcor'
+    if keyword_set(ucomp)   then instr_string = 'ucomp'
+    if keyword_set(lascoc2) then instr_string = 'lascoc2'
     empty_string = ''
+    nr=0 & nt=0 & np=0 & rmin=0. & rmax=0. & Irmin=0. & Irmax=0.
+    openr,1,fl_dir+'tom.grid.'+instr_string+'.dat'
+    readf,1,empty_string
+    readf,1,nr,nt,np,rmin,rmax,Irmin,Irmax
+    close,1
+   ;Set radmin_fit and radmax_fit equal to the Instrumental FoV limits
+    radmin_fit = Irmin & radmax_fit = Irmax
+   ;Set an adequate radial resolution for the fits
+    if keyword_set(aia) or keyword_set(euvia) or keyword_set(euvib) or keyword_set(eit) or $
+       keyword_set(mk4) or keyword_set(kcor)  or keyword_set(ucomp) then $
+       drad_fit=0.01
+    if keyword_set(lascoc2) then $
+       drad_fit=0.1
+   ;Compute de number of points in the fit
+    Npt_fit = round((radmax_fit-radmin_fit)/drad_fit)
     
     if keyword_set(aia) then begin
-       nr = 0 & nt = 0 & np = 0
-       rmin = 0. & rmax = 0. & Irmin = 0. & Irmax = 0.
-      ;Read in the tomographic computational ball grid parameters  
-       openr,1,dir_fl+'tom.grid.aia.dat'
-       readf,1,empty_string
-       readf,1,nr,nt,np,rmin,rmax,Irmin,Irmax
-       close,1
-       STOP
-;      radmin = 1.0 & radmax = 1.3
-       radmin = Irmin & radmax = Irmax
-       drad_fit = 0.01
-       Npt_fit = round((radmax-radmin)/drad_fit)
        fitflag_aia_A = fltarr(N_fl        ) + default
         N0_fit_aia_A = fltarr(N_fl        ) + default
         lN_fit_aia_A = fltarr(N_fl        ) + default
@@ -68,15 +81,22 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
        scT_fit_aia_A = fltarr(N_fl        ) + default
         Ne_fit_aia_A = fltarr(N_fl,Npt_fit) + default
         Tm_fit_aia_A = fltarr(N_fl,Npt_fit) + default
-       rad_fit_aia_A = radmin + drad_fit/2. + drad_fit * findgen(Npt_fit)
+       rad_fit_aia_A = radmin_fit + drad_fit/2. + drad_fit * findgen(Npt_fit)
        for ifl=0,N_fl-1 do begin
-          rad_appex  = max(rad_A(ifl,*))
-          radmax = min([radmax,rad_appex]) 
           tmp = reform(index_sampling_aia_A(ifl,*))
           ind_samp_aia = where(tmp eq 1)
           if ind_samp_aia[0] ne -1 then begin
              radsamp = reform(rad_A(ifl,ind_samp_aia)) ; Rsun
-             test_coverage, radsamp=radsamp, covgflag=covgflag, /aia
+            ;Determine radsamp_max (which is the apex in the case of closed loops)
+             radsamp_max=max(radsamp)
+             Nradsamp=n_elements(radsamp)
+            ;Sanity check
+             if radsamp_max ne radsamp(Nradsamp-1) then STOP
+            ;Determine the actual min and max rad for the fit
+             radfit_min =                  min(rad_fit_aia_A)
+             radfit_max = min([radsamp_max,max(rad_fit_aia_A)]) 
+            ;Test if there is proper coverage of actual sample data for a decent least squares fit.
+             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, covgflag=covgflag, /aia
              if covgflag eq 'yes' then begin
                 fitflag_aia_A(ifl) = +1.
                 Nesamp = reform(Ne_aia_A(ifl,ind_samp_aia))
@@ -142,17 +162,9 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                                     'p1_fit_aia',ptr_new( p1_fit_aia_A) ,$
                                     'p2_fit_aia',ptr_new( p2_fit_aia_A) )
 
-    endif                       ; AIA
+    endif ; AIA
 
     if keyword_set(euvia) then begin
-      ;Read in the tomographic computational ball grid parameters  
-       openr,1,dir_fl+'tom.grid.euvia.dat'
-       readf,1,empty_string
-       readf,1,nr,nt,np,rmin,rmax,Irmin,Irmax
-       close,1
-       radmin = 1.0 & radmax = 1.3
-       drad_fit = 0.01
-       Npt_fit = round((radmax-radmin)/drad_fit)
        fitflag_euvia_A = fltarr(N_fl        ) + default
         N0_fit_euvia_A = fltarr(N_fl        ) + default
         lN_fit_euvia_A = fltarr(N_fl        ) + default
@@ -166,7 +178,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
        scT_fit_euvia_A = fltarr(N_fl        ) + default
         Ne_fit_euvia_A = fltarr(N_fl,Npt_fit) + default
         Tm_fit_euvia_A = fltarr(N_fl,Npt_fit) + default
-       rad_fit_euvia_A = radmin + drad_fit/2. + drad_fit * findgen(Npt_fit)
+       rad_fit_euvia_A = radmin_fit + drad_fit/2. + drad_fit * findgen(Npt_fit)
        for ifl=0,N_fl-1 do begin      
           tmp = reform(index_sampling_euvia_A(ifl,*))
           ind_samp_euvia = where(tmp eq 1)
@@ -238,17 +250,9 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                                     'p1_fit_euvia',ptr_new( p1_fit_euvia_A) ,$
                                     'p2_fit_euvia',ptr_new( p2_fit_euvia_A) )
 
-    endif                       ; EUVI-A
+    endif ; EUVI-A
 
     if keyword_set(mk4) then begin
-      ;Read in the tomographic computational ball grid parameters  
-       openr,1,dir_fl+'tom.grid.mk4.dat'
-       readf,1,empty_string
-       readf,1,nr,nt,np,rmin,rmax,Irmin,Irmax
-       close,1
-       radmin = 1.15 & radmax = 1.5
-       drad_fit = 0.01
-       Npt_fit = round((radmax-radmin)/drad_fit)
        fitflag_mk4_A = fltarr(N_fl        ) + default
         N0_fit_mk4_A = fltarr(N_fl        ) + default
         lN_fit_mk4_A = fltarr(N_fl        ) + default
@@ -258,7 +262,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
         p2_fit_mk4_A = fltarr(N_fl        ) + default
        scN_fit_mk4_A = fltarr(N_fl        ) + default
         Ne_fit_mk4_A = fltarr(N_fl,Npt_fit) + default
-       rad_fit_mk4_A = radmin + drad_fit/2. + drad_fit * findgen(Npt_fit)
+       rad_fit_mk4_A = radmin_fit + drad_fit/2. + drad_fit * findgen(Npt_fit)
        for ifl=0,N_fl-1 do begin      
           tmp = reform(index_sampling_mk4_A(ifl,*))
           ind_samp_mk4 = where(tmp eq 1)
@@ -334,17 +338,9 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                                     'N2_fit_mk4',ptr_new( N2_fit_mk4_A) ,$
                                     'p1_fit_mk4',ptr_new( p1_fit_mk4_A) ,$
                                     'p2_fit_mk4',ptr_new( p2_fit_mk4_A) )
-    endif                       ; MK4
-
+    endif ; Mk4
+    
     if keyword_set(kcor) then begin
-      ;Read in the tomographic computational ball grid parameters  
-       openr,1,dir_fl+'tom.grid.kcor.dat'
-       readf,1,empty_string
-       readf,1,nr,nt,np,rmin,rmax,Irmin,Irmax
-       close,1
-       radmin = 1.15 & radmax = 1.5
-       drad_fit = 0.01
-       Npt_fit = round((radmax-radmin)/drad_fit)
        fitflag_kcor_A = fltarr(N_fl        ) + default
         N0_fit_kcor_A = fltarr(N_fl        ) + default
         lN_fit_kcor_A = fltarr(N_fl        ) + default
@@ -354,7 +350,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
         p2_fit_kcor_A = fltarr(N_fl        ) + default
        scN_fit_kcor_A = fltarr(N_fl        ) + default
         Ne_fit_kcor_A = fltarr(N_fl,Npt_fit) + default
-       rad_fit_kcor_A = radmin + drad_fit/2. + drad_fit * findgen(Npt_fit)
+       rad_fit_kcor_A = radmin_fit + drad_fit/2. + drad_fit * findgen(Npt_fit)
        for ifl=0,N_fl-1 do begin      
           tmp = reform(index_sampling_kcor_A(ifl,*))
           ind_samp_kcor = where(tmp eq 1)
@@ -396,17 +392,9 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                                     'N2_fit_kcor',ptr_new( N2_fit_kcor_A) ,$
                                     'p1_fit_kcor',ptr_new( p1_fit_kcor_A) ,$
                                     'p2_fit_kcor',ptr_new( p2_fit_kcor_A) )
-    endif                       ; KCOR
+    endif ; KCOR
 
     if keyword_set(ucomp) then begin
-      ;Read in the tomographic computational ball grid parameters  
-       openr,1,dir_fl+'tom.grid.ucomp.dat'
-       readf,1,empty_string
-       readf,1,nr,nt,np,rmin,rmax,Irmin,Irmax
-       close,1
-       radmin = 1.15 & radmax = 1.5
-       drad_fit = 0.01
-       Npt_fit = round((radmax-radmin)/drad_fit)
        fitflag_ucomp_A = fltarr(N_fl        ) + default
         N0_fit_ucomp_A = fltarr(N_fl        ) + default
         lN_fit_ucomp_A = fltarr(N_fl        ) + default
@@ -416,7 +404,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
         p2_fit_ucomp_A = fltarr(N_fl        ) + default
        scN_fit_ucomp_A = fltarr(N_fl        ) + default
         Ne_fit_ucomp_A = fltarr(N_fl,Npt_fit) + default
-       rad_fit_ucomp_A = radmin + drad_fit/2. + drad_fit * findgen(Npt_fit)
+       rad_fit_ucomp_A = radmin_fit + drad_fit/2. + drad_fit * findgen(Npt_fit)
        for ifl=0,N_fl-1 do begin      
           tmp = reform(index_sampling_ucomp_A(ifl,*))
           ind_samp_ucomp = where(tmp eq 1)
@@ -458,21 +446,9 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                                     'N2_fit_ucomp',ptr_new( N2_fit_ucomp_A) ,$
                                     'p1_fit_ucomp',ptr_new( p1_fit_ucomp_A) ,$
                                     'p2_fit_ucomp',ptr_new( p2_fit_ucomp_A) )
-    endif                       ; UCOMP
-
-
-    
-    
+    endif ; UCoMP
 
     if keyword_set(lascoc2) then begin
-      ;Read in the tomographic computational ball grid parameters  
-       openr,1,dir_fl+'tom.grid.lascoc2.dat'
-       readf,1,empty_string
-       readf,1,nr,nt,np,rmin,rmax,Irmin,Irmax
-       close,1
-       radmin = 2.5 & radmax = 6.0
-       drad_fit = 0.1
-       Npt_fit = round((radmax-radmin)/drad_fit)
        fitflag_c2_A = fltarr(N_fl        ) + default
         N1_fit_c2_A = fltarr(N_fl        ) + default
         N2_fit_c2_A = fltarr(N_fl        ) + default
@@ -481,7 +457,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
         lN_fit_c2_A = fltarr(N_fl        ) + default
        scN_fit_c2_A = fltarr(N_fl        ) + default
         Ne_fit_c2_A = fltarr(N_fl,Npt_fit) + default
-       rad_fit_c2_A = radmin + drad_fit/2. + drad_fit * findgen(Npt_fit)
+       rad_fit_c2_A = radmin_fit + drad_fit/2. + drad_fit * findgen(Npt_fit)
        for ifl=0,N_fl-1 do begin      
           tmp = reform(index_sampling_c2_A(ifl,*))
           ind_samp_c2 = where(tmp eq 1)
@@ -541,7 +517,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                                    'N2_fit_c2',ptr_new( N2_fit_c2_A) ,$
                                    'p1_fit_c2',ptr_new( p1_fit_c2_A) ,$
                                    'p2_fit_c2',ptr_new( p2_fit_c2_A) )
-    endif; LASCOC2
+    endif ; LASCOC2
 
     return
  end
