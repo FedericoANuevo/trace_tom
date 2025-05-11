@@ -36,38 +36,15 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
      Ne_kcor_A, index_kcor_A, index_sampling_kcor_A,$
      Ne_ucomp_A, index_ucomp_A, index_sampling_ucomp_A,$
      Ne_c2_A, index_c2_A, index_sampling_c2_A
-
     common radcrits, radcritA, radcritB
+    common tomgrid,nr,nt,np,rmin,rmax,Irmin,Irmax
+    common fitgrid,radmin_fit,radmax_fit,drad_fit,Npt_fit
 
    ;Set a default value for all the elements of all the [NAME]_A arrays
     default = -678.
-
-   ;Read in the tomographic computational ball grid parameters  
-    if keyword_set(aia)     then instr_string = 'aia'
-    if keyword_set(euvia)   then instr_string = 'euvia'
-    if keyword_set(eit)     then instr_string = 'eit'
-    if keyword_set(mk4)     then instr_string = 'mk4'
-    if keyword_set(kcor)    then instr_string = 'kcor'
-    if keyword_set(ucomp)   then instr_string = 'ucomp'
-    if keyword_set(lascoc2) then instr_string = 'lascoc2'
-    empty_string = ''
-    nr=0 & nt=0 & np=0 & rmin=0. & rmax=0. & Irmin=0. & Irmax=0.
-    openr,1,fl_dir+'tom.grid.'+instr_string+'.dat'
-    readf,1,empty_string
-    readf,1,nr,nt,np,rmin,rmax,Irmin,Irmax
-    close,1
-   ;Set radmin_fit and radmax_fit equal to the Instrumental FoV limits
-    radmin_fit = Irmin & radmax_fit = Irmax
-   ;Set an adequate radial resolution for the fits
-    if keyword_set(aia) or keyword_set(euvia) or keyword_set(euvib) or keyword_set(eit) or $
-       keyword_set(mk4) or keyword_set(kcor)  or keyword_set(ucomp) then $
-       drad_fit=0.01
-    if keyword_set(lascoc2) then $
-       drad_fit=0.1
-   ;Compute de number of points in the fit
-    Npt_fit = round((radmax_fit-radmin_fit)/drad_fit)
     
     if keyword_set(aia) then begin
+       read_tomgrid_and_define_fitgrid,fl_dir=fl_dir,instr_string='aia'
        fitflag_aia_A = fltarr(N_fl        ) + default
         N0_fit_aia_A = fltarr(N_fl        ) + default
         lN_fit_aia_A = fltarr(N_fl        ) + default
@@ -89,13 +66,15 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
              radsamp = reform(rad_A(ifl,ind_samp_aia)) ; Rsun
             ;Determine radsamp_max (which is the apex in the case of closed loops)
              radsamp_max=max(radsamp)
-             Nradsamp=n_elements(radsamp)
+             Nradsamp   =n_elements(radsamp)
             ;Sanity check of radsamp_max
              if radsamp(0) lt radsamp(Nradsamp-1) and radsamp_max ne radsamp(Nradsamp-1) then STOP
              if radsamp(0) gt radsamp(Nradsamp-1) and radsamp_max ne radsamp(0)          then STOP
             ;Determine the actual min and max rad for the fit
              radfit_min =                  min(rad_fit_aia_A)
              radfit_max = min([radsamp_max,max(rad_fit_aia_A)]) 
+            ;Determina range of rad_fit_[instrument]_fit over which evaluate the fit.
+             range_fit = where(rad_fit_aia_A ge radfit_min AND rad_fit_aia_A le radfit_max)
             ;Test if there is proper coverage of actual sample data for a decent least squares fit.
              test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, covgflag=covgflag, /aia
              if covgflag eq 'yes' then begin
@@ -106,10 +85,10 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                 fit_F_Ne_aia  = 'IHS'
                 linear_fit, 1./radsamp   , alog(Nesamp), AN, r2N, /linfit_idl
                 scN_fit_aia_A(ifl)   = r2N             
-                 N0_fit_aia_A(ifl)   = exp(AN[0]+AN[1])                                                                ; cm-3
-                 lN_fit_aia_A(ifl)   = 1./AN[1]                                                                        ; Rsun
-                 Ne_fit_aia_A(ifl,*) = N0_fit_aia_A(ifl) * exp(-(1/lN_fit_aia_A(ifl))*(1.-1./rad_fit_aia_A))           ; cm-3
-                 dNe_dr              = reform(Ne_fit_aia_A(ifl,*)) * float(-(1/lN_fit_aia_A(ifl))) / rad_fit_aia_A^2   ; cm-3 / Rsun
+                 N0_fit_aia_A(ifl)   = exp(AN[0]+AN[1])                                                                         ; cm-3
+                 lN_fit_aia_A(ifl)   = 1./AN[1]                                                                                 ; Rsun
+                 Ne_fit_aia_A(ifl,range_fit) = N0_fit_aia_A(ifl) * exp(-(1/lN_fit_aia_A(ifl))*(1.-1./rad_fit_aia_A(range_fit))) ; cm-3
+                 dNe_dr                      = reform(Ne_fit_aia_A(ifl,*)) * float(-(1/lN_fit_aia_A(ifl))) / rad_fit_aia_A^2    ; cm-3 / Rsun
                 indsamp = where(rad_fit_aia_A ge min(radsamp) and rad_fit_aia_A le max(radsamp) AND dNe_dr lt 0.)
                 v = abs(dNe_dr(indsamp)/reform(Ne_fit_aia_A(ifl,indsamp)))^(-1)
                 lN_fit_aia_A(ifl)   =  int_tabulated(rad_fit_aia_A(indsamp),v) / (max(rad_fit_aia_A(indsamp))-min(rad_fit_aia_A(indsamp))) ; cm-3 / Rsun
@@ -123,9 +102,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                  p1_fit_aia_A(ifl)   = A[1]                                                                          ; dimensionless exponent of power law
                  N2_fit_aia_A(ifl)   = A[2]                                                                          ; cm-3
                  p2_fit_aia_A(ifl)   = A[3]                                                                          ; dimensionless exponent of power law
-                ;Determina range of rad_fit_[instrument]_fit over which evaluate the fit.
-                 range = where(rad_fit_aia_A ge radfit_min AND rad_fit_aia_A le radfit_max)
-                 Ne_fit_aia_A(ifl,range) = A[0] * rad_fit_aia_A(range)^(-A[1]) + A[2] * rad_fit_aia_A(range)^(-A[3])   ; cm-3
+                 Ne_fit_aia_A(ifl,range_fit) = A[0] * rad_fit_aia_A(range_fit)^(-A[1]) + A[2] * rad_fit_aia_A(range_fit)^(-A[3]) ; cm-3
                  dNe_dr                  = - A[1]*A[0] * rad_fit_aia_A^(-A[1]-1) - A[3]*A[2] * rad_fit_aia_A^(-A[3]-1) ; cm-3 / Rsun
                 indsamp = where(rad_fit_aia_A ge radfit_min and rad_fit_aia_A le radfit_max AND dNe_dr lt 0.)
                 if indsamp[0] ne -1 then begin
@@ -138,10 +115,10 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                 ;Linear fit to Te(r)
                 linear_fit,    radsamp-1.,      Tmsamp , AT, r2T, /theil_sen, chisqr = chisqr
                  scT_fit_aia_A(ifl) = sqrt(chisqr)/mean(Tmsamp)                                                                    
-                  T0_fit_aia_A(ifl) = AT[0]                                                                    ; K
-                dTdr_fit_aia_A(ifl) = AT[1]                                                                    ; K/Rsun
-                  Tm_fit_aia_A(ifl,range) = T0_fit_aia_A(ifl) + dTdr_fit_aia_A(ifl) * (rad_fit_aia_A(range)-1.)  ; K
-             endif                                                                                             ; covgflag = 'yes'
+                  T0_fit_aia_A(ifl) = AT[0]                                                                             ; K
+                dTdr_fit_aia_A(ifl) = AT[1]                                                                             ; K/Rsun
+                  Tm_fit_aia_A(ifl,range_fit) = T0_fit_aia_A(ifl) + dTdr_fit_aia_A(ifl) * (rad_fit_aia_A(range_fit)-1.) ; K
+             endif ; covgflag = 'yes'
           endif
        endfor                   ; field lines loop.
        trace_data = create_struct( trace_data                           ,$
@@ -164,10 +141,16 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                                     'N2_fit_aia',ptr_new( N2_fit_aia_A) ,$
                                     'p1_fit_aia',ptr_new( p1_fit_aia_A) ,$
                                     'p2_fit_aia',ptr_new( p2_fit_aia_A) )
-
+       ;Add to structure the parameters of the tomography and fit grids.
+       trace_data = create_struct( trace_data                                                      ,$
+                                   'tomgrid_aia_hdr',ptr_new(['nr','nt','np','rmin','rmax','Irmin','Irmax'])   ,$
+                                   'tomgrid_aia'    ,ptr_new([ nr , nt , np , rmin , rmax , Irmin , Irmax ])   ,$
+                                   'fitgrid_aia_hdr',ptr_new(['radmin_fit','radmax_fit','drad_fit','Npt_fit']) ,$
+                                   'fitgrid_aia'    ,ptr_new([ radmin_fit , radmax_fit , drad_fit , Npt_fit ]) )
     endif ; AIA
 
     if keyword_set(euvia) then begin
+       read_tomgrid_and_define_fitgrid,instr_string='euvia'
        fitflag_euvia_A = fltarr(N_fl        ) + default
         N0_fit_euvia_A = fltarr(N_fl        ) + default
         lN_fit_euvia_A = fltarr(N_fl        ) + default
@@ -256,6 +239,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
     endif ; EUVI-A
 
     if keyword_set(mk4) then begin
+       read_tomgrid_and_define_fitgrid,instr_string='mk4'
        fitflag_mk4_A = fltarr(N_fl        ) + default
         N0_fit_mk4_A = fltarr(N_fl        ) + default
         lN_fit_mk4_A = fltarr(N_fl        ) + default
@@ -344,6 +328,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
     endif ; Mk4
     
     if keyword_set(kcor) then begin
+       read_tomgrid_and_define_fitgrid,instr_string='kcor'
        fitflag_kcor_A = fltarr(N_fl        ) + default
         N0_fit_kcor_A = fltarr(N_fl        ) + default
         lN_fit_kcor_A = fltarr(N_fl        ) + default
@@ -398,6 +383,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
     endif ; KCOR
 
     if keyword_set(ucomp) then begin
+       read_tomgrid_and_define_fitgrid,instr_string='ucomp'
        fitflag_ucomp_A = fltarr(N_fl        ) + default
         N0_fit_ucomp_A = fltarr(N_fl        ) + default
         lN_fit_ucomp_A = fltarr(N_fl        ) + default
@@ -452,6 +438,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
     endif ; UCoMP
 
     if keyword_set(lascoc2) then begin
+       read_tomgrid_and_define_fitgrid,instr_string='lascoc2'
        fitflag_c2_A = fltarr(N_fl        ) + default
         N1_fit_c2_A = fltarr(N_fl        ) + default
         N2_fit_c2_A = fltarr(N_fl        ) + default

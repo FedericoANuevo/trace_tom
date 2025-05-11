@@ -54,8 +54,9 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
      N1_fit_c2_A,N2_fit_c2_A,p1_fit_c2_A,p2_fit_c2_A,$
      lN_fit_c2_A,$
      fit_F_Ne_aia,fit_F_Ne_mk4,fit_F_Ne_c2,$
-     fit_F_Ne_euvia,fit_F_Ne_euvib,fit_F_eit_c2
-
+     fit_F_Ne_euvia,fit_F_Ne_euvib,fit_F_eit_c2,$
+     tomgrid_aia_hdr_A,tomgrid_aia_A,fitgrid_aia_hdr_A,fitgrid_aia_A
+ 
   restore, filename = dir + structure_filename
 
   N_fl    = *trace_data.N_fl
@@ -92,6 +93,10 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
              p1_fit_aia_A = *trace_data. p1_fit_aia
              p2_fit_aia_A = *trace_data. p2_fit_aia
           endif
+          tomgrid_aia_hdr_A = *trace_data. tomgrid_aia_hdr
+          tomgrid_aia_A     = *trace_data. tomgrid_aia
+          fitgrid_aia_hdr_A = *trace_data. fitgrid_aia_hdr
+          fitgrid_aia_A     = *trace_data. fitgrid_aia
   endif
   if keyword_set(euvia) then begin
                 Ne_euvia_A = *trace_data.Ne_euvia 
