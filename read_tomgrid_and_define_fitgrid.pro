@@ -10,7 +10,7 @@ pro read_tomgrid_and_define_fitgrid,fl_dir=fl_dir,instr_string=instr_string
   common fitgrid,radmin_fit,radmax_fit,drad_fit,Npt_fit
   
    ;Set all the variables needed to read in the tomographic grid parameters.
-    empty_string = '' & nr=0 & nt=0 & np=0 & rmin=0. & rmax=0. & Irmin=0. & Irmax=0.
+    empty_string='' & nr=0 & nt=0 & np=0 & rmin=0. & rmax=0. & Irmin=0. & Irmax=0.
   
    ;Read-in the tomographic computational ball grid parameters  
     openr,1,fl_dir+'tom.grid.'+instr_string+'.dat'

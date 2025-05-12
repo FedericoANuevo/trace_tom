@@ -55,8 +55,9 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
      lN_fit_c2_A,$
      fit_F_Ne_aia,fit_F_Ne_mk4,fit_F_Ne_c2,$
      fit_F_Ne_euvia,fit_F_Ne_euvib,fit_F_eit_c2,$
-     tomgrid_aia_hdr_A,tomgrid_aia_A,fitgrid_aia_hdr_A,fitgrid_aia_A
- 
+     tomgrid_aia_hdr_A,tomgrid_aia_A,fitgrid_aia_hdr_A,fitgrid_aia_A,$
+     leg_label_A
+  
   restore, filename = dir + structure_filename
 
   N_fl    = *trace_data.N_fl

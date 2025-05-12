@@ -27,7 +27,8 @@
 pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
                         aia=aia, euvia=euvia, euvib=euvib, eit=eit, $
                         mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2, $
-                        struture_filename=structure_filename
+                        struture_filename=structure_filename,$
+                        opcl=opcl
   
   common to_fit_data, trace_data, $
      N_fl, Npt_max, Npt_v,$
@@ -332,6 +333,22 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
                  rad:     ptr_new(rad_A)   ,$
                  lat:     ptr_new(lat_A)   ,$
                  lon:     ptr_new(lon_A)    }
+
+; Define leg label as all zeros by default (all open field lines) 
+  leg_label_A = lonarr(N_fl)
+if keyword_set(opcl) then begin
+; Read-in the leg-lable of all fieldlines.
+  leglab=0L
+  openr,1,fl_dir+'legs-labe.txt'
+  readf,1,N_fl
+  for ifl=0,N_fl-1 do begin
+     readf,1,leglab
+     leg_label_A(il)=leglab
+  endfor
+endif
+; Add leg label array to structure
+     trace_data = create_struct( trace_data ,$
+                   'leg_label_A' , ptr_new(leg_label_A) )
 
 ; Store into the structure traced tomographic resuls
   if keyword_set(aia) then begin
