@@ -11,7 +11,7 @@
 
 pro test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, covgflag=covgflag,$
                    aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
-                   mk4=mk4, kcor=kcor, lascoc2=lascoc2
+                   mk4=mk4, kcor=kcor, lascoc2=lascoc2, ucomp=ucomp
   
   Nseg = 4 ; Too much? maybe Nseg = 3 is enough.
   DR   = (radfit_max-radfit_min)/float(Nseg)

@@ -340,12 +340,13 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
 if keyword_set(opcl) then begin
 ; Read-in the leg-lable of all fieldlines.
   leglab=0L
-  openr,1,fl_dir+'legs-label.txt'
+  openr,1,fl_dir+'legs-label.dat'
   readf,1,N_fl
   for ifl=0,N_fl-1 do begin
      readf,1,leglab
-     leg_label_A(il)=leglab
+     leg_label_A(ifl)=leglab
   endfor
+  close,1
 endif
 ; Add leg label array to structure
      trace_data = create_struct( trace_data ,$

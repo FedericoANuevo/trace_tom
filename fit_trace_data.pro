@@ -80,7 +80,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
             ;Determine range of rad_fit_[instrument] over which we will actually evaluate the fit.
              range_fit = where(rad_fit_aia_A ge radfit_min AND rad_fit_aia_A le radfit_max)
             ;Test if there is proper coverage of actual sample data for a decent least squares fit.
-             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, covgflag=covgflag, /aia
+             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, covgflag=covgflag
              if covgflag eq 'yes' then begin
                 fitflag_aia_A(ifl) = +1.
                 Nesamp = reform(Ne_aia_A(ifl,ind_samp_aia))
@@ -188,7 +188,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
             ;Determine range of rad_fit_[instrument] over which we will actually evaluate the fit.
              range_fit = where(rad_fit_euvia_A ge radfit_min AND rad_fit_euvia_A le radfit_max)
             ;Test if there is proper coverage of actual sample data for a decent least squares fit.
-             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, covgflag=covgflag, /euvia
+             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, covgflag=covgflag
              if covgflag eq 'yes' then begin
                 fitflag_euvia_A(ifl) = +1.
                 Nesamp = reform(Ne_euvia_A(ifl,ind_samp_euvia))
@@ -292,7 +292,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
             ;Determine range of rad_fit_[instrument] over which we will actually evaluate the fit.
              range_fit = where(rad_fit_mk4_A ge radfit_min AND rad_fit_mk4_A le radfit_max)
             ;Test if there is proper coverage of actual sample data for a decent least squares fit.
-             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, covgflag=covgflag, /mk4
+             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, covgflag=covgflag
              if covgflag eq 'yes' then begin
                 fitflag_mk4_A(ifl) = +1.
                 Nesamp = reform(Ne_mk4_A(ifl,ind_samp_mk4))
@@ -401,7 +401,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
             ;Determine range of rad_fit_[instrument] over which we will actually evaluate the fit.
              range_fit = where(rad_fit_kcor_A ge radfit_min AND rad_fit_kcor_A le radfit_max)
             ;Test if there is proper coverage of actual sample data for a decent least squares fit.
-             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, covgflag=covgflag, /kcor
+             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, covgflag=covgflag
              if covgflag eq 'yes' then begin
                 fitflag_kcor_A(ifl) = +1.
                 Nesamp = reform(Ne_kcor_A(ifl,ind_samp_kcor))
@@ -476,7 +476,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
             ;Determine range of rad_fit_[instrument] over which we will actually evaluate the fit.
              range_fit = where(rad_fit_ucomp_A ge radfit_min AND rad_fit_ucomp_A le radfit_max)
             ;Test if there is proper coverage of actual sample data for a decent least squares fit.
-             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, covgflag=covgflag, /ucomp
+             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, covgflag=covgflag
              if covgflag eq 'yes' then begin
                 fitflag_ucomp_A(ifl) = +1.
                 Nesamp = reform(Ne_ucomp_A(ifl,ind_samp_ucomp))
@@ -550,7 +550,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
             ;Determine range of rad_fit_[instrument] over which we will actually evaluate the fit.
              range_fit = where(rad_fit_c2_A ge radfit_min AND rad_fit_c2_A le radfit_max)
             ;Test if there is proper coverage of actual sample data for a decent least squares fit.
-             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, covgflag=covgflag, /lascoc2
+             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, covgflag=covgflag
              if covgflag eq 'yes' then begin
                 fitflag_c2_A(ifl) = +1.
                 Nesamp = reform(Ne_c2_A(ifl,ind_samp_c2))
