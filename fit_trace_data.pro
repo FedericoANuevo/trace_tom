@@ -235,7 +235,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
        endfor                   ; field lines loop.
        trace_data = create_struct( trace_data                               ,$
                                   'fitflag_euvia',ptr_new( fitflag_euvia_A) ,$
-                                 'fit_F_Ne_euvia',ptr_new(  fit_F_Ne_euvia) ,$
+                                 'fit_F_Ne_euvia',ptr_new(fit_F_Ne_euvia  ) ,$
                                   'scN_fit_euvia',ptr_new( scN_fit_euvia_A) ,$
                                   'scT_fit_euvia',ptr_new( scT_fit_euvia_A) ,$
                                   'rad_fit_euvia',ptr_new( rad_fit_euvia_A) ,$
@@ -260,6 +260,114 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                                    'fitgrid_euvia_hdr',ptr_new(['radmin_fit','radmax_fit','drad_fit','Npt_fit']) ,$
                                    'fitgrid_euvia'    ,ptr_new([ radmin_fit , radmax_fit , drad_fit , Npt_fit ]) )
     endif ; EUVI-A
+
+    if keyword_set(euvib) then begin
+       read_tomgrid_and_define_fitgrid,fl_dir=fl_dir,instr_string='euvib'
+       fitflag_euvib_A = fltarr(N_fl        ) + default
+        N0_fit_euvib_A = fltarr(N_fl        ) + default
+        lN_fit_euvib_A = fltarr(N_fl        ) + default
+        N1_fit_euvib_A = fltarr(N_fl        ) + default
+        N2_fit_euvib_A = fltarr(N_fl        ) + default
+        p1_fit_euvib_A = fltarr(N_fl        ) + default
+        p2_fit_euvib_A = fltarr(N_fl        ) + default
+       scN_fit_euvib_A = fltarr(N_fl        ) + default
+        T0_fit_euvib_A = fltarr(N_fl        ) + default
+      dTdr_fit_euvib_A = fltarr(N_fl        ) + default
+       scT_fit_euvib_A = fltarr(N_fl        ) + default
+        Ne_fit_euvib_A = fltarr(N_fl,Npt_fit) + default
+        Tm_fit_euvib_A = fltarr(N_fl,Npt_fit) + default
+       rad_fit_euvib_A = radmin_fit + drad_fit/2. + drad_fit * findgen(Npt_fit)
+     dNedr_fit_euvib_A = fltarr(Npt_fit) + default
+       for ifl=0,N_fl-1 do begin      
+          tmp = reform(index_sampling_euvib_A(ifl,*))
+          ind_samp_euvib = where(tmp eq 1)
+          if ind_samp_euvib[0] ne -1 then begin
+             radsamp = reform(rad_A(ifl,ind_samp_euvib)) ; Rsun
+            ;Determine radsamp_max (which is the apex in the case of small closed loops,
+            ;                       or even a smaller height if the apex is a ZDA.
+             radsamp_max=max(radsamp)
+             Nradsamp   =n_elements(radsamp)
+            ;Sanity check of radsamp_max
+             if radsamp(0) lt radsamp(Nradsamp-1) and radsamp_max ne radsamp(Nradsamp-1) then STOP
+             if radsamp(0) gt radsamp(Nradsamp-1) and radsamp_max ne radsamp(0)          then STOP
+            ;Determine the min and max rad over which we will actually evaluate the fit.
+             radfit_min =                  min(rad_fit_euvib_A)
+             radfit_max = min([radsamp_max,max(rad_fit_euvib_A)]) 
+            ;Determine range of rad_fit_[instrument] over which we will actually evaluate the fit.
+             range_fit = where(rad_fit_euvib_A ge radfit_min AND rad_fit_euvib_A le radfit_max)
+            ;Test if there is proper coverage of actual sample data for a decent least squares fit.
+             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, covgflag=covgflag
+             if covgflag eq 'yes' then begin
+                fitflag_euvib_A(ifl) = +1.
+                Nesamp = reform(Ne_euvib_A(ifl,ind_samp_euvib))
+                Tmsamp = reform(Tm_euvib_A(ifl,ind_samp_euvib))
+                goto,skip_euvib_isohthermal_hydrostatic
+                fit_F_Ne_euvib  = 'IHS'
+                linear_fit, 1./radsamp   , alog(Nesamp), AN, r2N, /linfit_idl
+                scN_fit_euvib_A(ifl)  = r2N             
+                N0_fit_euvib_A(ifl)   = exp(AN[0]+AN[1]) ; cm-3
+                lN_fit_euvib_A(ifl)   = 1./AN[1]         ; Rsun
+                Ne_fit_euvib_A(ifl,range_fit) = N0_fit_euvib_A(ifl) * exp(-(1/lN_fit_euvib_A(ifl))*(1.-1./rad_fit_euvib_A(range_fit)))                 ; cm-3
+             dNedr_fit_auvia_A(    range_fit) = reform(Ne_fit_euvib_A(ifl,range_fir)) * float(-(1/lN_fit_euvib_A(ifl))) / rad_fit_euvib_A(range_fit)^2 ; cm-3 / Rsun
+                indsamp = where(dNedr_fit_euvib_A lt 0. AND dNedr_fit_euvib_A ne default)
+                v = abs(dNedr_fit_euvib_A(indsamp)/reform(Ne_fit_euvib_A(ifl,indsamp)))^(-1)                                                    ; Rsun
+                lN_fit_euvib_A(ifl) = int_tabulated(rad_fit_euvib_A(indsamp),v) / (max(rad_fit_euvib_A(indsamp))-min(rad_fit_euvib_A(indsamp))) ; Rsun
+                print,lN_fit_euvib_A(ifl), float(mean(v)), float(median(v)), float(1./AN[1])
+                skip_euvib_isohthermal_hydrostatic:
+               ;goto,skip_euvib_double_power_law
+                fit_F_Ne_euvib  = 'DPL'
+                double_power_fit, radsamp, Nesamp, A, chisq ;, /weighted
+                scN_fit_euvib_A(ifl)  = sqrt(chisq)/mean(Nesamp)
+                N1_fit_euvib_A(ifl)   = A[0] ; cm-3
+                p1_fit_euvib_A(ifl)   = A[1] ; dimensionless exponent of power law
+                N2_fit_euvib_A(ifl)   = A[2] ; cm-3
+                p2_fit_euvib_A(ifl)   = A[3] ; dimensionless exponent of power law
+                Ne_fit_euvib_A(ifl,range_fit) = A[0] * rad_fit_euvib_A(range_fit)^(-A[1]) + A[2] * rad_fit_euvib_A(range_fit)^(-A[3])                 ; cm-3
+             dNedr_fit_euvib_A(    range_fit) = - A[1]*A[0] * rad_fit_euvib_A(range_fit)^(-A[1]-1) - A[3]*A[2] * rad_fit_euvib_A(range_fit)^(-A[3]-1) ; cm-3 / Rsun
+             indsamp = where(dNedr_fit_euvib_A lt 0. AND dNedr_fit_euvib_A ne default)
+                if indsamp[0] ne -1 then begin
+                   v = abs(dNedr_fit_euvib_A(indsamp)/reform(Ne_fit_euvib_A(ifl,indsamp)))^(-1)                                                    ; Rsun
+                   lN_fit_euvib_A(ifl) = int_tabulated(rad_fit_euvib_A(indsamp),v) / (max(rad_fit_euvib_A(indsamp))-min(rad_fit_euvib_A(indsamp))) ; Rsun
+                   ; print,lN_fit_euvib_A(ifl), float(mean(v)), float(median(v))
+                   ; stop
+                endif
+                skip_euvib_double_power_law: 
+                ;Linear fit to Te(r)
+                linear_fit,    radsamp-1.,      Tmsamp , AT, r2T, /theil_sen, chisqr = chisqr
+                scT_fit_euvib_A(ifl)  = sqrt(chisqr)/mean(Tmsamp)                                                                    
+                T0_fit_euvib_A(ifl)   = AT[0]                                                                         ; K
+                dTdr_fit_euvib_A(ifl) = AT[1]                                                                         ; K/Rsun
+                Tm_fit_euvib_A(ifl,*) = T0_fit_euvib_A(ifl) + dTdr_fit_euvib_A(ifl)       *      (rad_fit_euvib_A-1.) ; K
+             endif                                                                                                    ; covgflag = 'yes'
+          endif
+       endfor                   ; field lines loop.
+       trace_data = create_struct( trace_data                               ,$
+                                  'fitflag_euvib',ptr_new( fitflag_euvib_A) ,$
+                                 'fit_F_Ne_euvib',ptr_new(fit_F_Ne_euvib  ) ,$
+                                  'scN_fit_euvib',ptr_new( scN_fit_euvib_A) ,$
+                                  'scT_fit_euvib',ptr_new( scT_fit_euvib_A) ,$
+                                  'rad_fit_euvib',ptr_new( rad_fit_euvib_A) ,$
+                                   'Ne_fit_euvib',ptr_new(  Ne_fit_euvib_A) ,$
+                                   'Tm_fit_euvib',ptr_new(  Tm_fit_euvib_A) ,$
+                                   'T0_fit_euvib',ptr_new(  T0_fit_euvib_A) ,$
+                                 'dTdr_fit_euvib',ptr_new(dTdr_fit_euvib_A) ,$
+                                   'lN_fit_euvib',ptr_new(  lN_fit_euvib_A) )
+       if fit_F_Ne_euvib eq 'IHS' then $
+          trace_data = create_struct( trace_data                        ,$
+                                 'N0_fit_euvib',ptr_new(  N0_fit_euvib_A) )                                                                        
+       if fit_F_Ne_euvib eq 'DPL' then $
+          trace_data = create_struct( trace_data                        ,$
+                                    'N1_fit_euvib',ptr_new( N1_fit_euvib_A) ,$
+                                    'N2_fit_euvib',ptr_new( N2_fit_euvib_A) ,$
+                                    'p1_fit_euvib',ptr_new( p1_fit_euvib_A) ,$
+                                    'p2_fit_euvib',ptr_new( p2_fit_euvib_A) )
+       ;Add to structure the parameters of the tomography and fit grids of this INSTRUMENT.
+       trace_data = create_struct( trace_data                                                                    ,$
+                                   'tomgrid_euvib_hdr',ptr_new(['nr','nt','np','rmin','rmax','Irmin','Irmax'])   ,$
+                                   'tomgrid_euvib'    ,ptr_new([ nr , nt , np , rmin , rmax , Irmin , Irmax ])   ,$
+                                   'fitgrid_euvib_hdr',ptr_new(['radmin_fit','radmax_fit','drad_fit','Npt_fit']) ,$
+                                   'fitgrid_euvib'    ,ptr_new([ radmin_fit , radmax_fit , drad_fit , Npt_fit ]) )
+    endif ; EUVI-B
 
     if keyword_set(mk4) then begin
        read_tomgrid_and_define_fitgrid,fl_dir=fl_dir,instr_string='mk4'
