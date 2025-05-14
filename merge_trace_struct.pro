@@ -350,7 +350,7 @@ if keyword_set(opcl) then begin
 endif
 ; Add leg label array to structure
      trace_data = create_struct( trace_data ,$
-                   'leg_label_A' , ptr_new(leg_label_A) )
+                   'leg_label' , ptr_new(leg_label_A) )
 
 ; Store into the structure traced tomographic resuls
   if keyword_set(aia) then begin

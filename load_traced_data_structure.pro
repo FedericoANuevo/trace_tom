@@ -20,12 +20,14 @@
 ; HISTORY: V1.0, AMV, November 2023, IAFE.
 ;          V1.1, AMV, January  2024, IAFE. Added fitted results.
 ;          V1.2, AMV, January  2024, IAFE. Added fits' parameters.
-;          V1.3, FAN, May      2024, ClaSP. Added euvia, euvib, and
-;          eit keywords.
+;          V1.3, FAN, May      2024, ClaSP. Added euvia, euvib, eit.
+;          V1.4, AMV, May      2025, CLaSP. Expanded to ucomp, 
+;                                    opcl, tom and fit grids.
 ;
 pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, $
-                                aia = aia, euvia = euvia, euvib = euvib, eit = eit, $
-                                mk4 = mk4, kcor = kcor, lascoc2 = lascoc2
+                                aia=aia, euvia=euvia, euvib=euvib, eit=eit, $
+                                mk4=mk4, kcor=kcor, lascoc2=lascoc2, ucomp=ucomp, $
+                                opcl=opcl
   
   common data, N_fl, Npt_max, Npt_v, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, WT_aia_A, ldem_flag_aia_A, index_aia_A, index_sampling_aia_A,$
@@ -75,6 +77,9 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
   rad_A   = *trace_data.rad
   lat_A   = *trace_data.lat
   lon_A   = *trace_data.lon
+
+  if keyword_set(opcl) then leg_label_A , *trace_data.leg_label
+  
   if keyword_set(aia) then begin
                 Ne_aia_A = *trace_data.Ne_aia 
                 Tm_aia_A = *trace_data.Tm_aia
@@ -105,6 +110,7 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
           fitgrid_aia_hdr_A = *trace_data. fitgrid_aia_hdr
           fitgrid_aia_A     = *trace_data. fitgrid_aia
   endif
+
   if keyword_set(euvia) then begin
                 Ne_euvia_A = *trace_data.Ne_euvia 
                 Tm_euvia_A = *trace_data.Tm_euvia
@@ -135,6 +141,7 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
           fitgrid_euvia_hdr_A = *trace_data. fitgrid_euvia_hdr
           fitgrid_euvia_A     = *trace_data. fitgrid_euvia
   endif
+
   if keyword_set(euvib) then begin
                 Ne_euvib_A = *trace_data.Ne_euvib 
                 Tm_euvib_A = *trace_data.Tm_euvib
@@ -165,6 +172,7 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
           fitgrid_euvib_hdr_A = *trace_data. fitgrid_euvib_hdr
           fitgrid_euvib_A     = *trace_data. fitgrid_euvib
   endif
+
   if keyword_set(eit) then begin
                 Ne_eit_A = *trace_data.Ne_eit 
                 Tm_eit_A = *trace_data.Tm_eit
@@ -195,6 +203,7 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
           fitgrid_eit_hdr_A = *trace_data. fitgrid_eit_hdr
           fitgrid_eit_A     = *trace_data. fitgrid_eit 
   endif
+
   if keyword_set(mk4) then begin
                 Ne_mk4_A = *trace_data.Ne_mk4 
              index_mk4_A = *trace_data.index_mk4
@@ -222,12 +231,52 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
           fitgrid_mk4_hdr_A = *trace_data. fitgrid_mk4_hdr
           fitgrid_mk4_A     = *trace_data. fitgrid_mk4 
   endif
+
   if keyword_set(kcor) then begin
                 Ne_kcor_A = *trace_data.Ne_kcor 
              index_kcor_A = *trace_data.index_kcor
     index_sampling_kcor_A = *trace_data.index_sampling_kcor
+           rad_fit_kcor_A = *trace_data. rad_fit_kcor             
+            Ne_fit_kcor_A = *trace_data.  Ne_fit_kcor
+           scN_fit_kcor_A = *trace_data. scN_fit_kcor
+           fitflag_kcor_A = *trace_data. fitflag_kcor
+          fit_F_Ne_kcor   = *trace_data.fit_F_Ne_kcor
+            lN_fit_kcor_A = *trace_data.  lN_fit_kcor 
+          if fit_F_Ne_kcor eq 'DPL' then begin
+             N1_fit_kcor_A = *trace_data. N1_fit_kcor
+             N2_fit_kcor_A = *trace_data. N2_fit_kcor
+             p1_fit_kcor_A = *trace_data. p1_fit_kcor
+             p2_fit_kcor_A = *trace_data. p2_fit_kcor
+          endif
+          tomgrid_kcor_hdr_A = *trace_data. tomgrid_kcor_hdr
+          tomgrid_kcor_A     = *trace_data. tomgrid_kcor
+          fitgrid_kcor_hdr_A = *trace_data. fitgrid_kcor_hdr
+          fitgrid_kcor_A     = *trace_data. fitgrid_kcor 
   endif
-  if keyword_set(lascoc2) then begin
+
+  if keyword_set(ucomp) then begin
+                Ne_ucomp_A = *trace_data.Ne_ucomp 
+             index_ucomp_A = *trace_data.index_ucomp
+    index_sampling_ucomp_A = *trace_data.index_sampling_ucomp
+           rad_fit_ucomp_A = *trace_data. rad_fit_ucomp             
+            Ne_fit_ucomp_A = *trace_data.  Ne_fit_ucomp
+           scN_fit_ucomp_A = *trace_data. scN_fit_ucomp
+           fitflag_ucomp_A = *trace_data. fitflag_ucomp
+          fit_F_Ne_ucomp   = *trace_data.fit_F_Ne_ucomp
+            lN_fit_ucomp_A = *trace_data.  lN_fit_ucomp 
+          if fit_F_Ne_ucomp eq 'DPL' then begin
+             N1_fit_ucomp_A = *trace_data. N1_fit_ucomp
+             N2_fit_ucomp_A = *trace_data. N2_fit_ucomp
+             p1_fit_ucomp_A = *trace_data. p1_fit_ucomp
+             p2_fit_ucomp_A = *trace_data. p2_fit_ucomp
+          endif
+          tomgrid_ucomp_hdr_A = *trace_data. tomgrid_ucomp_hdr
+          tomgrid_ucomp_A     = *trace_data. tomgrid_ucomp
+          fitgrid_ucomp_hdr_A = *trace_data. fitgrid_ucomp_hdr
+          fitgrid_ucomp_A     = *trace_data. fitgrid_ucomp 
+  endif
+
+    if keyword_set(lascoc2) then begin
                 Ne_c2_A = *trace_data.Ne_c2 
              index_c2_A = *trace_data.index_c2
     index_sampling_c2_A = *trace_data.index_sampling_c2
@@ -252,5 +301,7 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
           fitgrid_c2_hdr_A = *trace_data. fitgrid_c2_hdr
           fitgrid_c2_A     = *trace_data. fitgrid_c2 
   endif
+
   return
 end
+
