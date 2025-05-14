@@ -93,7 +93,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                  lN_fit_aia_A(ifl)   = 1./AN[1]                                                                                 ; Rsun
                  Ne_fit_aia_A(ifl,range_fit) = N0_fit_aia_A(ifl) * exp(-(1/lN_fit_aia_A(ifl))*(1.-1./rad_fit_aia_A(range_fit))) ; cm-3
               dNedr_fit_aia_A(    range_fit) = reform(Ne_fit_aia_A(ifl,range_fit)) * float(-(1/lN_fit_aia_A(ifl))) / rad_fit_aia_A(range_fit)^2 ; cm-3 / Rsun
-                 indsamp                     = where(dNedr_fit_aia_A lt 0. AND dNedr_fit_aia_A ne default)
+                 indsamp = where(dNedr_fit_aia_A lt 0. AND dNedr_fit_aia_A ne default)
                  v = abs(dNedr_fit_aia_A(indsamp)/reform(Ne_fit_aia_A(ifl,indsamp)))^(-1)                                                   ; Rsun
                  lN_fit_aia_A(ifl)   =  int_tabulated(rad_fit_aia_A(indsamp),v) / (max(rad_fit_aia_A(indsamp))-min(rad_fit_aia_A(indsamp))) ; Rsun
                  print,lN_fit_aia_A(ifl), float(mean(v)), float(median(v)), float(1./AN[1])
@@ -169,12 +169,26 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
         Ne_fit_euvia_A = fltarr(N_fl,Npt_fit) + default
         Tm_fit_euvia_A = fltarr(N_fl,Npt_fit) + default
        rad_fit_euvia_A = radmin_fit + drad_fit/2. + drad_fit * findgen(Npt_fit)
+     dNedr_fit_euvia_A = fltarr(Npt_fit) + default
        for ifl=0,N_fl-1 do begin      
           tmp = reform(index_sampling_euvia_A(ifl,*))
           ind_samp_euvia = where(tmp eq 1)
           if ind_samp_euvia[0] ne -1 then begin
              radsamp = reform(rad_A(ifl,ind_samp_euvia)) ; Rsun
-             test_coverage, radsamp=radsamp, covgflag=covgflag, /euvia
+            ;Determine radsamp_max (which is the apex in the case of small closed loops,
+            ;                       or even a smaller height if the apex is a ZDA.
+             radsamp_max=max(radsamp)
+             Nradsamp   =n_elements(radsamp)
+            ;Sanity check of radsamp_max
+             if radsamp(0) lt radsamp(Nradsamp-1) and radsamp_max ne radsamp(Nradsamp-1) then STOP
+             if radsamp(0) gt radsamp(Nradsamp-1) and radsamp_max ne radsamp(0)          then STOP
+            ;Determine the min and max rad over which we will actually evaluate the fit.
+             radfit_min =                  min(rad_fit_euvia_A)
+             radfit_max = min([radsamp_max,max(rad_fit_euvia_A)]) 
+            ;Determine range of rad_fit_[instrument] over which we will actually evaluate the fit.
+             range_fit = where(rad_fit_euvia_A ge radfit_min AND rad_fit_euvia_A le radfit_max)
+            ;Test if there is proper coverage of actual sample data for a decent least squares fit.
+             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, covgflag=covgflag, /euvia
              if covgflag eq 'yes' then begin
                 fitflag_euvia_A(ifl) = +1.
                 Nesamp = reform(Ne_euvia_A(ifl,ind_samp_euvia))
@@ -183,29 +197,29 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                 fit_F_Ne_euvia  = 'IHS'
                 linear_fit, 1./radsamp   , alog(Nesamp), AN, r2N, /linfit_idl
                 scN_fit_euvia_A(ifl)  = r2N             
-                N0_fit_euvia_A(ifl)   = exp(AN[0]+AN[1])                                                            ; cm-3
-                lN_fit_euvia_A(ifl)   = 1./AN[1]                                                                    ; Rsun
-                Ne_fit_euvia_A(ifl,*) = N0_fit_euvia_A(ifl) * exp(-(1/lN_fit_euvia_A(ifl))*(1.-1./rad_fit_euvia_A)) ; cm-3
-                dNe_dr              = reform(Ne_fit_euvia_A(ifl,*)) * float(-(1/lN_fit_euvia_A(ifl))) / rad_fit_euvia_A^2 ; cm-3 / Rsun
-                indsamp = where(rad_fit_euvia_A ge min(radsamp) and rad_fit_euvia_A le max(radsamp) AND dNe_dr lt 0.)
-                v = abs(dNe_dr(indsamp)/reform(Ne_fit_euvia_A(ifl,indsamp)))^(-1)
-                lN_fit_euvia_A(ifl)   =  int_tabulated(rad_fit_euvia_A(indsamp),v) / (max(rad_fit_euvia_A(indsamp))-min(rad_fit_euvia_A(indsamp))) ; cm-3 / Rsun
+                N0_fit_euvia_A(ifl)   = exp(AN[0]+AN[1]) ; cm-3
+                lN_fit_euvia_A(ifl)   = 1./AN[1]         ; Rsun
+                Ne_fit_euvia_A(ifl,range_fit) = N0_fit_euvia_A(ifl) * exp(-(1/lN_fit_euvia_A(ifl))*(1.-1./rad_fit_euvia_A(range_fit)))                 ; cm-3
+             dNedr_fit_auvia_A(    range_fit) = reform(Ne_fit_euvia_A(ifl,range_fir)) * float(-(1/lN_fit_euvia_A(ifl))) / rad_fit_euvia_A(range_fit)^2 ; cm-3 / Rsun
+                indsamp = where(dNedr_fit_euvia_A lt 0. AND dNedr_fit_euvia_A ne default)
+                v = abs(dNedr_fit_euvia_A(indsamp)/reform(Ne_fit_euvia_A(ifl,indsamp)))^(-1)                                                    ; Rsun
+                lN_fit_euvia_A(ifl) = int_tabulated(rad_fit_euvia_A(indsamp),v) / (max(rad_fit_euvia_A(indsamp))-min(rad_fit_euvia_A(indsamp))) ; Rsun
                 print,lN_fit_euvia_A(ifl), float(mean(v)), float(median(v)), float(1./AN[1])
                 skip_euvia_isohthermal_hydrostatic:
                ;goto,skip_euvia_double_power_law
                 fit_F_Ne_euvia  = 'DPL'
                 double_power_fit, radsamp, Nesamp, A, chisq ;, /weighted
                 scN_fit_euvia_A(ifl)  = sqrt(chisq)/mean(Nesamp)
-                N1_fit_euvia_A(ifl)   = A[0]                                                                          ; cm-3
-                p1_fit_euvia_A(ifl)   = A[1]                                                                          ; dimensionless exponent of power law
-                N2_fit_euvia_A(ifl)   = A[2]                                                                          ; cm-3
-                p2_fit_euvia_A(ifl)   = A[3]                                                                          ; dimensionless exponent of power law
-                Ne_fit_euvia_A(ifl,*) = A[0] * rad_fit_euvia_A^(-A[1]) + A[2] * rad_fit_euvia_A^(-A[3])                   ; cm-3
-                dNe_dr              = - A[1]*A[0] * rad_fit_euvia_A^(-A[1]-1) - A[3]*A[2] * rad_fit_euvia_A^(-A[3]-1)   ; cm-3 / Rsun
-                indsamp = where(rad_fit_euvia_A ge min(radsamp) and rad_fit_euvia_A le max(radsamp) AND dNe_dr lt 0.)
+                N1_fit_euvia_A(ifl)   = A[0] ; cm-3
+                p1_fit_euvia_A(ifl)   = A[1] ; dimensionless exponent of power law
+                N2_fit_euvia_A(ifl)   = A[2] ; cm-3
+                p2_fit_euvia_A(ifl)   = A[3] ; dimensionless exponent of power law
+                Ne_fit_euvia_A(ifl,range_fit) = A[0] * rad_fit_euvia_A(range_fit)^(-A[1]) + A[2] * rad_fit_euvia_A(range_fit)^(-A[3])                 ; cm-3
+             dNedr_fit_euvia_A(    range_fit) = - A[1]*A[0] * rad_fit_euvia_A(range_fit)^(-A[1]-1) - A[3]*A[2] * rad_fit_euvia_A(range_fit)^(-A[3]-1) ; cm-3 / Rsun
+             indsamp = where(dNedr_fit_euvia_A lt 0. AND dNedr_fit_euvia_A ne default)
                 if indsamp[0] ne -1 then begin
-                   v = abs(dNe_dr(indsamp)/reform(Ne_fit_euvia_A(ifl,indsamp)))^(-1)
-                   lN_fit_euvia_A(ifl)   =  int_tabulated(rad_fit_euvia_A(indsamp),v) / (max(rad_fit_euvia_A(indsamp))-min(rad_fit_euvia_A(indsamp)))
+                   v = abs(dNedr_fit_euvia_A(indsamp)/reform(Ne_fit_euvia_A(ifl,indsamp)))^(-1)                                                    ; Rsun
+                   lN_fit_euvia_A(ifl) = int_tabulated(rad_fit_euvia_A(indsamp),v) / (max(rad_fit_euvia_A(indsamp))-min(rad_fit_euvia_A(indsamp))) ; Rsun
                    ; print,lN_fit_euvia_A(ifl), float(mean(v)), float(median(v))
                    ; stop
                 endif
@@ -259,54 +273,68 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
        scN_fit_mk4_A = fltarr(N_fl        ) + default
         Ne_fit_mk4_A = fltarr(N_fl,Npt_fit) + default
        rad_fit_mk4_A = radmin_fit + drad_fit/2. + drad_fit * findgen(Npt_fit)
+     dNedr_fit_mk4_A = fltarr(Npt_fit) + default
        for ifl=0,N_fl-1 do begin      
           tmp = reform(index_sampling_mk4_A(ifl,*))
           ind_samp_mk4 = where(tmp eq 1)
           if ind_samp_mk4[0] ne -1 then begin
              radsamp = reform(rad_A(ifl,ind_samp_mk4)) ; Rsun
-             test_coverage, radsamp=radsamp, covgflag=covgflag, /mk4
+            ;Determine radsamp_max (which is the apex in the case of small closed loops,
+            ;                       or even a smaller height if the apex is a ZDA.
+             radsamp_max=max(radsamp)
+             Nradsamp   =n_elements(radsamp)
+            ;Sanity check of radsamp_max
+             if radsamp(0) lt radsamp(Nradsamp-1) and radsamp_max ne radsamp(Nradsamp-1) then STOP
+             if radsamp(0) gt radsamp(Nradsamp-1) and radsamp_max ne radsamp(0)          then STOP
+            ;Determine the min and max rad over which we will actually evaluate the fit.
+             radfit_min =                  min(rad_fit_mk4_A)
+             radfit_max = min([radsamp_max,max(rad_fit_mk4_A)])
+            ;Determine range of rad_fit_[instrument] over which we will actually evaluate the fit.
+             range_fit = where(rad_fit_mk4_A ge radfit_min AND rad_fit_mk4_A le radfit_max)
+            ;Test if there is proper coverage of actual sample data for a decent least squares fit.
+             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, covgflag=covgflag, /mk4
              if covgflag eq 'yes' then begin
                 fitflag_mk4_A(ifl) = +1.
                 Nesamp = reform(Ne_mk4_A(ifl,ind_samp_mk4))
                 goto,skip_mk4_isohthermal_hydrostatic
                 fit_F_Ne_mk4  = 'IHS'
                 linear_fit, 1./radsamp   ,alog(Nesamp), AN, r2N, /linfit_idl
-                scN_fit_mk4_A(ifl)   = r2N
-                N0_fit_mk4_A(ifl)   = exp(AN[0]+AN[1])                                                                ; cm-3
-                lN_fit_mk4_A(ifl)   = 1./AN[1]                                                                        ; Rsun
-                Ne_fit_mk4_A(ifl,*) = N0_fit_mk4_A(ifl) * exp(-(1/lN_fit_mk4_A(ifl))*(1.-1./rad_fit_mk4_A))           ; cm-3
-                dNe_dr              = reform(Ne_fit_mk4_A(ifl,*)) * float(-(1/lN_fit_mk4_A(ifl))) / rad_fit_mk4_A^2   ; cm-3 / Rsun
-                indsamp = where(rad_fit_mk4_A ge min(radsamp) and rad_fit_mk4_A le max(radsamp) AND dNe_dr lt 0.)
-                v = abs(dNe_dr(indsamp)/reform(Ne_fit_mk4_A(ifl,indsamp)))^(-1)
-                lN_fit_mk4_A(ifl)   =  int_tabulated(rad_fit_mk4_A(indsamp),v) / (max(rad_fit_mk4_A(indsamp))-min(rad_fit_mk4_A(indsamp))) ; cm-3 / Rsun                  
+               scN_fit_mk4_A(ifl) = r2N
+                N0_fit_mk4_A(ifl) = exp(AN[0]+AN[1]) ; cm-3
+                lN_fit_mk4_A(ifl) = 1./AN[1]         ; Rsun
+                Ne_fit_mk4_A(ifl,range_fit) = N0_fit_mk4_A(ifl) * exp(-(1/lN_fit_mk4_A(ifl))*(1.-1./rad_fit_mk4_A(range_fit)))                 ; cm-3
+             dNedr_fit_mk4_A(    range_fit) = reform(Ne_fit_mk4_A(ifl,range_fit)) * float(-(1/lN_fit_mk4_A(ifl))) / rad_fit_mk4_A(range_fit)^2 ; cm-3 / Rsun
+                indsamp = where(dNedr_fit_mk4_A lt 0. AND dNedr_fit_mk4_A ne default)
+                v = abs(dNedr_fit_mk4(indsamp)/reform(Ne_fit_mk4_A(ifl,indsamp)))^(-1)                                                  ; Rsun
+                lN_fit_mk4_A(ifl) = int_tabulated(rad_fit_mk4_A(indsamp),v) / (max(rad_fit_mk4_A(indsamp))-min(rad_fit_mk4_A(indsamp))) ; Rsun
                 print,lN_fit_mk4_A(ifl), float(mean(v)), float(median(v)), float(1./AN[1])
                 skip_mk4_isohthermal_hydrostatic:
                 goto,skip_mk4_single_power_law
                 fit_F_Ne_mk4  = 'SPL'
                 linear_fit, alog(radsamp), alog(Nesamp), AN, r2N, /linfit_idl
-                scN_fit_mk4_A(ifl)   = r2N
-                N1_fit_mk4_A(ifl)   = exp(AN[0])                                               ; cm-3
-                p1_fit_mk4_A(ifl)   =    -AN[1]                                                ; dimensionless exponent of power law
-                Ne_fit_mk4_A(ifl,*) = N1_fit_mk4_A(ifl) * rad_fit_mk4_A^(-p1_fit_mk4_A(ifl))   ; cm-3
-                indsamp = where(rad_fit_mk4_A ge min(radsamp) and rad_fit_mk4_A le max(radsamp)  AND dNe_dr lt 0.)
-                v = abs(rad_fit_mk4_A(indsamp) / float(p1_fit_mk4_A(ifl))) 
-                lN_fit_mk4_A(ifl)   = int_tabulated( rad_fit_mk4_A(indsamp), v) / (max(rad_fit_mk4_A(indsamp))-min(rad_fit_mk4_A(indsamp))) ; Rsun
+               scN_fit_mk4_A(ifl) = r2N
+                N1_fit_mk4_A(ifl) = exp(AN[0]) ; cm-3
+                p1_fit_mk4_A(ifl) =    -AN[1]  ; dimensionless exponent of power law
+                Ne_fit_mk4_A(ifl,range_fit) = N1_fit_mk4_A(ifl) * rad_fit_mk4_A(range_fit)^(-p1_fit_mk4_A(ifl)) ; cm-3
+                indsamp = where(rad_fit_mk4_A ge min(radsamp) and rad_fit_mk4_A le max(radsamp))
+                v = abs(rad_fit_mk4_A(indsamp) / float(p1_fit_mk4_A(ifl)))                                                                ; Rsun
+                lN_fit_mk4_A(ifl) = int_tabulated( rad_fit_mk4_A(indsamp), v) / (max(rad_fit_mk4_A(indsamp))-min(rad_fit_mk4_A(indsamp))) ; Rsun
                 print,lN_fit_mk4_A(ifl), float(mean(v)), float(median(v))
                 skip_mk4_single_power_law:
                ;goto,skip_mk4_double_power_law
                 fit_F_Ne_mk4  = 'DPL'
                 double_power_fit, radsamp, Nesamp, A, chisqr ;, /weighted
-                scN_fit_mk4_A(ifl)   = sqrt(chisqr)/mean(Nesamp)
-                N1_fit_mk4_A(ifl)   = A[0]                                                                          ; cm-3
-                p1_fit_mk4_A(ifl)   = A[1]                                                                          ; dimensionless exponent of power law
-                N2_fit_mk4_A(ifl)   = A[2]                                                                          ; cm-3
-                p2_fit_mk4_A(ifl)   = A[3]                                                                          ; dimensionless exponent of power law
-                Ne_fit_mk4_A(ifl,*) = A[0] * rad_fit_mk4_A^(-A[1]) + A[2] * rad_fit_mk4_A^(-A[3])                   ; cm-3
-                dNe_dr              = - A[1]*A[0] * rad_fit_mk4_A^(-A[1]-1) - A[3]*A[2] * rad_fit_mk4_A^(-A[3]-1)   ; cm-3 / Rsun
-                indsamp = where(rad_fit_mk4_A ge min(radsamp) and rad_fit_mk4_A le max(radsamp) AND dNe_dr lt 0.)
+               scN_fit_mk4_A(ifl) = sqrt(chisqr)/mean(Nesamp)
+                N1_fit_mk4_A(ifl) = A[0] ; cm-3
+                p1_fit_mk4_A(ifl) = A[1] ; dimensionless exponent of power law
+                N2_fit_mk4_A(ifl) = A[2] ; cm-3
+                p2_fit_mk4_A(ifl) = A[3] ; dimensionless exponent of power law
+                Ne_fit_mk4_A(ifl,range_fit) = A[0] * rad_fit_mk4_A(range_fit)^(-A[1]) + A[2] * rad_fit_mk4_A(range_fit)^(-A[3])                 ; cm-3
+             dNedr_fit_mk4_A(    range_fit) = - A[1]*A[0] * rad_fit_mk4_A(range_fit)^(-A[1]-1) - A[3]*A[2] * rad_fit_mk4_A(range_fit)^(-A[3]-1) ; cm-3 / Rsun
+                indsamp = where(dNedr_fit_mk4_A lt 0. AND dNedr_fit_mk4_A ne default)
                 if indsamp[0] ne -1 then begin
-                   v = abs(dNe_dr(indsamp)/reform(Ne_fit_mk4_A(ifl,indsamp)))^(-1)
-                   lN_fit_mk4_A(ifl)   = int_tabulated(rad_fit_mk4_A(indsamp), v) / (max(rad_fit_mk4_A(indsamp))-min(rad_fit_mk4_A(indsamp))) ; Rsun
+                   v = abs(dNedr_fit_mk4_A(indsamp)/reform(Ne_fit_mk4_A(ifl,indsamp)))^(-1)                                                          ; Rsun
+                   lN_fit_mk4_A(ifl) = int_tabulated(rad_fit_mk4_A(indsamp), v) / (max(rad_fit_mk4_A(indsamp))-min(rad_fit_mk4_A(indsamp))) ; Rsun
                    ; print,lN_fit_mk4_A(ifl), float(mean(v)), float(median(v))
                    ; stop
                 endif 
@@ -463,7 +491,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
              dNedr_fit_ucomp_A(    range_fit) = - A[1]*A[0] * rad_fit_ucomp_A(range_fit)^(-A[1]-1) - A[3]*A[2] * rad_fit_ucomp_A(range_fit)^(-A[3]-1) ; cm-3 / Rsun
              indsamp = where(dNedr_fit_ucomp_A lt 0. AND dNedr_fit_ucomp_A ne default)
                 if indsamp[0] ne -1 then begin
-                   v = abs(dNe_dr(indsamp)/reform(Ne_fit_ucomp_A(ifl,indsamp)))^(-1)
+                   v = abs(dNedr_fit_ucomp_A(indsamp)/reform(Ne_fit_ucomp_A(ifl,indsamp)))^(-1)
                    lN_fit_ucomp_A(ifl)   = int_tabulated(rad_fit_ucomp_A(indsamp), v) / (max(rad_fit_ucomp_A(indsamp))-min(rad_fit_ucomp_A(indsamp))) ; Rsun
                    ; print,lN_fit_mk4_A(ifl), float(mean(v)), float(median(v))
                    ; stop
@@ -503,41 +531,55 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
        scN_fit_c2_A = fltarr(N_fl        ) + default
         Ne_fit_c2_A = fltarr(N_fl,Npt_fit) + default
        rad_fit_c2_A = radmin_fit + drad_fit/2. + drad_fit * findgen(Npt_fit)
+     dNedr_fit_c2_A = fltarr(Npt_fit) + default
        for ifl=0,N_fl-1 do begin      
           tmp = reform(index_sampling_c2_A(ifl,*))
           ind_samp_c2 = where(tmp eq 1)
           if ind_samp_c2[0] ne -1 then begin
              radsamp = reform(rad_A(ifl,ind_samp_c2)) ; Rsun
-             test_coverage, radsamp=radsamp, covgflag=covgflag, /lascoc2
+            ;Determine radsamp_max (which is the apex in the case of small closed loops,
+            ;                       or even a smaller height if the apex is a ZDA.
+             radsamp_max=max(radsamp)
+             Nradsamp   =n_elements(radsamp)
+            ;Sanity check of radsamp_max
+             if radsamp(0) lt radsamp(Nradsamp-1) and radsamp_max ne radsamp(Nradsamp-1) then STOP
+             if radsamp(0) gt radsamp(Nradsamp-1) and radsamp_max ne radsamp(0)          then STOP
+            ;Determine the min and max rad over which we will actually evaluate the fit.
+             radfit_min =                  min(rad_fit_c2_A)
+             radfit_max = min([radsamp_max,max(rad_fit_c2_A)]) 
+            ;Determine range of rad_fit_[instrument] over which we will actually evaluate the fit.
+             range_fit = where(rad_fit_c2_A ge radfit_min AND rad_fit_c2_A le radfit_max)
+            ;Test if there is proper coverage of actual sample data for a decent least squares fit.
+             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, covgflag=covgflag, /lascoc2
              if covgflag eq 'yes' then begin
                 fitflag_c2_A(ifl) = +1.
                 Nesamp = reform(Ne_c2_A(ifl,ind_samp_c2))
                 goto,skip_c2_single_power_law
                 fit_F_Ne_c2 = 'SPL'
                 linear_fit, alog(radsamp), alog(Nesamp), AN, r2N, /linfit_idl
-                scN_fit_c2_A(ifl)  = r2N
-                N1_fit_c2_A(ifl)   = exp(AN[0])                                           ; cm-3
-                p1_fit_c2_A(ifl)   =    -AN[1]                                            ; dimensionless exponent of power law
-                Ne_fit_c2_A(ifl,*) = N1_fit_c2_A(ifl) * rad_fit_c2_A^(-p1_fit_c2_A(ifl))  ; cm-3
-                indsamp = where(rad_fit_c2_A ge min(radsamp) and rad_fit_c2_A le max(radsamp) AND dNe_dr lt 0.)
-                v =  abs(rad_fit_c2_A(indsamp) / float(p1_fit_c2_A(ifl))) 
-                lN_fit_c2_A(ifl)   = int_tabulated( rad_fit_c2_A(indsamp), v) / (max(rad_fit_c2_A(indsamp))-min(rad_fit_c2_A(indsamp))) ; Rsun
+               scN_fit_c2_A(ifl) = r2N
+                N1_fit_c2_A(ifl) = exp(AN[0]) ; cm-3
+                p1_fit_c2_A(ifl) =    -AN[1]  ; dimensionless exponent of power law
+                Ne_fit_c2_A(ifl,range_fit) = N1_fit_c2_A(ifl) * rad_fit_c2_A(range_fit)^(-p1_fit_c2_A(ifl)) ; cm-3
+                indsamp = where(rad_fit_c2_A ge min(radsamp) and rad_fit_c2_A le max(radsamp))
+                v =  abs(rad_fit_c2_A(indsamp) / float(p1_fit_c2_A(ifl)))                                                             ; Rsun
+                lN_fit_c2_A(ifl) = int_tabulated( rad_fit_c2_A(indsamp), v) / (max(rad_fit_c2_A(indsamp))-min(rad_fit_c2_A(indsamp))) ; Rsun
                 print,lN_fit_c2_A(ifl), float(mean(v)), float(median(v))
                 skip_c2_single_power_law:
                ;goto,skip_c2_double_power_law
                 fit_F_Ne_c2  = 'DPL'
                 double_power_fit, radsamp, Nesamp, A, chisqr ;, /weighted
                 scN_fit_c2_A(ifl)   = sqrt(chisqr)/mean(Nesamp)
-                N1_fit_c2_A(ifl)   = A[0]                                                                         ; cm-3
-                p1_fit_c2_A(ifl)   = A[1]                                                                         ; dimensionless exponent of power law
-                N2_fit_c2_A(ifl)   = A[2]                                                                         ; cm-3
-                p2_fit_c2_A(ifl)   = A[3]                                                                         ; dimensionless exponent of power law
-                Ne_fit_c2_A(ifl,*) = A[0] * rad_fit_c2_A^(-A[1]) + A[2] * rad_fit_c2_A^(-A[3])                    ; cm-3
-                dNe_dr              = - A[1]*A[0] * rad_fit_c2_A^(-A[1]-1) - A[3]*A[2] * rad_fit_c2_A^(-A[3]-1)   ; cm-3 / Rsun
-                indsamp = where(rad_fit_c2_A ge min(radsamp) and rad_fit_c2_A le max(radsamp) AND dNe_dr lt 0.)
+                N1_fit_c2_A(ifl)   = A[0] ; cm-3
+                p1_fit_c2_A(ifl)   = A[1] ; dimensionless exponent of power law
+                N2_fit_c2_A(ifl)   = A[2] ; cm-3
+                p2_fit_c2_A(ifl)   = A[3] ; dimensionless exponent of power law
+                Ne_fit_c2_A(ifl,range_fit) = A[0] * rad_fit_c2_A(range_fit)^(-A[1]) + A[2] * rad_fit_c2_A(range_fit)^(-A[3])                 ; cm-3
+             dNedr_fit_c2_A(    range_fit) = - A[1]*A[0] * rad_fit_c2_A(range_fit)^(-A[1]-1) - A[3]*A[2] * rad_fit_c2_A(range_fit)^(-A[3]-1) ; cm-3 / Rsun
+                indsamp = where(dNedr_fit_c2_A lt 0. AND dNedr_fit_c2_A ne default)
                 if indsamp[0] ne -1 then begin
-                   v = abs(dNe_dr(indsamp)/reform(Ne_fit_c2_A(ifl,indsamp)))^(-1)
-                   lN_fit_c2_A(ifl)   = int_tabulated(rad_fit_c2_A(indsamp), v) / (max(rad_fit_c2_A(indsamp))-min(rad_fit_c2_A(indsamp))) ; Rsun
+                   v = abs(dNedr_fit_c2(indsamp)/reform(Ne_fit_c2_A(ifl,indsamp)))^(-1)                                                 ; Rsun
+                   lN_fit_c2_A(ifl) = int_tabulated(rad_fit_c2_A(indsamp), v) / (max(rad_fit_c2_A(indsamp))-min(rad_fit_c2_A(indsamp))) ; Rsun
                 endif
                  ; print,lN_fit_c2_A(ifl), float(mean(v)), float(median(v))
                  ; stop
