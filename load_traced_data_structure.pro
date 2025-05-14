@@ -56,6 +56,11 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
      fit_F_Ne_aia,fit_F_Ne_mk4,fit_F_Ne_c2,$
      fit_F_Ne_euvia,fit_F_Ne_euvib,fit_F_eit_c2,$
      tomgrid_aia_hdr_A,tomgrid_aia_A,fitgrid_aia_hdr_A,fitgrid_aia_A,$
+     tomgrid_euvia_hdr_A,tomgrid_euvia_A,fitgrid_euvia_hdr_A,fitgrid_euvia_A,$
+     tomgrid_mk4_hdr_A,tomgrid_mk4_A,fitgrid_mk4_hdr_A,fitgrid_mk4_A,$
+     tomgrid_kcor_hdr_A,tomgrid_kcor_A,fitgrid_kcor_hdr_A,fitgrid_kcor_A,$
+     tomgrid_ucomp_hdr_A,tomgrid_ucomp_A,fitgrid_ucomp_hdr_A,fitgrid_ucomp_A,$
+     tomgrid_c2_hdr_A,tomgrid_c2_A,fitgrid_c2_hdr_A,fitgrid_c2_A,$
      leg_label_A
   
   restore, filename = dir + structure_filename
@@ -124,7 +129,10 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
              p1_fit_euvia_A = *trace_data. p1_fit_euvia
              p2_fit_euvia_A = *trace_data. p2_fit_euvia
           endif
-
+          tomgrid_euvia_hdr_A = *trace_data. tomgrid_euvia_hdr
+          tomgrid_euvia_A     = *trace_data. tomgrid_euvia
+          fitgrid_euvia_hdr_A = *trace_data. fitgrid_euvia_hdr
+          fitgrid_euvia_A     = *trace_data. fitgrid_euvia
   endif
   if keyword_set(euvib) then begin
                 Ne_euvib_A = *trace_data.Ne_euvib 
@@ -151,7 +159,10 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
              p1_fit_euvib_A = *trace_data. p1_fit_euvib
              p2_fit_euvib_A = *trace_data. p2_fit_euvib
           endif
-
+          tomgrid_euvib_hdr_A = *trace_data. tomgrid_euvib_hdr
+          tomgrid_euvib_A     = *trace_data. tomgrid_euvib
+          fitgrid_euvib_hdr_A = *trace_data. fitgrid_euvib_hdr
+          fitgrid_euvib_A     = *trace_data. fitgrid_euvib
   endif
   if keyword_set(eit) then begin
                 Ne_eit_A = *trace_data.Ne_eit 
@@ -178,7 +189,10 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
              p1_fit_eit_A = *trace_data. p1_fit_eit
              p2_fit_eit_A = *trace_data. p2_fit_eit
           endif
- 
+          tomgrid_eit_hdr_A = *trace_data. tomgrid_eit_hdr
+          tomgrid_eit_A     = *trace_data. tomgrid_eit
+          fitgrid_eit_hdr_A = *trace_data. fitgrid_eit_hdr
+          fitgrid_eit_A     = *trace_data. fitgrid_eit 
   endif
   if keyword_set(mk4) then begin
                 Ne_mk4_A = *trace_data.Ne_mk4 
@@ -202,6 +216,10 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
              p1_fit_mk4_A = *trace_data. p1_fit_mk4
              p2_fit_mk4_A = *trace_data. p2_fit_mk4
           endif
+          tomgrid_mk4_hdr_A = *trace_data. tomgrid_mk4_hdr
+          tomgrid_mk4_A     = *trace_data. tomgrid_mk4
+          fitgrid_mk4_hdr_A = *trace_data. fitgrid_mk4_hdr
+          fitgrid_mk4_A     = *trace_data. fitgrid_mk4 
   endif
   if keyword_set(kcor) then begin
                 Ne_kcor_A = *trace_data.Ne_kcor 
@@ -228,6 +246,10 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
              p1_fit_c2_A = *trace_data. p1_fit_c2
              p2_fit_c2_A = *trace_data. p2_fit_c2
           endif
+          tomgrid_c2_hdr_A = *trace_data. tomgrid_c2_hdr
+          tomgrid_c2_A     = *trace_data. tomgrid_c2
+          fitgrid_c2_hdr_A = *trace_data. fitgrid_c2_hdr
+          fitgrid_c2_A     = *trace_data. fitgrid_c2 
   endif
   return
 end
