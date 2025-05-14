@@ -22,8 +22,9 @@
 ;          defined only if its data is used.
 ;          V2.2 FAN, CLASP, May 2024. Added WT and LDEM_FLAG to the
 ;          traced result.
+;          V2.4 AMV, CLaSP, May 2024, expanded to include closed FL,
+;          added line-label to structure
 ;
-
 pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
                         aia=aia, euvia=euvia, euvib=euvib, eit=eit, $
                         mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2, $
@@ -339,7 +340,7 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
 if keyword_set(opcl) then begin
 ; Read-in the leg-lable of all fieldlines.
   leglab=0L
-  openr,1,fl_dir+'legs-labe.txt'
+  openr,1,fl_dir+'legs-label.txt'
   readf,1,N_fl
   for ifl=0,N_fl-1 do begin
      readf,1,leglab
