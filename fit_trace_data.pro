@@ -67,20 +67,23 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
           ind_samp_aia = where(tmp eq 1)
           if ind_samp_aia[0] ne -1 then begin
              radsamp = reform(rad_A(ifl,ind_samp_aia)) ; Rsun
-            ;Determine radsamp_max (which is the apex in the case of small closed loops,
-            ;                       or even a smaller height if the apex is a ZDA.
+            ;--------------------------SUBROUTINE?------------------------------------------------------------
+            ;Determine maximum heiht of the fl geometry (apex if closed)
+             rad_fl_max = max(rad_A(ifl,*))
+            ;Determine radsamp_max
              radsamp_max=max(radsamp)
              Nradsamp   =n_elements(radsamp)
-            ;Sanity check of radsamp_max
-             if radsamp(0) lt radsamp(Nradsamp-1) and radsamp_max ne radsamp(Nradsamp-1) then STOP
-             if radsamp(0) gt radsamp(Nradsamp-1) and radsamp_max ne radsamp(0)          then STOP
+                ;Sanity check of radsamp_max
+                ;if radsamp(0) lt radsamp(Nradsamp-1) and radsamp_max ne radsamp(Nradsamp-1) then STOP
+                ;if radsamp(0) gt radsamp(Nradsamp-1) and radsamp_max ne radsamp(0)          then STOP
             ;Determine the min and max rad over which we will actually evaluate the fit.
              radfit_min =                  min(rad_fit_aia_A)
              radfit_max = min([radsamp_max,max(rad_fit_aia_A)]) 
             ;Determine range of rad_fit_[instrument] over which we will actually evaluate the fit.
              range_fit = where(rad_fit_aia_A ge radfit_min AND rad_fit_aia_A le radfit_max)
+            ;---------------------------------------------------------------------------------------------------
             ;Test if there is proper coverage of actual sample data for a decent least squares fit.
-             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, covgflag=covgflag
+             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, rad_fl_max=rad_fl_max, covgflag=covgflag
              if covgflag eq 'yes' then begin
                 fitflag_aia_A(ifl) = +1.
                 Nesamp = reform(Ne_aia_A(ifl,ind_samp_aia))

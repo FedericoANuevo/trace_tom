@@ -105,10 +105,12 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
              p1_fit_aia_A = *trace_data. p1_fit_aia
              p2_fit_aia_A = *trace_data. p2_fit_aia
           endif
-          tomgrid_aia_hdr_A = *trace_data. tomgrid_aia_hdr
-          tomgrid_aia_A     = *trace_data. tomgrid_aia
-          fitgrid_aia_hdr_A = *trace_data. fitgrid_aia_hdr
-          fitgrid_aia_A     = *trace_data. fitgrid_aia
+          if keyword_set(opcl) then begin
+             tomgrid_aia_hdr_A = *trace_data. tomgrid_aia_hdr
+             tomgrid_aia_A     = *trace_data. tomgrid_aia
+             fitgrid_aia_hdr_A = *trace_data. fitgrid_aia_hdr
+             fitgrid_aia_A     = *trace_data. fitgrid_aia
+          endif          
   endif
 
   if keyword_set(euvia) then begin
