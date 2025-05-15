@@ -70,6 +70,8 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
             ;--------------------------SUBROUTINE?------------------------------------------------------------
             ;Determine maximum heiht of the fl geometry (apex if closed)
              rad_fl_max = max(rad_A(ifl,*))
+             print,rad_fl_max
+ stop
             ;Determine radsamp_max
              radsamp_max=max(radsamp)
              Nradsamp   =n_elements(radsamp)

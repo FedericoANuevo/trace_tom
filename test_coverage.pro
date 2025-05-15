@@ -29,7 +29,9 @@ pro test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max
   covgflag = 'no'
   if (where(radsamp ge Ri(0) and radsamp le Ri(1)))(0) ne -1 AND  $
      (where(radsamp gt Ri(1) and radsamp le Ri(2)))(0) ne -1 AND  $
-     (where(radsamp gt Ri(2) and radsamp le Ri(3)))(0) ne -1 THEN covgflag = 'yes'
+     (where(radsamp gt Ri(2) and radsamp le Ri(3)))(0) ne -1 AND  $
+     n_elements(radsamp) ge 5 $
+  THEN covgflag = 'yes'
   
   return
 end
