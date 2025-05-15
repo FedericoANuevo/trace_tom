@@ -9,7 +9,7 @@
 ;
 ;-------------------------------------------------------------------------
 
-pro test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, rad_fl_max=rad_fl_max, covgflag=covgflag,$
+pro test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, rad_fl_max=rad_fl_max, covgflag=covgflag
   common tomgrid,nr,nt,np,rmin,rmax,Irmin,Irmax  
 
 ; Set rad_1:
