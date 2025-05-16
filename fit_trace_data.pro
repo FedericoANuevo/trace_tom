@@ -38,12 +38,18 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
      Ne_kcor_A, index_kcor_A, index_sampling_kcor_A,$
      Ne_ucomp_A, index_ucomp_A, index_sampling_ucomp_A,$
      Ne_c2_A, index_c2_A, index_sampling_c2_A
-    common radcrits, radcritA, radcritB
+    common radcrits, rad_fl_max;radcritA, radcritB
     common tomgrid,nr,nt,np,rmin,rmax,Irmin,Irmax
     common fitgrid,radmin_fit,radmax_fit,drad_fit,Npt_fit
 
    ;Set a default value for all the elements of all the [NAME]_A arrays
     default = -678.
+
+   ;Determine maximum heiht of the fl geometry (apex if closed)
+    rad_fl_max = max(rad_A(ifl,*))
+   ;print,rad_fl_max
+   ;stop
+    
     
     if keyword_set(aia) then begin
        read_tomgrid_and_define_fitgrid,fl_dir=fl_dir,instr_string='aia'
@@ -68,10 +74,6 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
           if ind_samp_aia[0] ne -1 then begin
              radsamp = reform(rad_A(ifl,ind_samp_aia)) ; Rsun
             ;--------------------------SUBROUTINE?------------------------------------------------------------
-            ;Determine maximum heiht of the fl geometry (apex if closed)
-             rad_fl_max = max(rad_A(ifl,*))
-             print,rad_fl_max
- stop
             ;Determine radsamp_max
              radsamp_max=max(radsamp)
              Nradsamp   =n_elements(radsamp)
@@ -85,7 +87,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
              range_fit = where(rad_fit_aia_A ge radfit_min AND rad_fit_aia_A le radfit_max)
             ;---------------------------------------------------------------------------------------------------
             ;Test if there is proper coverage of actual sample data for a decent least squares fit.
-             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, rad_fl_max=rad_fl_max, covgflag=covgflag
+             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, covgflag=covgflag
              if covgflag eq 'yes' then begin
                 fitflag_aia_A(ifl) = +1.
                 Nesamp = reform(Ne_aia_A(ifl,ind_samp_aia))

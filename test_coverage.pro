@@ -10,8 +10,8 @@
 ;-------------------------------------------------------------------------
 
 pro test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, rad_fl_max=rad_fl_max, covgflag=covgflag
-  common tomgrid,nr,nt,np,rmin,rmax,Irmin,Irmax  
-
+  common tomgrid,nr,nt,np,rmin,rmax,Irmin,Irmax 
+  common radcrits, rad_fl_max   ;radcritA, radcritB
 ; Set rad_1:
   rad_1 = Irmin
 
