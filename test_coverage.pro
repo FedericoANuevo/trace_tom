@@ -24,7 +24,8 @@ pro test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max
   Nseg = 3 ; Let us test this value.
   DR   = (rad_2-rad_1)/float(Nseg)
  ;Set of Nseg+1 Ri values that bound Nseg equally long segments.
-  Ri   = radfit_min + DR * findgen(Nseg+1)
+; Ri   = radfit_min + DR * findgen(Nseg+1)
+  Ri   = rad_1 + DR * findgen(Nseg+1)
  ;Test coverage.
   covgflag = 'no'
   if (where(radsamp ge Ri(0) and radsamp le Ri(1)))(0) ne -1 AND  $
