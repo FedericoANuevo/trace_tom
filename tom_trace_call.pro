@@ -18,7 +18,11 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
 
 ; Define PROJECT_NAME, a string suffix to construct the full PATHS to the required files.
   PROJECT_NAME = 'CR2254'
-
+; Define field_line_geometry_suffix_dir
+  field_line_geometry_suffix_dir='_aunifgrid_1.15Rs_1x1deg/'
+  if not keyword_set(field_line_geometry_suffix_dir) then $
+  field_line_geometry_suffix_dir='/'
+  
 ; Provide FL_LIST, the file which informs the number of field lines and the
 ; filenames of the ASCII files containing the geometry of each line.
   fl_list = 'fdips_field_150x180x360_mrmqs220221t2004c2254_000.ubdat_fline-filenames_list.txt'
@@ -29,7 +33,7 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
   base_dir = '/data1/'
   if keyword_set(nfs1) then base_dir = '/data/Data1/data1/'
   if keyword_set(nfs2) then base_dir = '/data/Data2/data1/'
-   fl_dir = base_dir+'DATA/trace_tom_files/'+PROJECT_NAME+'/field_lines_geometry/'
+   fl_dir = base_dir+'DATA/trace_tom_files/'+PROJECT_NAME+'/field_lines_geometry'+field_line_geometry_suffix_dir
   tom_dir = base_dir+'DATA/trace_tom_files/'+PROJECT_NAME+'/tomography_3Dproducts/' 
 ;------------------------------------------------------------------------------------
     
@@ -53,7 +57,7 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
      Irmin    = 1.09;1.02
      Irmax    = 1.25;1.25
      tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_list=fl_list,$
-               nr=nr,nt=nt,np=np,rmin=rmin,rmax=rmax,Irmin=Irmin,Irmax=Irmax;,/csv
+               nr=nr,nt=nt,np=np,rmin=rmin,rmax=rmax,Irmin=Irmin,Irmax=Irmax ;,/csv
   endif
 
   if keyword_set(lasco) then begin
