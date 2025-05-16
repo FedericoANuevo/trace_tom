@@ -61,7 +61,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
         Tm_fit_aia_A = fltarr(N_fl,Npt_fit) + default
        rad_fit_aia_A = radmin_fit + drad_fit/2. + drad_fit * findgen(Npt_fit)
      dNedr_fit_aia_A = fltarr(Npt_fit) + default
-       for ifl=0,N_fl-1 do begin
+       for ifl=0L,N_fl-1 do begin
           tmp = reform(index_sampling_aia_A(ifl,*))
           ind_samp_aia = where(tmp eq 1)
           if ind_samp_aia[0] ne -1 then begin
@@ -163,7 +163,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
         Tm_fit_euvia_A = fltarr(N_fl,Npt_fit) + default
        rad_fit_euvia_A = radmin_fit + drad_fit/2. + drad_fit * findgen(Npt_fit)
      dNedr_fit_euvia_A = fltarr(Npt_fit) + default
-       for ifl=0,N_fl-1 do begin      
+       for ifl=0L,N_fl-1 do begin      
           tmp = reform(index_sampling_euvia_A(ifl,*))
           ind_samp_euvia = where(tmp eq 1)
           if ind_samp_euvia[0] ne -1 then begin
@@ -265,7 +265,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
         Tm_fit_euvib_A = fltarr(N_fl,Npt_fit) + default
        rad_fit_euvib_A = radmin_fit + drad_fit/2. + drad_fit * findgen(Npt_fit)
      dNedr_fit_euvib_A = fltarr(Npt_fit) + default
-       for ifl=0,N_fl-1 do begin      
+       for ifl=0L,N_fl-1 do begin      
           tmp = reform(index_sampling_euvib_A(ifl,*))
           ind_samp_euvib = where(tmp eq 1)
           if ind_samp_euvib[0] ne -1 then begin
@@ -363,7 +363,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
         Ne_fit_mk4_A = fltarr(N_fl,Npt_fit) + default
        rad_fit_mk4_A = radmin_fit + drad_fit/2. + drad_fit * findgen(Npt_fit)
      dNedr_fit_mk4_A = fltarr(Npt_fit) + default
-       for ifl=0,N_fl-1 do begin      
+       for ifl=0L,N_fl-1 do begin      
           tmp = reform(index_sampling_mk4_A(ifl,*))
           ind_samp_mk4 = where(tmp eq 1)
           if ind_samp_mk4[0] ne -1 then begin
@@ -466,7 +466,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
         Ne_fit_kcor_A = fltarr(N_fl,Npt_fit) + default
        rad_fit_kcor_A = radmin_fit + drad_fit/2. + drad_fit * findgen(Npt_fit)
      dNedr_fit_kcor_A = fltarr(Npt_fit) + default
-       for ifl=0,N_fl-1 do begin      
+       for ifl=0L,N_fl-1 do begin      
           tmp = reform(index_sampling_kcor_A(ifl,*))
           ind_samp_kcor = where(tmp eq 1)
           if ind_samp_kcor[0] ne -1 then begin
@@ -535,7 +535,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
         Ne_fit_ucomp_A = fltarr(N_fl,Npt_fit) + default
        rad_fit_ucomp_A = radmin_fit + drad_fit/2. + drad_fit * findgen(Npt_fit)
      dNedr_fit_ucomp_A = fltarr(Npt_fit) + default
-       for ifl=0,N_fl-1 do begin      
+       for ifl=0L,N_fl-1 do begin      
           tmp = reform(index_sampling_ucomp_A(ifl,*))
           ind_samp_ucomp = where(tmp eq 1)
           if ind_samp_ucomp[0] ne -1 then begin
@@ -603,7 +603,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
         Ne_fit_c2_A = fltarr(N_fl,Npt_fit) + default
        rad_fit_c2_A = radmin_fit + drad_fit/2. + drad_fit * findgen(Npt_fit)
      dNedr_fit_c2_A = fltarr(Npt_fit) + default
-       for ifl=0,N_fl-1 do begin      
+       for ifl=0L,N_fl-1 do begin      
           tmp = reform(index_sampling_c2_A(ifl,*))
           ind_samp_c2 = where(tmp eq 1)
           if ind_samp_c2[0] ne -1 then begin

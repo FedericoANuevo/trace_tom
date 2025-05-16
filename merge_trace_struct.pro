@@ -50,7 +50,7 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
   structure_filename = structure_filename + '-tracing-structure-merge'
 
 ; Read the list with the field-lines  
-  N_fl     = 0
+  N_fl     = 0L
   filename = ''
   openr,1,fl_dir+fl_list
   readf,1,N_fl
@@ -122,7 +122,7 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
      index_sampling_c2_A = intarr(N_fl,Npt_max) + default
   endif
            
-  for i_fl = 0,N_fl-1 do begin ; Start loop in fieldlines  
+  for i_fl = 0L,N_fl-1 do begin ; Start loop in fieldlines  
      initialized = 'no'
      readf,1,filename
      
@@ -342,9 +342,9 @@ if keyword_set(opcl) then begin
   leglab=0L
   openr,1,fl_dir+'legs-label.dat'
   readf,1,N_fl
-  for ifl=0,N_fl-1 do begin
+  for i_fl=0L,N_fl-1 do begin
      readf,1,leglab
-     leg_label_A(ifl)=leglab
+     leg_label_A(i_fl)=leglab
   endfor
   close,1
 endif
