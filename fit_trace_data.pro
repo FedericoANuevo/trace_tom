@@ -44,12 +44,6 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
 
    ;Set a default value for all the elements of all the [NAME]_A arrays
     default = -678.
-
-   ;Determine maximum heiht of the fl geometry (apex if closed)
-    rad_fl_max = max(rad_A(ifl,Npt_v(ifl)-1))
-   ;print,rad_fl_max
-   ;stop
-    
     
     if keyword_set(aia) then begin
        read_tomgrid_and_define_fitgrid,fl_dir=fl_dir,instr_string='aia'
@@ -74,6 +68,10 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
           if ind_samp_aia[0] ne -1 then begin
              radsamp = reform(rad_A(ifl,ind_samp_aia)) ; Rsun
             ;--------------------------SUBROUTINE?------------------------------------------------------------
+            ;Determine maximum heiht of the fl geometry (apex if closed)
+             rad_fl_max = max(rad_A(ifl,Npt_v(ifl)-1))
+            ;print,rad_fl_max
+            ;stop
             ;Determine radsamp_max
              radsamp_max=max(radsamp)
              Nradsamp   =n_elements(radsamp)
