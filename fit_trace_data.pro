@@ -46,7 +46,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
     default = -678.
 
    ;Determine maximum heiht of the fl geometry (apex if closed)
-    rad_fl_max = max(rad_A(ifl,*))
+    rad_fl_max = max(rad_A(ifl,Npt_v(ifl)-1))
    ;print,rad_fl_max
    ;stop
     
