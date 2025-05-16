@@ -93,9 +93,9 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
      nt       = 60
      np       = 2*nt
      rmin     = 1.09
-     rmax     = 1.20
+     rmax     = 1.25
      Irmin    = 1.09
-     Irmax    = 1.25
+     Irmax    = 1.20
      tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_list=fl_list,$
                nr=nr,nt=nt,np=np,rmin=rmin,rmax=rmax,Irmin=Irmin,Irmax=Irmax
   endif
