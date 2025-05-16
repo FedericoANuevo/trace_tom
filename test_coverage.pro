@@ -11,7 +11,7 @@
 
 pro test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, rad_fl_max=rad_fl_max, covgflag=covgflag
   common tomgrid,nr,nt,np,rmin,rmax,Irmin,Irmax 
-  common radcrits, rad_fl_max   ;radcritA, radcritB
+
 ; Set rad_1:
   rad_1 = Irmin
 
@@ -24,7 +24,6 @@ pro test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max
   Nseg = 3 ; Let us test this value.
   DR   = (rad_2-rad_1)/float(Nseg)
  ;Set of Nseg+1 Ri values that bound Nseg equally long segments.
-; Ri   = radfit_min + DR * findgen(Nseg+1)
   Ri   = rad_1 + DR * findgen(Nseg+1)
  ;Test coverage.
   covgflag = 'no'

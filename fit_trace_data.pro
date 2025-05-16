@@ -38,7 +38,6 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
      Ne_kcor_A, index_kcor_A, index_sampling_kcor_A,$
      Ne_ucomp_A, index_ucomp_A, index_sampling_ucomp_A,$
      Ne_c2_A, index_c2_A, index_sampling_c2_A
-    common radcrits, rad_fl_max;radcritA, radcritB
     common tomgrid,nr,nt,np,rmin,rmax,Irmin,Irmax
     common fitgrid,radmin_fit,radmax_fit,drad_fit,Npt_fit
 
@@ -66,26 +65,15 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
           tmp = reform(index_sampling_aia_A(ifl,*))
           ind_samp_aia = where(tmp eq 1)
           if ind_samp_aia[0] ne -1 then begin
+            ;Determine maximum heiht of the fl geometry (apex if closed).
+             rad_fl_max = max(rad_A(ifl,0:Npt_v(ifl)-1))
+            ;Make 1-D array with the actual sampling heights.
              radsamp = reform(rad_A(ifl,ind_samp_aia)) ; Rsun
-            ;--------------------------SUBROUTINE?------------------------------------------------------------
-            ;Determine maximum heiht of the fl geometry (apex if closed)
-             rad_fl_max = max(rad_A(ifl,Npt_v(ifl)-1))
-            ;print,rad_fl_max
-            ;stop
-            ;Determine radsamp_max
-             radsamp_max=max(radsamp)
-             Nradsamp   =n_elements(radsamp)
-                ;Sanity check of radsamp_max
-                ;if radsamp(0) lt radsamp(Nradsamp-1) and radsamp_max ne radsamp(Nradsamp-1) then STOP
-                ;if radsamp(0) gt radsamp(Nradsamp-1) and radsamp_max ne radsamp(0)          then STOP
-            ;Determine the min and max rad over which we will actually evaluate the fit.
-             radfit_min =                  min(rad_fit_aia_A)
-             radfit_max = min([radsamp_max,max(rad_fit_aia_A)]) 
-            ;Determine range of rad_fit_[instrument] over which we will actually evaluate the fit.
-             range_fit = where(rad_fit_aia_A ge radfit_min AND rad_fit_aia_A le radfit_max)
-            ;---------------------------------------------------------------------------------------------------
+            ;Determine critical fit heights and range
+             determine_fit_critical_parameters, radsamp=radsamp, rad_fit=rad_fit_aia_A, $
+                                                radfit_min=radfit_min, radfit_max=radfit_max, range_fit=range_fit
             ;Test if there is proper coverage of actual sample data for a decent least squares fit.
-             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, covgflag=covgflag
+             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, rad_fl_max=rad_fl_max, covgflag=covgflag
              if covgflag eq 'yes' then begin
                 fitflag_aia_A(ifl) = +1.
                 Nesamp = reform(Ne_aia_A(ifl,ind_samp_aia))
@@ -179,21 +167,15 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
           tmp = reform(index_sampling_euvia_A(ifl,*))
           ind_samp_euvia = where(tmp eq 1)
           if ind_samp_euvia[0] ne -1 then begin
+            ;Determine maximum heiht of the fl geometry (apex if closed).
+             rad_fl_max = max(rad_A(ifl,0:Npt_v(ifl)-1))
+            ;Make 1-D array with the actual sampling heights.
              radsamp = reform(rad_A(ifl,ind_samp_euvia)) ; Rsun
-            ;Determine radsamp_max (which is the apex in the case of small closed loops,
-            ;                       or even a smaller height if the apex is a ZDA.
-             radsamp_max=max(radsamp)
-             Nradsamp   =n_elements(radsamp)
-            ;Sanity check of radsamp_max
-             if radsamp(0) lt radsamp(Nradsamp-1) and radsamp_max ne radsamp(Nradsamp-1) then STOP
-             if radsamp(0) gt radsamp(Nradsamp-1) and radsamp_max ne radsamp(0)          then STOP
-            ;Determine the min and max rad over which we will actually evaluate the fit.
-             radfit_min =                  min(rad_fit_euvia_A)
-             radfit_max = min([radsamp_max,max(rad_fit_euvia_A)]) 
-            ;Determine range of rad_fit_[instrument] over which we will actually evaluate the fit.
-             range_fit = where(rad_fit_euvia_A ge radfit_min AND rad_fit_euvia_A le radfit_max)
+            ;Determine critical fit heights and range
+             determine_fit_critical_parameters, radsamp=radsamp, rad_fit=rad_fit_euvia_A, $
+                                                radfit_min=radfit_min, radfit_max=radfit_max, range_fit=range_fit
             ;Test if there is proper coverage of actual sample data for a decent least squares fit.
-             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, covgflag=covgflag
+             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, rad_fl_max=rad_fl_max, covgflag=covgflag
              if covgflag eq 'yes' then begin
                 fitflag_euvia_A(ifl) = +1.
                 Nesamp = reform(Ne_euvia_A(ifl,ind_samp_euvia))
@@ -236,7 +218,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                 dTdr_fit_euvia_A(ifl) = AT[1]                                                                         ; K/Rsun
                 Tm_fit_euvia_A(ifl,*) = T0_fit_euvia_A(ifl) + dTdr_fit_euvia_A(ifl)       *      (rad_fit_euvia_A-1.) ; K
              endif                                                                                                    ; covgflag = 'yes'
-          endif
+          endif; ind_samp
        endfor                   ; field lines loop.
        trace_data = create_struct( trace_data                               ,$
                                   'fitflag_euvia',ptr_new( fitflag_euvia_A) ,$
@@ -287,21 +269,15 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
           tmp = reform(index_sampling_euvib_A(ifl,*))
           ind_samp_euvib = where(tmp eq 1)
           if ind_samp_euvib[0] ne -1 then begin
+            ;Determine maximum heiht of the fl geometry (apex if closed).
+             rad_fl_max = max(rad_A(ifl,0:Npt_v(ifl)-1))
+            ;Make 1-D array with the actual sampling heights.
              radsamp = reform(rad_A(ifl,ind_samp_euvib)) ; Rsun
-            ;Determine radsamp_max (which is the apex in the case of small closed loops,
-            ;                       or even a smaller height if the apex is a ZDA.
-             radsamp_max=max(radsamp)
-             Nradsamp   =n_elements(radsamp)
-            ;Sanity check of radsamp_max
-             if radsamp(0) lt radsamp(Nradsamp-1) and radsamp_max ne radsamp(Nradsamp-1) then STOP
-             if radsamp(0) gt radsamp(Nradsamp-1) and radsamp_max ne radsamp(0)          then STOP
-            ;Determine the min and max rad over which we will actually evaluate the fit.
-             radfit_min =                  min(rad_fit_euvib_A)
-             radfit_max = min([radsamp_max,max(rad_fit_euvib_A)]) 
-            ;Determine range of rad_fit_[instrument] over which we will actually evaluate the fit.
-             range_fit = where(rad_fit_euvib_A ge radfit_min AND rad_fit_euvib_A le radfit_max)
+            ;Determine critical fit heights and range
+             determine_fit_critical_parameters, radsamp=radsamp, rad_fit=rad_fit_euvib_A, $
+                                                radfit_min=radfit_min, radfit_max=radfit_max, range_fit=range_fit
             ;Test if there is proper coverage of actual sample data for a decent least squares fit.
-             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, covgflag=covgflag
+             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, rad_fl_max=rad_fl_max, covgflag=covgflag
              if covgflag eq 'yes' then begin
                 fitflag_euvib_A(ifl) = +1.
                 Nesamp = reform(Ne_euvib_A(ifl,ind_samp_euvib))
@@ -343,9 +319,9 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                 T0_fit_euvib_A(ifl)   = AT[0]                                                                         ; K
                 dTdr_fit_euvib_A(ifl) = AT[1]                                                                         ; K/Rsun
                 Tm_fit_euvib_A(ifl,*) = T0_fit_euvib_A(ifl) + dTdr_fit_euvib_A(ifl)       *      (rad_fit_euvib_A-1.) ; K
-             endif                                                                                                    ; covgflag = 'yes'
-          endif
-       endfor                   ; field lines loop.
+             endif ; covgflag = 'yes'
+          endif; indsamp
+       endfor                ; field lines loop.
        trace_data = create_struct( trace_data                               ,$
                                   'fitflag_euvib',ptr_new( fitflag_euvib_A) ,$
                                  'fit_F_Ne_euvib',ptr_new(fit_F_Ne_euvib  ) ,$
@@ -391,21 +367,15 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
           tmp = reform(index_sampling_mk4_A(ifl,*))
           ind_samp_mk4 = where(tmp eq 1)
           if ind_samp_mk4[0] ne -1 then begin
+            ;Determine maximum heiht of the fl geometry (apex if closed).
+             rad_fl_max = max(rad_A(ifl,0:Npt_v(ifl)-1))
+            ;Make 1-D array with the actual sampling heights.
              radsamp = reform(rad_A(ifl,ind_samp_mk4)) ; Rsun
-            ;Determine radsamp_max (which is the apex in the case of small closed loops,
-            ;                       or even a smaller height if the apex is a ZDA.
-             radsamp_max=max(radsamp)
-             Nradsamp   =n_elements(radsamp)
-            ;Sanity check of radsamp_max
-             if radsamp(0) lt radsamp(Nradsamp-1) and radsamp_max ne radsamp(Nradsamp-1) then STOP
-             if radsamp(0) gt radsamp(Nradsamp-1) and radsamp_max ne radsamp(0)          then STOP
-            ;Determine the min and max rad over which we will actually evaluate the fit.
-             radfit_min =                  min(rad_fit_mk4_A)
-             radfit_max = min([radsamp_max,max(rad_fit_mk4_A)])
-            ;Determine range of rad_fit_[instrument] over which we will actually evaluate the fit.
-             range_fit = where(rad_fit_mk4_A ge radfit_min AND rad_fit_mk4_A le radfit_max)
+            ;Determine critical fit heights and range
+             determine_fit_critical_parameters, radsamp=radsamp, rad_fit=rad_fit_mk4_A, $
+                                                radfit_min=radfit_min, radfit_max=radfit_max, range_fit=range_fit
             ;Test if there is proper coverage of actual sample data for a decent least squares fit.
-             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, covgflag=covgflag
+             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, rad_fl_max=rad_fl_max, covgflag=covgflag
              if covgflag eq 'yes' then begin
                 fitflag_mk4_A(ifl) = +1.
                 Nesamp = reform(Ne_mk4_A(ifl,ind_samp_mk4))
@@ -500,21 +470,15 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
           tmp = reform(index_sampling_kcor_A(ifl,*))
           ind_samp_kcor = where(tmp eq 1)
           if ind_samp_kcor[0] ne -1 then begin
+            ;Determine maximum heiht of the fl geometry (apex if closed).
+             rad_fl_max = max(rad_A(ifl,0:Npt_v(ifl)-1))
+            ;Make 1-D array with the actual sampling heights.
              radsamp = reform(rad_A(ifl,ind_samp_kcor)) ; Rsun
-            ;Determine radsamp_max (which is the apex in the case of small closed loops,
-            ;                       or even a smaller height if the apex is a ZDA.
-             radsamp_max=max(radsamp)
-             Nradsamp   =n_elements(radsamp)
-            ;Sanity check of radsamp_max
-             if radsamp(0) lt radsamp(Nradsamp-1) and radsamp_max ne radsamp(Nradsamp-1) then STOP
-             if radsamp(0) gt radsamp(Nradsamp-1) and radsamp_max ne radsamp(0)          then STOP
-            ;Determine the min and max rad over which we will actually evaluate the fit.
-             radfit_min =                  min(rad_fit_kcor_A)
-             radfit_max = min([radsamp_max,max(rad_fit_kcor_A)]) 
-            ;Determine range of rad_fit_[instrument] over which we will actually evaluate the fit.
-             range_fit = where(rad_fit_kcor_A ge radfit_min AND rad_fit_kcor_A le radfit_max)
+            ;Determine critical fit heights and range
+             determine_fit_critical_parameters, radsamp=radsamp, rad_fit=rad_fit_kcor_A, $
+                                                radfit_min=radfit_min, radfit_max=radfit_max, range_fit=range_fit
             ;Test if there is proper coverage of actual sample data for a decent least squares fit.
-             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, covgflag=covgflag
+             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, rad_fl_max=rad_fl_max, covgflag=covgflag
              if covgflag eq 'yes' then begin
                 fitflag_kcor_A(ifl) = +1.
                 Nesamp = reform(Ne_kcor_A(ifl,ind_samp_kcor))
@@ -575,21 +539,15 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
           tmp = reform(index_sampling_ucomp_A(ifl,*))
           ind_samp_ucomp = where(tmp eq 1)
           if ind_samp_ucomp[0] ne -1 then begin
+            ;Determine maximum heiht of the fl geometry (apex if closed).
+             rad_fl_max = max(rad_A(ifl,0:Npt_v(ifl)-1))
+            ;Make 1-D array with the actual sampling heights.
              radsamp = reform(rad_A(ifl,ind_samp_ucomp)) ; Rsun
-            ;Determine radsamp_max (which is the apex in the case of small closed loops,
-            ;                       or even a smaller height if the apex is a ZDA.
-             radsamp_max=max(radsamp)
-             Nradsamp   =n_elements(radsamp)
-            ;Sanity check of radsamp_max
-             if radsamp(0) lt radsamp(Nradsamp-1) and radsamp_max ne radsamp(Nradsamp-1) then STOP
-             if radsamp(0) gt radsamp(Nradsamp-1) and radsamp_max ne radsamp(0)          then STOP
-            ;Determine the min and max rad over which we will actually evaluate the fit.
-             radfit_min =                  min(rad_fit_ucomp_A)
-             radfit_max = min([radsamp_max,max(rad_fit_ucomp_A)]) 
-            ;Determine range of rad_fit_[instrument] over which we will actually evaluate the fit.
-             range_fit = where(rad_fit_ucomp_A ge radfit_min AND rad_fit_ucomp_A le radfit_max)
+            ;Determine critical fit heights and range
+             determine_fit_critical_parameters, radsamp=radsamp, rad_fit=rad_fit_ucomp_A, $
+                                                radfit_min=radfit_min, radfit_max=radfit_max, range_fit=range_fit
             ;Test if there is proper coverage of actual sample data for a decent least squares fit.
-             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, covgflag=covgflag
+             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, rad_fl_max=rad_fl_max, covgflag=covgflag
              if covgflag eq 'yes' then begin
                 fitflag_ucomp_A(ifl) = +1.
                 Nesamp = reform(Ne_ucomp_A(ifl,ind_samp_ucomp))
@@ -649,21 +607,15 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
           tmp = reform(index_sampling_c2_A(ifl,*))
           ind_samp_c2 = where(tmp eq 1)
           if ind_samp_c2[0] ne -1 then begin
+            ;Determine maximum heiht of the fl geometry (apex if closed).
+             rad_fl_max = max(rad_A(ifl,0:Npt_v(ifl)-1))
+            ;Make 1-D array with the actual sampling heights.
              radsamp = reform(rad_A(ifl,ind_samp_c2)) ; Rsun
-            ;Determine radsamp_max (which is the apex in the case of small closed loops,
-            ;                       or even a smaller height if the apex is a ZDA.
-             radsamp_max=max(radsamp)
-             Nradsamp   =n_elements(radsamp)
-            ;Sanity check of radsamp_max
-             if radsamp(0) lt radsamp(Nradsamp-1) and radsamp_max ne radsamp(Nradsamp-1) then STOP
-             if radsamp(0) gt radsamp(Nradsamp-1) and radsamp_max ne radsamp(0)          then STOP
-            ;Determine the min and max rad over which we will actually evaluate the fit.
-             radfit_min =                  min(rad_fit_c2_A)
-             radfit_max = min([radsamp_max,max(rad_fit_c2_A)]) 
-            ;Determine range of rad_fit_[instrument] over which we will actually evaluate the fit.
-             range_fit = where(rad_fit_c2_A ge radfit_min AND rad_fit_c2_A le radfit_max)
+            ;Determine critical fit heights and range
+             determine_fit_critical_parameters, radsamp=radsamp, rad_fit=rad_fit_c2_A, $
+                                                radfit_min=radfit_min, radfit_max=radfit_max, range_fit=range_fit
             ;Test if there is proper coverage of actual sample data for a decent least squares fit.
-             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, covgflag=covgflag
+             test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, rad_fl_max=rad_fl_max, covgflag=covgflag
              if covgflag eq 'yes' then begin
                 fitflag_c2_A(ifl) = +1.
                 Nesamp = reform(Ne_c2_A(ifl,ind_samp_c2))
