@@ -144,7 +144,7 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
              fitgrid_euvia_hdr_A = *trace_data. fitgrid_euvia_hdr
              fitgrid_euvia_A     = *trace_data. fitgrid_euvia
           endif
-   endif
+       endif
 
   if keyword_set(euvib) then begin
                 Ne_euvib_A = *trace_data.Ne_euvib 
@@ -177,7 +177,8 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
              fitgrid_euvib_hdr_A = *trace_data. fitgrid_euvib_hdr
              fitgrid_euvib_A     = *trace_data. fitgrid_euvib
           endif
-  endif
+       endif
+  
 
   if keyword_set(eit) then begin
                 Ne_eit_A = *trace_data.Ne_eit 
@@ -210,7 +211,8 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
              fitgrid_eit_hdr_A = *trace_data. fitgrid_eit_hdr
              fitgrid_eit_A     = *trace_data. fitgrid_eit
           endif
-  endif
+       endif
+  
 
   if keyword_set(mk4) then begin
                 Ne_mk4_A = *trace_data.Ne_mk4 
@@ -240,7 +242,8 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
              fitgrid_mk4_hdr_A = *trace_data. fitgrid_mk4_hdr
              fitgrid_mk4_A     = *trace_data. fitgrid_mk4
           endif
-  endif
+       endif
+  
 
   if keyword_set(kcor) then begin
                 Ne_kcor_A = *trace_data.Ne_kcor 
@@ -259,11 +262,12 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
              p2_fit_kcor_A = *trace_data. p2_fit_kcor
           endif
           if keyword_set(opcl) then begin
-          tomgrid_kcor_hdr_A = *trace_data. tomgrid_kcor_hdr
-          tomgrid_kcor_A     = *trace_data. tomgrid_kcor
-          fitgrid_kcor_hdr_A = *trace_data. fitgrid_kcor_hdr
-          fitgrid_kcor_A     = *trace_data. fitgrid_kcor 
-  endif
+             tomgrid_kcor_hdr_A = *trace_data. tomgrid_kcor_hdr
+             tomgrid_kcor_A     = *trace_data. tomgrid_kcor
+             fitgrid_kcor_hdr_A = *trace_data. fitgrid_kcor_hdr
+             fitgrid_kcor_A     = *trace_data. fitgrid_kcor
+          endif
+       endif
 
   if keyword_set(ucomp) then begin
                 Ne_ucomp_A = *trace_data.Ne_ucomp 
@@ -317,6 +321,8 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
           endif
   endif
 
-  return
-end
+    return    
+ end
+
+  
 

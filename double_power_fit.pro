@@ -31,8 +31,8 @@ pro double_power_fit, radsamp, Nesamp, A, chisq, weighted=weighted
                        function_name='function_double_power_law',$
                        status=status, iter=iter, chisq=chisq, itmax=100, /double)
 
-  test = finite(A,/NAN)
-  if test(0) eq 1 then stop ; sucede si el determinante es nulo
+ ;test = finite(A,/NAN)
+ ;if test(0) eq 1 then stop ; sucede si el determinante es nulo
   
   return
 end
