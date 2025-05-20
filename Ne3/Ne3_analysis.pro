@@ -1,4 +1,4 @@
-pro Ne3_analysis
+pro Ne3_analysis, load=load
 
     common data, N_fl, Npt_max, Npt_v, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, WT_aia_A, ldem_flag_aia_A, index_aia_A, index_sampling_aia_A,$
@@ -37,18 +37,22 @@ pro Ne3_analysis
      tomgrid_c2_hdr_A,tomgrid_c2_A,fitgrid_c2_hdr_A,fitgrid_c2_A,$
      leg_label_A
 
-    dir = '/data1/DATA/trace_tom_files/CR2254/field_lines_geometry_aunifgrid_1.15Rs_1x1deg/'
+    dir = '/data1/DATA/trace_tom_files/CR2254/field_lines_geometry_aunifgrid_1.15Rs_5x5deg/'
     structure_filename='fdips_field_150x180x360_mrmqs220221t2004c2254_000.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
-    
+
+    if keyword_set(load) then $
     load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data,/aia,/ucomp,/kcor,/opcl
 
 ; Define boxes of footpoint Lat/Lot to analyze
-    Nbox = 1
+    Nbox = 2
     LonLimits = fltarr(Nbox,2)
     LatLimits = fltarr(Nbox,2)
-   ;Box-0: Streamer
-    LonLimits(0,*) = [  0., 180.]
-    LatLimits(0,*) = [-80.,+ 80.]
+   ;Box-0: 
+    LonLimits(0,*) = [  0.,  90.]
+    LatLimits(0,*) = [-30.,+ 30.]
+   ;Box-1: 
+    LonLimits(1,*) = [ 100., 150.]
+    LatLimits(1,*) = [+ 60.,+ 80.]
 
 ; Determine the Lat and Lon of the footppoint of each field line.
 ; 1D Arrays: radial index corresponding to Rmin and Rmax for each field line:
@@ -60,7 +64,7 @@ pro Ne3_analysis
     for ifl = 0,N_fl-1 do Footpoint_Lon(ifl) = lon_A(ifl,irmin[ifl])
     for ifl = 0,N_fl-1 do Footpoint_Lat(ifl) = lat_A(ifl,irmin[ifl])
 
-stop
+    
 ; Tag each field line (ifl) with the BOX number (ibox) to which it belongs.
 ; If tag is -1 the line footpoint is not within any BOX.
     line_boxID  = intarr(N_fl) - 1.
@@ -78,16 +82,57 @@ loadct,0
 !p.color=0
 !p.background=255
 csz=1
-plot,lon_A,lat_A,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=csz,title=strmid(structure_filename,0,17)+'  r = 1.0 Rs',ytitle='Carrington Latitude [deg]'
-ctbl = 12 ; 16-LEVEL
-colors = 16 + 190 * (indgen(Ngroups))/float(Ngroups-1)
-loadct,ctbl
-for ifl=0,N_fl-1 do oplot,[Footpoint_Lon(ifl)],[Footpoint_Lat(ifl)],psym=4,color=colors(line_boxID(ifl)),th=2
+plot,lon_A,lat_A,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=csz,title='Location of footpoints',ytitle='Carrington Latitude [deg]'
+oplot,Footpoint_Lon,Footpoint_Lat,psym=4
+loadct,12
+green =  16
+blue  = 100
+red   = 200
+ibox = 0
+ifl  = where(line_boxID eq ibox)
+oplot,Footpoint_Lon(ifl),Footpoint_Lat(ifl),psym=4,th=2,color=red
+ibox = 1
+ifl  = where(line_boxID eq ibox)
+oplot,Footpoint_Lon(ifl),Footpoint_Lat(ifl),psym=4,th=2,color=blue
 loadct,0
 !p.multi=0
 ps2
 
-    stop
+;---- Tag field lines for which the fit is positive at all heights ----
+   tag_pos = fltarr(N_fl)
+   for ifl=0,N_fl-1 do begin
+      if min(Ne_fit_aia_A(ifl,*)) gt 0. then tag_pos(ifl)=+1
+   endfor
+;----------------------------------------------------------------------
+scN_crit = 0.2
+Ne_fit_aia_BoxAvg = fltarr(Nbox,n_elements(rad_fit_aia_A))
+for ibox=0,Nbox-1 do begin
+   ifl = where(line_BoxID eq ibox AND fitflag_AIA_A eq +1 AND tag_pos eq +1 AND scN_fit_aia_A le scN_crit)
+   if ifl(0) ne -1 then begin
+      Ne_fit_aia_BoxAvg(ibox,*) = total( Ne_fit_aia_A(ifl,*) , 1 ) / float(n_elements(ifl))
+   endif
+   if ifl(0) eq -1 then stop
+endfor
+
+for ibox=0,Nbox-1 do begin
+   window,ibox
+   plot,rad_fit_aia_A,Ne_fit_aia_BoxAvg(ibox,*)/1.e8,xr=[1.09,1.21],yr=[0.6,1.4],xstyle=1,ystyle=1
+endfor
+
+stop
 
     return
  end
+
+PRO ps1,archivo
+set_plot,'ps'
+device,filename=archivo,bits_per_pixel=8,/color,/encapsulated
+return
+end
+
+PRO ps2
+device,/close
+set_plot,'x'
+!p.multi=0
+return
+end
