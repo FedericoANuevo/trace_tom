@@ -1,4 +1,4 @@
-pro Ne3_analysis, load=load
+pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits
 
     common data, N_fl, Npt_max, Npt_v, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, WT_aia_A, ldem_flag_aia_A, index_aia_A, index_sampling_aia_A,$
@@ -45,8 +45,8 @@ pro Ne3_analysis, load=load
     load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data,/aia,/ucomp,/kcor,/opcl
 
 ; Define box of footpoint Lat/Lot to analyze
-    LonLimits = [  0., 180.]
-    LatLimits = [-60.,+ 60.]
+  if not keyword_set(LonLimits) then LonLimits = [  0., 360.]
+  if not keyword_set(LatLimits) then LatLimits = [-90.,+ 90.]
 
 ; Tag +1 field lines with footpoints within the BOX.
 ; If tag is -1 the line footpoint is not within BOX.
