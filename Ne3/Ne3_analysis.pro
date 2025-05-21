@@ -1,4 +1,4 @@
-pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits
+pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, plot_filename_suffix=plot_filename_suffix
 
     common data, N_fl, Npt_max, Npt_v, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, WT_aia_A, ldem_flag_aia_A, index_aia_A, index_sampling_aia_A,$
@@ -44,24 +44,44 @@ pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits
     if keyword_set(load) then $
     load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data,/aia,/ucomp,/kcor,/opcl
 
+; Define plot filename suffix
+  if not keyword_set(plot_filename_suffix) then plot_filename_suffix='footpoints-map'
+
 ; Define box of footpoint Lat/Lot to analyze
   if not keyword_set(LonLimits) then LonLimits = [  0., 360.]
   if not keyword_set(LatLimits) then LatLimits = [-90.,+ 90.]
 
-; Tag +1 field lines with footpoints within the BOX.
-; If tag is -1 the line footpoint is not within BOX.
-    tag_box  = intarr(N_fl) - 1
+; Tag field lines with footpoints within the BOX.
+    tag_box_A = fltarr(N_fl) - 678.
     ifl_A = where( (Footpoint_Lon_A ge LonLimits(0) AND Footpoint_Lon_A le LonLimits(1)) AND $
                    (Footpoint_Lat_A ge LatLimits(0) AND Footpoint_Lat_A le LatLimits(1)) )
-    tag_box(ifl_A) = +1
+    tag_box_A(ifl_A) = +1.
 
+; Tag field lines for which the fit is positive at all heights.
+; Also,
+; Tag field lines for which the fit is positive at least for Nsamp
+; points below and Nsamp above R_crit, as defined next.
+Nsamp  = 2
+r_crit = 1.15 ; Rsun
+tag_pos_A        = fltarr(N_fl) - 678.
+tag_fullrange_A  = fltarr(N_fl) - 678.
+for ifl=0,N_fl-1 do begin
+   ifitpos = where(reform(Ne_fit_aia_A(ifl,*)) gt 0.)
+   if ifitpos(0) ne -1 then begin
+      if n_elements(ifitpos) eq n_elements(rad_fit_aia_A)             then tag_pos_A      (ifl) = +1.
+      if n_elements(where(rad_fit_aia_A(ifitpos) lt r_crit)) ge Nsamp AND  $
+         n_elements(where(rad_fit_aia_A(ifitpos) gt r_crit)) ge Nsamp then tag_fullrange_A(ifl) = +1.
+   endif
+endfor
+
+;-----------------PLOTS SECTION--------------------------------------------------------------
 ; Define a few color codes.
 blue  = 100
 red   = 200
 green =  16
 
 ; Lat/Lon plots of FootPoints
-ps1,'./'+structure_filename+'_footpoints-map.eps'
+ps1,'./'+structure_filename+'_'+plot_filename_suffix+'.eps'
 np=1000
 !p.multi=[0,1,2]
 loadct,0
@@ -75,23 +95,46 @@ oplot,Footpoint_Lon_A,Footpoint_Lat_A,psym=4
 
 loadct,12
 ; Highlight in blue field lines with footpoints within BOX.
-ifl_A  = where(tag_box eq +1)
+ifl_A  = where(tag_box_A eq +1)
 oplot,Footpoint_Lon_A(ifl_A),Footpoint_Lat_A(ifl_A),psym=4,th=2,color=blue
 
-; Tag field lines for which the fit is positive at all heights
-tag_pos = fltarr(N_fl)
-for ifl=0,N_fl-1 do begin
-   if min(Ne_fit_aia_A(ifl,*)) gt 0. then tag_pos(ifl)=+1
-endfor
-
-; Highlight in red Box field lines for which tag_pos = +1 and scN < scN_crit
+; Set a maximum threshold for scN
 scN_crit = 0.2
-ifl_A = where(tag_box eq +1 AND fitflag_AIA_A eq +1 AND tag_pos eq +1 AND scN_fit_aia_A le scN_crit)
-oplot,Footpoint_Lon_A(ifl_A),Footpoint_Lat_A(ifl_A),psym=4,th=2,color=red
 
-; Compute and plot the average Ne(r) of the blue field lines
-Ne_fit_aia_Avg = fltarr(n_elements(rad_fit_aia_A))
+goto,skip_tag_pos_A
+; Highlight in red Box field lines for which tag_pos_A = +1 and there is a fit with scN < scN_crit
+ifl_A = where(tag_box_A eq +1 AND tag_pos_A eq +1 AND fitflag_AIA_A eq +1 AND scN_fit_aia_A le scN_crit)
+oplot,Footpoint_Lon_A(ifl_A),Footpoint_Lat_A(ifl_A),psym=4,th=2,color=red
+; Compute and plot the average Ne(r) of the RED field lines
+Ne_fit_aia_Avg = fltarr(n_elements(rad_fit_aia_A)) - 678.
 Ne_fit_aia_Avg = total( Ne_fit_aia_A(ifl_A,*) , 1 ) / float(n_elements(ifl_A))
+skip_tag_pos_A:
+
+;goto,skip_tag_fullrange
+; Highlight in red Box field lines for which tag_fullrange_A = +1 and there is a fit with scN < scN_crit
+ifl_A = where(tag_box_A eq +1 AND tag_fullrange_A eq +1 AND fitflag_AIA_A eq +1 AND scN_fit_aia_A le scN_crit)
+oplot,Footpoint_Lon_A(ifl_A),Footpoint_Lat_A(ifl_A),psym=4,th=2,color=red
+; Compute and plot the average Ne(r) of the RED field lines
+Ne_fit_aia_Avg = fltarr(n_elements(rad_fit_aia_A)) - 678.
+index_selected_A = intarr(N_fl)
+for ir=0,n_elements(rad_fit_aia_A)-1 do begin
+   Nptsavg = 0
+   for ifl=0,N_fl-1 do begin
+      if tag_box_A[ifl] eq +1 AND tag_fullrange_A[ifl] eq +1 AND fitflag_AIA_A[ifl] eq +1 AND scN_fit_aia_A[ifl] le scN_crit then begin
+         index_selected_A(ifl) = +1
+         if Ne_fit_aia_A(ifl,ir) gt 0. then begin
+            Nptsavg = Nptsavg + 1
+            Ne_fit_aia_Avg(ir) = Ne_fit_aia_Avg(ir) + Ne_fit_aia_A(ifl,ir)
+         endif
+      endif      
+   endfor ; ifl
+   Ne_fit_aia_Avg(ir) = Ne_fit_aia_Avg(ir) / float(Nptsavg)
+endfor ; ir
+ifl_A = where(index_selected_A eq +1)
+oplot,Footpoint_Lon_A(ifl_A),Footpoint_Lat_A(ifl_A),psym=4,th=2,color=red
+skip_tag_fullrange:
+
+; Plot the average Ne(r)
 plot,rad_fit_aia_A,Ne_fit_aia_Avg/1.e8,charsize=csz,font=0,$
      title='Average N!De!N(r) of red-colored field lines',$
      ytitle = 'Ne(r) [x 10!U8!N cm!U-3!N]',ystyle=1,$
