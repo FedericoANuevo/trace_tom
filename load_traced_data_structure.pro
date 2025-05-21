@@ -64,7 +64,8 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
      tomgrid_kcor_hdr_A,tomgrid_kcor_A,fitgrid_kcor_hdr_A,fitgrid_kcor_A,$
      tomgrid_ucomp_hdr_A,tomgrid_ucomp_A,fitgrid_ucomp_hdr_A,fitgrid_ucomp_A,$
      tomgrid_c2_hdr_A,tomgrid_c2_A,fitgrid_c2_hdr_A,fitgrid_c2_A,$
-     leg_label_A
+     leg_label_A,$
+     Footpoint_Rad_A, Footpoint_Lon_A, Footpoint_Lat_A
   
   restore, filename = dir + structure_filename
 
@@ -79,6 +80,20 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
   lon_A   = *trace_data.lon
 
   if keyword_set(opcl) then leg_label_A = *trace_data.leg_label
+
+; Determine the Rad, Lat and Lon of the footppoint of each field line.
+; 1D Arrays: radial index corresponding to Rmin for each field line:
+  irmin=intarr(N_fl)
+  for i=0,N_fl-1 do irmin(i)=where(abs(rad_A(i,*)) eq min(abs(rad_A(i,*))))
+; 1D Arrays: Footpoint Lon and Lat for each field line:
+  Footpoint_Rad_A = fltarr(N_fl)
+  Footpoint_Lon_A = fltarr(N_fl)
+  Footpoint_Lat_A = fltarr(N_fl)
+  for ifl = 0,N_fl-1 do begin
+     Footpoint_Rad_A(ifl) = rad_A(ifl,irmin[ifl])
+     Footpoint_Lon_A(ifl) = lon_A(ifl,irmin[ifl])
+     Footpoint_Lat_A(ifl) = lat_A(ifl,irmin[ifl])
+  endfor
   
   if keyword_set(aia) then begin
                 Ne_aia_A = *trace_data.Ne_aia 

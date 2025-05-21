@@ -1,4 +1,4 @@
-pro Ne3_analysis, load=load, footpoints=footpoints
+pro Ne3_analysis, load=load
 
     common data, N_fl, Npt_max, Npt_v, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, WT_aia_A, ldem_flag_aia_A, index_aia_A, index_sampling_aia_A,$
@@ -35,37 +35,24 @@ pro Ne3_analysis, load=load, footpoints=footpoints
      tomgrid_kcor_hdr_A,tomgrid_kcor_A,fitgrid_kcor_hdr_A,fitgrid_kcor_A,$
      tomgrid_ucomp_hdr_A,tomgrid_ucomp_A,fitgrid_ucomp_hdr_A,fitgrid_ucomp_A,$
      tomgrid_c2_hdr_A,tomgrid_c2_A,fitgrid_c2_hdr_A,fitgrid_c2_A,$
-     leg_label_A
-
+     leg_label_A,$
+     Footpoint_Rad_A, Footpoint_Lon_A, Footpoint_Lat_A
+  
     dir = '/data1/DATA/trace_tom_files/CR2254/field_lines_geometry_aunifgrid_1.15Rs_5x5deg/'
     structure_filename='fdips_field_150x180x360_mrmqs220221t2004c2254_000.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
 
     if keyword_set(load) then $
     load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data,/aia,/ucomp,/kcor,/opcl
 
-;   Determine the Rad, Lat and Lon of the footppoint of each field line.
-;   1D Arrays: radial index corresponding to Rmin for each field line:
-    if keyword_set(footpoints) then begin
-       irmin=intarr(N_fl)
-       for i=0,N_fl-1 do irmin(i)=where(abs(rad_A(i,*)) eq min(abs(rad_A(i,*))))
-;      1D Arrays: Footpoint Lon and Lat for each field line:
-       Footpoint_Rad = fltarr(N_fl)
-       Footpoint_Lon = fltarr(N_fl)
-       Footpoint_Lat = fltarr(N_fl)
-       for ifl = 0,N_fl-1 do Footpoint_Rad(ifl) = rad_A(ifl,irmin[ifl])
-       for ifl = 0,N_fl-1 do Footpoint_Lon(ifl) = lon_A(ifl,irmin[ifl])
-       for ifl = 0,N_fl-1 do Footpoint_Lat(ifl) = lat_A(ifl,irmin[ifl])
-    endif
-    
 ; Define box of footpoint Lat/Lot to analyze
-    LonLimits = [  0., 360.]
+    LonLimits = [  0., 180.]
     LatLimits = [-60.,+ 60.]
 
 ; Tag +1 field lines with footpoints within the BOX.
 ; If tag is -1 the line footpoint is not within BOX.
     tag_box  = intarr(N_fl) - 1
-    ifl_A = where( (Footpoint_Lon ge LonLimits(0) AND Footpoint_Lon le LonLimits(1)) AND $
-                   (Footpoint_Lat ge LatLimits(0) AND Footpoint_Lat le LatLimits(1)) )
+    ifl_A = where( (Footpoint_Lon_A ge LonLimits(0) AND Footpoint_Lon_A le LonLimits(1)) AND $
+                   (Footpoint_Lat_A ge LatLimits(0) AND Footpoint_Lat_A le LatLimits(1)) )
     tag_box(ifl_A) = +1
 
 ; Define a few color codes.
@@ -84,12 +71,12 @@ loadct,0
 csz=1
 plot,lon_A,lat_A,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=csz,$
      title='Location of footpoints',ytitle='Carrington Latitude [deg]',font=0
-oplot,Footpoint_Lon,Footpoint_Lat,psym=4
+oplot,Footpoint_Lon_A,Footpoint_Lat_A,psym=4
 
 loadct,12
 ; Highlight in blue field lines with footpoints within BOX.
 ifl_A  = where(tag_box eq +1)
-oplot,Footpoint_Lon(ifl_A),Footpoint_Lat(ifl_A),psym=4,th=2,color=blue
+oplot,Footpoint_Lon_A(ifl_A),Footpoint_Lat_A(ifl_A),psym=4,th=2,color=blue
 
 ; Tag field lines for which the fit is positive at all heights
 tag_pos = fltarr(N_fl)
@@ -100,7 +87,7 @@ endfor
 ; Highlight in red Box field lines for which tag_pos = +1 and scN < scN_crit
 scN_crit = 0.2
 ifl_A = where(tag_box eq +1 AND fitflag_AIA_A eq +1 AND tag_pos eq +1 AND scN_fit_aia_A le scN_crit)
-oplot,Footpoint_Lon(ifl_A),Footpoint_Lat(ifl_A),psym=4,th=2,color=red
+oplot,Footpoint_Lon_A(ifl_A),Footpoint_Lat_A(ifl_A),psym=4,th=2,color=red
 
 ; Compute and plot the average Ne(r) of the blue field lines
 Ne_fit_aia_Avg = fltarr(n_elements(rad_fit_aia_A))
