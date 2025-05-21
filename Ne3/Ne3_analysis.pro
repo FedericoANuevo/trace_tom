@@ -62,7 +62,7 @@ pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, plot_file
 ; Tag field lines for which the fit is positive at least for Nsamp
 ; points below and Nsamp above R_crit, as defined next.
 Nsamp  = 2
-r_crit = 1.15 ; Rsun
+r_crit = median(rad_fit_aia_A) ; 1.15 ; Rsun
 tag_pos_A        = fltarr(N_fl) - 678.
 tag_fullrange_A  = fltarr(N_fl) - 678.
 for ifl=0,N_fl-1 do begin
