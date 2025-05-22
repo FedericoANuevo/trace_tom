@@ -8,6 +8,7 @@ pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, plot_file
      Ne_eit_A, Tm_eit_A, WT_eit_A, ldem_flag_eit_A, index_eit_A, index_sampling_eit_A,$
      Ne_mk4_A, index_mk4_A, index_sampling_mk4_A,$
      Ne_kcor_A, index_kcor_A, index_sampling_kcor_A,$
+     Ne_ucomp_A, index_ucomp_A, index_sampling_ucomp_A,$
      Ne_c2_A, index_c2_A, index_sampling_c2_A,$
      rad_fit_aia_A, Ne_fit_aia_A, Tm_fit_aia_A, fitflag_aia_A,scN_fit_aia_A,scT_fit_aia_A,$
      rad_fit_euvia_A, Ne_fit_euvia_A, Tm_fit_euvia_A, fitflag_euvia_A,scN_fit_euvia_A,scT_fit_euvia_A,$
@@ -185,7 +186,6 @@ if keyword_set(ucomp) then begin
 endif
 skip_tag_pos:
 
-
 goto,skip_tag_fullrange
 ; Highlight in red Box field lines for which tag_fullrange_A = +1 and there is a fit with scN < scN_crit
 ifl_A = where(tag_box_A eq +1 AND tag_fullrange_A eq +1 AND fitflag_AIA_A eq +1 AND scN_fit_aia_A le scN_crit)
@@ -213,18 +213,19 @@ skip_tag_fullrange:
 ; Plot the average Ne(r) for all selected instruments.
 
 xrange = [1.095,1.195]
-yrange = [0.63,1.33]
-unit   = 1.e8 & unit_power_str = '8'
-plot,rad_fit_aia_A,Ne_fit_aia_Avg/unit,charsize=csz,font=0,$
+yrange = [0.63 ,1.33 ]
+unit           = 1.e8
+unit_power_str =   '8'
+plot,rad_fit_kcor_A,Ne_fit_kcor_A(0,*)/unit,charsize=csz,font=0,$
      title='Average N!De!N(r) along red-colored field lines',$
      ytitle = 'Ne(r) [x 10!U'+unit_power_str+'!N cm!U-3!N]',yr=yrange,ystyle=1,$
      xtitle = 'r [Rsun]'                                   ,xr=xrange,xstyle=1,$
      /nodata
 
 loadct,12
-if keyword_set(aia)   then oplot,rad_fit_aia_A  ,Ne_fit_aia_Avg  /unit,color=blue
-if keyword_set(kcor)  then oplot,rad_fit_kcor_A ,Ne_fit_kcor_Avg /unit,color=red
-if keyword_set(ucomp) then oplot,rad_fit_ucomp_A,Ne_fit_ucomp_Avg/unit,color=green
+if keyword_set(aia)   then oplot,rad_fit_aia_A  ,Ne_fit_aia_Avg  /unit,color=blue ,th=2
+if keyword_set(kcor)  then oplot,rad_fit_kcor_A ,Ne_fit_kcor_Avg /unit,color=red  ,th=2
+if keyword_set(ucomp) then oplot,rad_fit_ucomp_A,Ne_fit_ucomp_Avg/unit,color=green,th=2
 loadct,0
 !p.multi=0
 ps2

@@ -114,8 +114,7 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
      Ne_ucomp_A    = fltarr(N_fl,Npt_max) + default
      index_ucomp_A = intarr(N_fl,Npt_max) + default
      index_sampling_ucomp_A = intarr(N_fl,Npt_max) + default
-  endif
-  
+  endif  
   if keyword_set(lascoc2) then begin
      Ne_c2_A    = fltarr(N_fl,Npt_max) + default
      index_c2_A = intarr(N_fl,Npt_max) + default
