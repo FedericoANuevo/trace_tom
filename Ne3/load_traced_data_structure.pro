@@ -43,6 +43,8 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
      rad_fit_eit_A, Ne_fit_eit_A, Tm_fit_eit_A, fitflag_eit_A,scN_fit_eit_A,scT_fit_eit_A,$
      rad_fit_c2_A, Ne_fit_c2_A, fitflag_c2_A,scN_fit_c2_A,$
      rad_fit_mk4_A, Ne_fit_mk4_A, fitflag_mk4_A,scN_fit_mk4_A,$
+     rad_fit_kcor_A, Ne_fit_kcor_A, fitflag_kcor_A,scN_fit_kcor_A,$
+     rad_fit_ucomp_A, Ne_fit_ucomp_A, fitflag_ucomp_A,scN_fit_ucomp_A,$
      N0_fit_aia_A,lN_fit_aia_A,T0_fit_aia_A,dTdr_fit_aia_A,$
      N0_fit_euvia_A,lN_fit_euvia_A,T0_fit_euvia_A,dTdr_fit_euvia_A,$
      N0_fit_euvib_A,lN_fit_euvib_A,T0_fit_euvib_A,dTdr_fit_euvib_A,$

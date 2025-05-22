@@ -1,4 +1,5 @@
-pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, plot_filename_suffix=plot_filename_suffix
+pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, plot_filename_suffix=plot_filename_suffix,$
+                  aia=aia, kcor=kcor, ucomp=ucomp
 
     common data, N_fl, Npt_max, Npt_v, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, WT_aia_A, ldem_flag_aia_A, index_aia_A, index_sampling_aia_A,$
@@ -14,6 +15,8 @@ pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, plot_file
      rad_fit_eit_A, Ne_fit_eit_A, Tm_fit_eit_A, fitflag_eit_A,scN_fit_eit_A,scT_fit_eit_A,$
      rad_fit_c2_A, Ne_fit_c2_A, fitflag_c2_A,scN_fit_c2_A,$
      rad_fit_mk4_A, Ne_fit_mk4_A, fitflag_mk4_A,scN_fit_mk4_A,$
+     rad_fit_kcor_A, Ne_fit_kcor_A, fitflag_kcor_A,scN_fit_kcor_A,$
+     rad_fit_ucomp_A, Ne_fit_ucomp_A, fitflag_ucomp_A,scN_fit_ucomp_A,$
      N0_fit_aia_A,lN_fit_aia_A,T0_fit_aia_A,dTdr_fit_aia_A,$
      N0_fit_euvia_A,lN_fit_euvia_A,T0_fit_euvia_A,dTdr_fit_euvia_A,$
      N0_fit_euvib_A,lN_fit_euvib_A,T0_fit_euvib_A,dTdr_fit_euvib_A,$
@@ -57,21 +60,72 @@ pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, plot_file
                    (Footpoint_Lat_A ge LatLimits(0) AND Footpoint_Lat_A le LatLimits(1)) )
     tag_box_A(ifl_A) = +1.
 
-; Tag field lines for which the fit is positive at all heights.
+; Tag field lines for which the fit is positive at all heights below
+; R_max, as defined below.
 ; Also,
 ; Tag field lines for which the fit is positive at least for Nsamp
-; points below and Nsamp above R_crit, as defined next.
-Nsamp  = 2
-r_crit = median(rad_fit_aia_A) ; 1.15 ; Rsun
-tag_pos_A        = fltarr(N_fl) - 678.
-tag_fullrange_A  = fltarr(N_fl) - 678.
+; points below R_crit, and for Nsamp values in range [R_crit,R_max],
+; as defined next.
+Nsamp = 2
+; Set R_crit and R_max using the "bottleneck" instrument, achieved by organizing
+; these conditionals in increasing "bottleneckless".
+;
+if keyword_set(kcor ) then begin
+   r_crit = median(rad_fit_kcor_A )
+   r_max  = max   (rad_fit_kcor_A )
+endif
+if keyword_set(aia  ) then begin
+   r_crit = median(rad_fit_aia_A  )
+   r_max  = max   (rad_fit_aia_A  )
+endif
+if keyword_set(ucomp) then begin
+   r_crit = median(rad_fit_ucomp_A)
+   r_max  = max   (rad_fit_ucomp_A)
+endif
+;
+tag_pos_aia_A          = fltarr(N_fl) - 678.
+tag_fullrange_aia_A    = fltarr(N_fl) - 678.
+tag_pos_kcor_A         = fltarr(N_fl) - 678.
+tag_fullrange_kcor_A   = fltarr(N_fl) - 678.
+tag_pos_ucomp_A        = fltarr(N_fl) - 678.
+tag_fullrange_ucomp_A  = fltarr(N_fl) - 678.
 for ifl=0,N_fl-1 do begin
-   ifitpos = where(reform(Ne_fit_aia_A(ifl,*)) gt 0.)
-   if ifitpos(0) ne -1 then begin
-      if n_elements(ifitpos) eq n_elements(rad_fit_aia_A)             then tag_pos_A      (ifl) = +1.
-      if n_elements(where(rad_fit_aia_A(ifitpos) lt r_crit)) ge Nsamp AND  $
-         n_elements(where(rad_fit_aia_A(ifitpos) gt r_crit)) ge Nsamp then tag_fullrange_A(ifl) = +1.
-   endif
+   if keyword_set(aia) then begin
+      ifitpos_aia = where(reform(Ne_fit_aia_A  (ifl,*)) gt 0. and rad_fit_aia_A le R_max)
+      ifitrad_aia = where(rad_fit_aia_A le R_max) 
+      if ifitpos_aia(0) ne -1 then begin
+         if n_elements(ifitpos_aia) eq n_elements(ifitrad_aia) then tag_pos_aia_A(ifl) = +1.
+         if n_elements(where(rad_fit_aia_A(ifitpos_aia) lt r_crit))                                         ge Nsamp AND  $
+            n_elements(where(rad_fit_aia_A(ifitpos_aia) gt r_crit AND rad_fit_aia_A(ifitpos_aia) lt r_max)) ge Nsamp then tag_fullrange_aia_A(ifl) = +1.
+      endif
+   endif else begin
+      tag_pos_aia_A(ifl) = +1
+      tag_fullrange_aia_A(ifl) = +1
+   endelse
+   if keyword_set(kcor) then begin
+      ifitpos_kcor = where(reform(Ne_fit_kcor_A (ifl,*)) gt 0. and rad_fit_kcor_A le R_max)
+      ifitrad_kcor = where(rad_fit_kcor_A le R_max) 
+      if ifitpos_kcor(0) ne -1 then begin
+         if n_elements(ifitpos_kcor) eq n_elements(ifitrad_kcor) then tag_pos_kcor_A(ifl) = +1.
+         if n_elements(where(rad_fit_kcor_A(ifitpos_kcor) lt r_crit))                                           ge Nsamp AND  $
+            n_elements(where(rad_fit_kcor_A(ifitpos_kcor) gt r_crit AND rad_fit_kcor_A(ifitpos_kcor) lt r_max)) ge Nsamp then tag_fullrange_kcor_A(ifl) = +1.
+      endif
+   endif else begin
+      tag_pos_kcor_A(ifl) = +1
+      tag_fullrange_kcor_A(ifl) = +1
+   endelse
+   if keyword_set(ucomp) then begin
+      ifitpos_ucomp = where(reform(Ne_fit_ucomp_A(ifl,*)) gt 0. and rad_fit_ucomp_A le R_max)
+      ifitrad_ucomp = where(rad_fit_ucomp_A le R_max) 
+      if ifitpos_ucomp(0) ne -1 then begin
+         if n_elements(ifitpos_ucomp) eq n_elements(ifitrad_ucomp) then tag_pos_ucomp_A(ifl) = +1.
+         if n_elements(where(rad_fit_ucomp_A(ifitpos_ucomp) lt r_crit))                                             ge Nsamp AND  $
+            n_elements(where(rad_fit_ucomp_A(ifitpos_ucomp) gt r_crit AND rad_fit_ucomp_A(ifitpos_ucomp) lt r_max)) ge Nsamp then tag_fullrange_ucomp_A(ifl) = +1.
+      endif
+   endif else begin
+      tag_pos_ucomp_A(ifl) = +1
+      tag_fullrange_ucomp_A(ifl) = +1
+   endelse
 endfor
 
 ;-----------------PLOTS SECTION--------------------------------------------------------------
@@ -101,16 +155,38 @@ oplot,Footpoint_Lon_A(ifl_A),Footpoint_Lat_A(ifl_A),psym=4,th=2,color=blue
 ; Set a maximum threshold for scN
 scN_crit = 0.2
 
-goto,skip_tag_pos_A
-; Highlight in red Box field lines for which tag_pos_A = +1 and there is a fit with scN < scN_crit
-ifl_A = where(tag_box_A eq +1 AND tag_pos_A eq +1 AND fitflag_AIA_A eq +1 AND scN_fit_aia_A le scN_crit)
-oplot,Footpoint_Lon_A(ifl_A),Footpoint_Lat_A(ifl_A),psym=4,th=2,color=red
-; Compute and plot the average Ne(r) of the RED field lines
-Ne_fit_aia_Avg = fltarr(n_elements(rad_fit_aia_A)) - 678.
-Ne_fit_aia_Avg = total( Ne_fit_aia_A(ifl_A,*) , 1 ) / float(n_elements(ifl_A))
-skip_tag_pos_A:
+; Highlight in red Box field lines for which tag_pos_INSTRUMENT_A = +1 and there
+; is a fit with scN < scN_crit for all instruments.
+ifl_aia_A   = indgen(N_fl)
+ifl_kcor_A  = indgen(N_fl)
+ifl_ucomp_A = indgen(N_fl)
+if keyword_set(aia)   then ifl_aia_A   = where(tag_box_A eq +1 AND tag_pos_aia_A   eq +1 AND fitflag_aia_A   eq +1 AND scN_fit_aia_A   le scN_crit)
+if keyword_set(kcor)  then ifl_kcor_A  = where(tag_box_A eq +1 AND tag_pos_kcor_A  eq +1 AND fitflag_kcor_A  eq +1 AND scN_fit_kcor_A  le scN_crit)
+if keyword_set(ucomp) then ifl_ucomp_A = where(tag_box_A eq +1 AND tag_pos_ucomp_A eq +1 AND fitflag_ucomp_A eq +1 AND scN_fit_ucomp_A le scN_crit)
+; Make an index array with the common elements of all ifl_INSTRUMENT_A
+                           ifl_A = indgen(N_fl)
+if keyword_set(aia)   then ifl_A = intersect(ifl_A,ifl_aia_A  )
+if keyword_set(kcor)  then ifl_A = intersect(ifl_A,ifl_kcor_A )
+if keyword_set(ucomp) then ifl_A = intersect(ifl_A,ifl_ucomp_A)
 
-;goto,skip_tag_fullrange
+oplot,Footpoint_Lon_A(ifl_A),Footpoint_Lat_A(ifl_A),psym=4,th=2,color=red
+; Compute the average Ne(r) of each instrument for lines indexed ifl_A
+if keyword_set(aia) then begin
+   Ne_fit_aia_Avg = fltarr(n_elements(rad_fit_aia_A)) - 678.
+   Ne_fit_aia_Avg = total( Ne_fit_aia_A(ifl_A,*) , 1 ) / float(n_elements(ifl_A))
+endif
+if keyword_set(kcor) then begin
+   Ne_fit_kcor_Avg = fltarr(n_elements(rad_fit_kcor_A)) - 678.
+   Ne_fit_kcor_Avg = total( Ne_fit_kcor_A(ifl_A,*) , 1 ) / float(n_elements(ifl_A))
+endif
+if keyword_set(ucomp) then begin
+   Ne_fit_ucomp_Avg = fltarr(n_elements(rad_fit_ucomp_A)) - 678.
+   Ne_fit_ucomp_Avg = total( Ne_fit_ucomp_A(ifl_A,*) , 1 ) / float(n_elements(ifl_A))
+endif
+skip_tag_pos:
+
+
+goto,skip_tag_fullrange
 ; Highlight in red Box field lines for which tag_fullrange_A = +1 and there is a fit with scN < scN_crit
 ifl_A = where(tag_box_A eq +1 AND tag_fullrange_A eq +1 AND fitflag_AIA_A eq +1 AND scN_fit_aia_A le scN_crit)
 oplot,Footpoint_Lon_A(ifl_A),Footpoint_Lat_A(ifl_A),psym=4,th=2,color=red
@@ -134,12 +210,21 @@ ifl_A = where(index_selected_A eq +1)
 oplot,Footpoint_Lon_A(ifl_A),Footpoint_Lat_A(ifl_A),psym=4,th=2,color=red
 skip_tag_fullrange:
 
-; Plot the average Ne(r)
-plot,rad_fit_aia_A,Ne_fit_aia_Avg/1.e8,charsize=csz,font=0,$
-     title='Average N!De!N(r) of red-colored field lines',$
-     ytitle = 'Ne(r) [x 10!U8!N cm!U-3!N]',ystyle=1,$
-     xtitle = 'r [Rsun]',xr=[1.095,1.195] ,xstyle=1
+; Plot the average Ne(r) for all selected instruments.
 
+xrange = [1.095,1.195]
+yrange = [0.63,1.33]
+unit   = 1.e8 & unit_power_str = '8'
+plot,rad_fit_aia_A,Ne_fit_aia_Avg/unit,charsize=csz,font=0,$
+     title='Average N!De!N(r) along red-colored field lines',$
+     ytitle = 'Ne(r) [x 10!U'+unit_power_str+'!N cm!U-3!N]',yr=yrange,ystyle=1,$
+     xtitle = 'r [Rsun]'                                   ,xr=xrange,xstyle=1,$
+     /nodata
+
+loadct,12
+if keyword_set(aia)   then oplot,rad_fit_aia_A  ,Ne_fit_aia_Avg  /unit,color=blue
+if keyword_set(kcor)  then oplot,rad_fit_kcor_A ,Ne_fit_kcor_Avg /unit,color=red
+if keyword_set(ucomp) then oplot,rad_fit_ucomp_A,Ne_fit_ucomp_Avg/unit,color=green
 loadct,0
 !p.multi=0
 ps2
