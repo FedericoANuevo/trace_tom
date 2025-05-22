@@ -211,21 +211,20 @@ oplot,Footpoint_Lon_A(ifl_A),Footpoint_Lat_A(ifl_A),psym=4,th=2,color=red
 skip_tag_fullrange:
 
 ; Plot the average Ne(r) for all selected instruments.
-
 xrange = [1.095,1.195]
-yrange = [0.63 ,1.33 ]
-unit           = 1.e8
+yrange = [0.5  ,2.5 ]
+unit           = 1.e8 ; cm-3
 unit_power_str =   '8'
 plot,rad_fit_kcor_A,Ne_fit_kcor_A(0,*)/unit,charsize=csz,font=0,$
-     title='Average N!De!N(r) along red-colored field lines',$
+     title='<N!De!N(r)>   Solid: AIA; Dashed: KOR, Dot-Dashed: UCOMP',$
      ytitle = 'Ne(r) [x 10!U'+unit_power_str+'!N cm!U-3!N]',yr=yrange,ystyle=1,$
      xtitle = 'r [Rsun]'                                   ,xr=xrange,xstyle=1,$
      /nodata
 
 loadct,12
-if keyword_set(aia)   then oplot,rad_fit_aia_A  ,Ne_fit_aia_Avg  /unit,color=blue ,th=2
-if keyword_set(kcor)  then oplot,rad_fit_kcor_A ,Ne_fit_kcor_Avg /unit,color=red  ,th=2
-if keyword_set(ucomp) then oplot,rad_fit_ucomp_A,Ne_fit_ucomp_Avg/unit,color=green,th=2
+if keyword_set(aia)   then oplot,rad_fit_aia_A  ,Ne_fit_aia_Avg  /unit,color=red,th=2
+if keyword_set(kcor)  then oplot,rad_fit_kcor_A ,Ne_fit_kcor_Avg /unit,color=red,th=2,linestyle=2
+if keyword_set(ucomp) then oplot,rad_fit_ucomp_A,Ne_fit_ucomp_Avg/unit,color=red,th=2
 loadct,0
 !p.multi=0
 ps2

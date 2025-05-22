@@ -574,7 +574,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                 p1_fit_ucomp_A(ifl) = A[1] ; dimensionless exponent of power law
                 N2_fit_ucomp_A(ifl) = A[2] ; cm-3
                 p2_fit_ucomp_A(ifl) = A[3] ; dimensionless exponent of power law
-                Ne_fit_ucomp_A(ifl,range_fit) = A[0] * rad_fit_kcor_A(range_fit)^(-A[1]) + A[2] * rad_fit_kcor_A(range_fit)^(-A[3])                   ; cm-3
+                Ne_fit_ucomp_A(ifl,range_fit) = A[0] * rad_fit_ucomp_A(range_fit)^(-A[1]) + A[2] * rad_fit_ucomp_A(range_fit)^(-A[3])                 ; cm-3
              dNedr_fit_ucomp_A(    range_fit) = - A[1]*A[0] * rad_fit_ucomp_A(range_fit)^(-A[1]-1) - A[3]*A[2] * rad_fit_ucomp_A(range_fit)^(-A[3]-1) ; cm-3 / Rsun
              indsamp = where(dNedr_fit_ucomp_A lt 0. AND dNedr_fit_ucomp_A ne default)
                 if n_elements(indsamp) gt n_elements(range_fit)/2. then begin

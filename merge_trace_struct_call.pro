@@ -15,7 +15,7 @@ pro merge_trace_struct_call, nfs1=nfs1, nfs2=nfs2, opcl=opcl
 ; filenames of the ASCII files containing the geometry of each line.
   fl_list = 'fdips_field_150x180x360_mrmqs220221t2004c2254_000.ubdat_fline-filenames_list.txt'
 ; Define field_line_geometry_suffix_dir
-  field_line_geometry_suffix_dir='_aunifgrid_1.15Rs_2x2deg/'
+  field_line_geometry_suffix_dir='_aunifgrid_1.15Rs_5x5deg/'
   if not keyword_set(field_line_geometry_suffix_dir) then $
   field_line_geometry_suffix_dir='/'
 
