@@ -1,5 +1,6 @@
 pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, plot_filename_suffix=plot_filename_suffix,$
-                  aia=aia, kcor=kcor, ucomp=ucomp
+                  aia=aia, kcor=kcor, ucomp=ucomp,$
+                  open=open,closed=closed
 
     common data, N_fl, Npt_max, Npt_v, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, WT_aia_A, ldem_flag_aia_A, index_aia_A, index_sampling_aia_A,$
@@ -61,6 +62,10 @@ pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, plot_file
                    (Footpoint_Lat_A ge LatLimits(0) AND Footpoint_Lat_A le LatLimits(1)) )
     tag_box_A(ifl_A) = +1.
 
+; Create index arrays for closed and open field lines.
+  ifl_closed_A = where(leg_label_A ne 0)
+  ifl_open_A   = where(leg_label_A eq 0)
+    
 ; Tag field lines for which the fit is positive at all heights below
 ; R_max, as defined below.
 ; Also,
@@ -68,8 +73,8 @@ pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, plot_file
 ; points below R_crit, and for Nsamp values in range [R_crit,R_max],
 ; as defined next.
 Nsamp = 2
-; Set R_crit and R_max using the "bottleneck" instrument, achieved by organizing
-; these conditionals in increasing "bottleneckless".
+; Set two parameters, named R_crit and R_max, using the "bottleneck" instrument,
+; achieved by organizing these conditionals in increasing "bottleneckless".
 ;
 if keyword_set(kcor ) then begin
    r_crit = median(rad_fit_kcor_A )
@@ -150,13 +155,14 @@ oplot,Footpoint_Lon_A,Footpoint_Lat_A,psym=4
 
 loadct,12
 ; Highlight in blue field lines with footpoints within BOX.
-ifl_A  = where(tag_box_A eq +1)
-oplot,Footpoint_Lon_A(ifl_A),Footpoint_Lat_A(ifl_A),psym=4,th=2,color=blue
+; ifl_A  = where(tag_box_A eq +1)
+; oplot,Footpoint_Lon_A(ifl_A),Footpoint_Lat_A(ifl_A),psym=4,th=2,color=blue
 
 ; Set a maximum threshold for scN
 scN_crit = 0.2
 
-; Highlight in red Box field lines for which tag_pos_INSTRUMENT_A = +1 and there
+; Highlight in green/blue/red:  all/closed/open field lines within the
+; selected box, for which tag_pos_INSTRUMENT_A = +1 and there
 ; is a fit with scN < scN_crit for all instruments.
 ifl_aia_A   = indgen(N_fl)
 ifl_kcor_A  = indgen(N_fl)
@@ -169,8 +175,15 @@ if keyword_set(ucomp) then ifl_ucomp_A = where(tag_box_A eq +1 AND tag_pos_ucomp
 if keyword_set(aia)   then ifl_A = intersect(ifl_A,ifl_aia_A  )
 if keyword_set(kcor)  then ifl_A = intersect(ifl_A,ifl_kcor_A )
 if keyword_set(ucomp) then ifl_A = intersect(ifl_A,ifl_ucomp_A)
+; Intersect with CLOSED or OPEN, if so requested
+if keyword_set(closed) then ifl_A = intersect(ifl_A,ifl_closed_A)
+if keyword_set(open)   then ifl_A = intersect(ifl_A,ifl_open_A  )
+; Now select the color and plot footpoints
+if NOT keyword_set(closed) and NOT keyword_set(open) then color = green 
+if     keyword_set(closed)                           then color = blue
+if                                 keyword_set(open) then color = red  
+oplot,Footpoint_Lon_A(ifl_A),Footpoint_Lat_A(ifl_A),psym=4,th=2,color=color
 
-oplot,Footpoint_Lon_A(ifl_A),Footpoint_Lat_A(ifl_A),psym=4,th=2,color=red
 ; Compute the average Ne(r) of each instrument for lines indexed ifl_A
 if keyword_set(aia) then begin
    Ne_fit_aia_Avg = fltarr(n_elements(rad_fit_aia_A)) - 678.
@@ -212,7 +225,7 @@ skip_tag_fullrange:
 
 ; Plot the average Ne(r) for all selected instruments.
 xrange = [1.095,1.195]
-yrange = [0.6  ,1.8 ]
+yrange = [0.6,1.6]
 unit           = 1.e8 ; cm-3
 unit_power_str =   '8'
 plot,rad_fit_kcor_A,Ne_fit_kcor_A(0,*)/unit,charsize=csz,font=0,$
@@ -222,9 +235,9 @@ plot,rad_fit_kcor_A,Ne_fit_kcor_A(0,*)/unit,charsize=csz,font=0,$
      /nodata
 
 loadct,12
-if keyword_set(aia)   then oplot,rad_fit_aia_A  ,Ne_fit_aia_Avg  /unit,color=red,th=2
-if keyword_set(kcor)  then oplot,rad_fit_kcor_A ,Ne_fit_kcor_Avg /unit,color=red,th=2,linestyle=2
-if keyword_set(ucomp) then oplot,rad_fit_ucomp_A,Ne_fit_ucomp_Avg/unit,color=red,th=2,linestyle=3
+if keyword_set(aia)   then oplot,rad_fit_aia_A  ,Ne_fit_aia_Avg  /unit,color=color,th=2
+if keyword_set(kcor)  then oplot,rad_fit_kcor_A ,Ne_fit_kcor_Avg /unit,color=color,th=2,linestyle=2
+if keyword_set(ucomp) then oplot,rad_fit_ucomp_A,Ne_fit_ucomp_Avg/unit,color=color,th=2,linestyle=3
 loadct,0
 !p.multi=0
 ps2
