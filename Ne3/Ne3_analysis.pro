@@ -212,11 +212,11 @@ skip_tag_fullrange:
 
 ; Plot the average Ne(r) for all selected instruments.
 xrange = [1.095,1.195]
-yrange = [0.5  ,2.5 ]
+yrange = [0.6  ,1.8 ]
 unit           = 1.e8 ; cm-3
 unit_power_str =   '8'
 plot,rad_fit_kcor_A,Ne_fit_kcor_A(0,*)/unit,charsize=csz,font=0,$
-     title='<N!De!N(r)>   Solid: AIA; Dashed: KCOR',$
+     title='<N!De!N(r)>   Solid: AIA; Dashed: KCOR; Dot-Dashed: UCoMP',$
      ytitle = 'Ne(r) [x 10!U'+unit_power_str+'!N cm!U-3!N]',yr=yrange,ystyle=1,$
      xtitle = 'r [Rsun]'                                   ,xr=xrange,xstyle=1,$
      /nodata
@@ -224,7 +224,7 @@ plot,rad_fit_kcor_A,Ne_fit_kcor_A(0,*)/unit,charsize=csz,font=0,$
 loadct,12
 if keyword_set(aia)   then oplot,rad_fit_aia_A  ,Ne_fit_aia_Avg  /unit,color=red,th=2
 if keyword_set(kcor)  then oplot,rad_fit_kcor_A ,Ne_fit_kcor_Avg /unit,color=red,th=2,linestyle=2
-if keyword_set(ucomp) then oplot,rad_fit_ucomp_A,Ne_fit_ucomp_Avg/unit,color=red,th=2
+if keyword_set(ucomp) then oplot,rad_fit_ucomp_A,Ne_fit_ucomp_Avg/unit,color=red,th=2,linestyle=3
 loadct,0
 !p.multi=0
 ps2

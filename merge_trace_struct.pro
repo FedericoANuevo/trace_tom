@@ -276,7 +276,7 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
 
    ; UCOMP
        if keyword_set(ucomp)    then begin
-        file_ucomp   = filename+'_kcor.out'
+        file_ucomp   = filename+'_ucomp.out'
         if i_fl eq 0 then structure_filename = structure_filename + '_ucomp'
         readcol,fl_dir+file_ucomp,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_ucomp_l,$
                 index_ucomp_l ,FORMAT='D,D,D,D,D,D'

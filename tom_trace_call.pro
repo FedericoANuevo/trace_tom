@@ -15,7 +15,7 @@
 
 pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
                    nfs1=nfs1,nfs2=nfs2
-
+  
 ; Define PROJECT_NAME, a string suffix to construct the full PATHS to the required files.
   PROJECT_NAME = 'CR2254'
 ; Define field_line_geometry_suffix_dir
