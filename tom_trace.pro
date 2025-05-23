@@ -25,9 +25,6 @@ pro tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_lis
   if instr eq 'lascoc2' or instr eq 'mk4' or instr eq 'kcor' or instr eq 'ucomp' then $
      read_vlsrt,tom_dir,tom_file,nr,nt,np,rmin,rmax,Irmin,Irmax,rad,lat,lon,N_e
 
-; Correction of KCOR density:
-  if instr eq 'kcor' then N_e=N_e*0.79
-  
 ; Read the list with the field-lines  
   N=0L
   filename=''
