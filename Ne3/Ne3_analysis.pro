@@ -216,7 +216,7 @@ yrange = [0.5  ,2.5 ]
 unit           = 1.e8 ; cm-3
 unit_power_str =   '8'
 plot,rad_fit_kcor_A,Ne_fit_kcor_A(0,*)/unit,charsize=csz,font=0,$
-     title='<N!De!N(r)>   Solid: AIA; Dashed: KOR, Dot-Dashed: UCOMP',$
+     title='<N!De!N(r)>   Solid: AIA; Dashed: KCOR',$
      ytitle = 'Ne(r) [x 10!U'+unit_power_str+'!N cm!U-3!N]',yr=yrange,ystyle=1,$
      xtitle = 'r [Rsun]'                                   ,xr=xrange,xstyle=1,$
      /nodata

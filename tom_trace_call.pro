@@ -90,7 +90,8 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
                nr=nr,nt=nt,np=np,rmin=rmin,rmax=rmax,Irmin=Irmin,Irmax=Irmax
   endif
 
- if keyword_set(ucomp) then begin
+  if keyword_set(ucomp) then begin
+     stop
      tom_file = 'Ne_ratio_ucomp_1074-1079_second_target_segment2.dat'
      instr    = 'ucomp'
      nr       = 16
