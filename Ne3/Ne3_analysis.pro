@@ -40,7 +40,7 @@ pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, plot_file
      tomgrid_kcor_hdr_A,tomgrid_kcor_A,fitgrid_kcor_hdr_A,fitgrid_kcor_A,$
      tomgrid_ucomp_hdr_A,tomgrid_ucomp_A,fitgrid_ucomp_hdr_A,fitgrid_ucomp_A,$
      tomgrid_c2_hdr_A,tomgrid_c2_A,fitgrid_c2_hdr_A,fitgrid_c2_A,$
-     leg_label_A,$
+     leg_label_A,leg_footbfield_A,$
      Footpoint_Rad_A, Footpoint_Lon_A, Footpoint_Lat_A
   
     dir = '/data1/DATA/trace_tom_files/CR2254/field_lines_geometry_aunifgrid_1.15Rs_5x5deg/'
@@ -66,6 +66,11 @@ pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, plot_file
   ifl_closed_A = where(leg_label_A ne 0)
   ifl_open_A   = where(leg_label_A eq 0)
     
+; Create index arrays for positive/negative footpoint Brad lines
+  leg_footBr_A = reform(leg_footBfield_A(*,0))
+  ifl_pos_A = where(leg_footBr_A gt 0.)
+  ifl_neg_A = where(leg_footBr_A lt 0.)
+
 ; Tag field lines for which the fit is positive at all heights below
 ; R_max, as defined below.
 ; Also,
@@ -179,10 +184,22 @@ if keyword_set(ucomp) then ifl_A = intersect(ifl_A,ifl_ucomp_A)
 if keyword_set(closed) then ifl_A = intersect(ifl_A,ifl_closed_A)
 if keyword_set(open)   then ifl_A = intersect(ifl_A,ifl_open_A  )
 ; Now select the color and plot footpoints
-if NOT keyword_set(closed) and NOT keyword_set(open) then color = green 
-if     keyword_set(closed)                           then color = blue
-if                                 keyword_set(open) then color = red  
-oplot,Footpoint_Lon_A(ifl_A),Footpoint_Lat_A(ifl_A),psym=4,th=2,color=color
+if  keyword_set(closed) then begin
+   color = blue
+   oplot,Footpoint_Lon_A(ifl_A),Footpoint_Lat_A(ifl_A),psym=4,th=2,color=color
+endif
+if keyword_set(open) then begin
+   color = green
+   indxpos_A = intersect(ifl_A,ifl_pos_A)
+   oplot,Footpoint_Lon_A(indxpos_A),Footpoint_Lat_A(indxpos_A),psym=4,th=2,color=color
+   color = red
+   indxneg_A = intersect(ifl_A,ifl_neg_A)
+   oplot,Footpoint_Lon_A(indxneg_A),Footpoint_Lat_A(indxneg_A),psym=4,th=2,color=color
+endif
+if NOT keyword_set(closed) and NOT keyword_set(open) then begin
+   loadct,0
+   oplot,Footpoint_Lon_A(ifl_A),Footpoint_Lat_A(ifl_A),psym=4,th=2
+endif
 
 ; Compute the average Ne(r) of each instrument for lines indexed ifl_A
 if keyword_set(aia) then begin
@@ -224,6 +241,7 @@ oplot,Footpoint_Lon_A(ifl_A),Footpoint_Lat_A(ifl_A),psym=4,th=2,color=red
 skip_tag_fullrange:
 
 ; Plot the average Ne(r) for all selected instruments.
+loadct,0
 xrange = [1.095,1.195]
 yrange = [0.6,1.6]
 unit           = 1.e8 ; cm-3
@@ -234,7 +252,8 @@ plot,rad_fit_kcor_A,Ne_fit_kcor_A(0,*)/unit,charsize=csz,font=0,$
      xtitle = 'r [Rsun]'                                   ,xr=xrange,xstyle=1,$
      /nodata
 
-loadct,12
+;loadct,12
+color=0
 if keyword_set(aia)   then oplot,rad_fit_aia_A  ,Ne_fit_aia_Avg  /unit,color=color,th=2
 if keyword_set(kcor)  then oplot,rad_fit_kcor_A ,Ne_fit_kcor_Avg /unit,color=color,th=2,linestyle=2
 if keyword_set(ucomp) then oplot,rad_fit_ucomp_A,Ne_fit_ucomp_Avg/unit,color=color,th=2,linestyle=3

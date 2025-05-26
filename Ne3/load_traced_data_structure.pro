@@ -67,7 +67,7 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
      tomgrid_kcor_hdr_A,tomgrid_kcor_A,fitgrid_kcor_hdr_A,fitgrid_kcor_A,$
      tomgrid_ucomp_hdr_A,tomgrid_ucomp_A,fitgrid_ucomp_hdr_A,fitgrid_ucomp_A,$
      tomgrid_c2_hdr_A,tomgrid_c2_A,fitgrid_c2_hdr_A,fitgrid_c2_A,$
-     leg_label_A,$
+     leg_label_A,leg_footbfield_A,$
      Footpoint_Rad_A, Footpoint_Lon_A, Footpoint_Lat_A
   
   restore, filename = dir + structure_filename
@@ -82,7 +82,10 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
   lat_A   = *trace_data.lat
   lon_A   = *trace_data.lon
 
-  if keyword_set(opcl) then leg_label_A = *trace_data.leg_label
+  if keyword_set(opcl) then begin
+     leg_label_A      = *trace_data.leg_label
+     leg_footbfield_A = *trace_data.leg_footbfield
+  endif
 
 ; Determine the Rad, Lat and Lon of the footppoint of each field line.
 ; 1D Arrays: radial index corresponding to Rmin for each field line:

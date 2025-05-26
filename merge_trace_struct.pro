@@ -334,8 +334,10 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
                  lat:     ptr_new(lat_A)   ,$
                  lon:     ptr_new(lon_A)    }
 
-; Define leg label as all zeros by default (all open field lines) 
+; Define leg label array
   leg_label_A = lonarr(N_fl)
+; Define leg footpoint Bfield array
+  leg_footbfield_A = fltarr(N_fl,3)
 if keyword_set(opcl) then begin
 ; Read-in the leg-lable of all fieldlines.
   leglab=0L
@@ -346,10 +348,25 @@ if keyword_set(opcl) then begin
      leg_label_A(i_fl)=leglab
   endfor
   close,1
+; Read-in the leg footpoint Bfield of all fieldlines.
+  leglab=0L
+  openr,1,fl_dir+'legs-footpoint-Bfield.dat'
+  readf,1,N_fl
+  xx='' & Br=0. & Bth=0. & Bph=0.
+  readf,1,xx
+  for i_fl=0L,N_fl-1 do begin
+     readf,1,Br,Bth,Bph
+     leg_footbfield_A(i_fl,*)=[Br,Bth,Bph]
+  endfor
+  close,1
 endif
 ; Add leg label array to structure
      trace_data = create_struct( trace_data ,$
                    'leg_label' , ptr_new(leg_label_A) )
+
+; Add leg footpoint Bfield array to structure
+     trace_data = create_struct( trace_data ,$
+                   'leg_footbfield' , ptr_new(leg_footbfield_A) )
 
 ; Store into the structure traced tomographic resuls
   if keyword_set(aia) then begin
