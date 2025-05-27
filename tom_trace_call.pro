@@ -19,7 +19,7 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
 ; Define PROJECT_NAME, a string suffix to construct the full PATHS to the required files.
   PROJECT_NAME = 'CR2254'
 ; Define field_line_geometry_suffix_dir
-  field_line_geometry_suffix_dir='_aunifgrid_1.15Rs_1x1deg/'
+  field_line_geometry_suffix_dir='_aunifgrid_1.15Rs_3x3deg/'
   if not keyword_set(field_line_geometry_suffix_dir) then $
   field_line_geometry_suffix_dir='/'
   
@@ -91,7 +91,6 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
   endif
 
   if keyword_set(ucomp) then begin
-     stop
      tom_file = 'Ne_ratio_ucomp_1074-1079_second_target_segment2.dat'
      instr    = 'ucomp'
      nr       = 16

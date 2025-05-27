@@ -1,6 +1,6 @@
 pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, plot_filename_suffix=plot_filename_suffix,$
                   aia=aia, kcor=kcor, ucomp=ucomp,$
-                  open=open,closed=closed
+                  open=open,closed=closed,connect=connect
 
     common data, N_fl, Npt_max, Npt_v, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, WT_aia_A, ldem_flag_aia_A, index_aia_A, index_sampling_aia_A,$
@@ -154,8 +154,10 @@ loadct,0
 !p.background=255
 
 csz=1
+if keyword_set(open)   then opcl_str='open '
+if keyword_set(closed) then opcl_str='closed '
 plot,lon_A,lat_A,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=csz,$
-     title='Location of footpoints',ytitle='Carrington Latitude [deg]',font=0
+     title='Location of '+opcl_str+'footpoints',ytitle='Carrington Latitude [deg]',font=0
 oplot,Footpoint_Lon_A,Footpoint_Lat_A,psym=4
 
 loadct,12
@@ -183,18 +185,26 @@ if keyword_set(ucomp) then ifl_A = intersect(ifl_A,ifl_ucomp_A)
 ; Intersect with CLOSED or OPEN, if so requested
 if keyword_set(closed) then ifl_A = intersect(ifl_A,ifl_closed_A)
 if keyword_set(open)   then ifl_A = intersect(ifl_A,ifl_open_A  )
-; Now select the color and plot footpoints
-if  keyword_set(closed) then begin
-   color = blue
-   oplot,Footpoint_Lon_A(ifl_A),Footpoint_Lat_A(ifl_A),psym=4,th=2,color=color
-endif
-if keyword_set(open) then begin
+if keyword_set(open) or keyword_set(closed) then begin
    color = green
    indxpos_A = intersect(ifl_A,ifl_pos_A)
    oplot,Footpoint_Lon_A(indxpos_A),Footpoint_Lat_A(indxpos_A),psym=4,th=2,color=color
    color = red
    indxneg_A = intersect(ifl_A,ifl_neg_A)
    oplot,Footpoint_Lon_A(indxneg_A),Footpoint_Lat_A(indxneg_A),psym=4,th=2,color=color
+   if keyword_set(closed) AND keyword_set(connect) then begin
+      loadct,0
+      ifl=0
+      while ifl le N_fl-2 do begin
+         if leg_label_A(ifl) ne 0 then begin
+            if intersect(ifl,ifl_A) ne 0 then oplot,reform(Footpoint_Lon_A(ifl:ifl+1)),reform(Footpoint_Lat_A(ifl:ifl+1))
+            ifl=ifl+2
+         endif else begin
+            ifl=ifl+1
+         endelse
+      endwhile
+   loadct,12
+   endif
 endif
 if NOT keyword_set(closed) and NOT keyword_set(open) then begin
    loadct,0
