@@ -1,8 +1,9 @@
-=pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, plot_filename_suffix=plot_filename_suffix,$
+pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, $
+                  plot_filename_suffix=plot_filename_suffix,$
                   aia=aia, kcor=kcor, ucomp=ucomp,$
                   open=open,closed=closed,connect=connect
 
-    common data, N_fl, Npt_max, Npt_v, x_A, y_A, z_A, rad_A, lat_A, lon_A,$
+  common data, N_fl, Npt_max, Npt_v, x_A, y_A, z_A, s_A, Br_A, Bth_A, Bph_A, B_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, WT_aia_A, ldem_flag_aia_A, index_aia_A, index_sampling_aia_A,$
      Ne_euvia_A, Tm_euvia_A,  WT_euvia_A, ldem_flag_euvia_A, index_euvia_A, index_sampling_euvia_A,$
      Ne_euvib_A, Tm_euvib_A, WT_euvib_A, ldem_flag_euvib_A, index_euvib_A, index_sampling_euvib_A,$
@@ -40,14 +41,14 @@
      tomgrid_kcor_hdr_A,tomgrid_kcor_A,fitgrid_kcor_hdr_A,fitgrid_kcor_A,$
      tomgrid_ucomp_hdr_A,tomgrid_ucomp_A,fitgrid_ucomp_hdr_A,fitgrid_ucomp_A,$
      tomgrid_c2_hdr_A,tomgrid_c2_A,fitgrid_c2_hdr_A,fitgrid_c2_A,$
-     leg_label_A,leg_footbfield_A,$
+     leg_label_A,leg_footbfield_A,leg_length_A,$
      Footpoint_Rad_A, Footpoint_Lon_A, Footpoint_Lat_A
   
-    dir = '/data1/DATA/trace_tom_files/CR2254/field_lines_geometry_aunifgrid_1.15Rs_5x5deg/'
+    dir = '/data1/DATA/trace_tom_files/CR2254/field_lines_geometry_aunifgrid_1.15Rs_3x3deg/'
     structure_filename='fdips_field_150x180x360_mrmqs220221t2004c2254_000.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
 
     if keyword_set(load) then $
-    load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data,/aia,/ucomp,/kcor,/opcl
+    load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data,/aia,/ucomp,/kcor,/trace_Bs
 
 ; Define plot filename suffix
   if not keyword_set(plot_filename_suffix) then plot_filename_suffix='footpoints-map'
@@ -252,10 +253,36 @@ skip_tag_fullrange:
 
 ; Plot the average Ne(r) for all selected instruments.
 loadct,0
-xrange = [1.095,1.195]
-yrange = [0.6,1.6]
 unit           = 1.e8 ; cm-3
 unit_power_str =   '8'
+xrange = [1.095,1.195]
+yrflag = -1
+if keyword_set(aia) then begin
+   r    = rad_fit_aia_A
+   f    = Ne_fit_aia_Avg/unit
+   miny = min(f(where(f gt 0. and r le max(xrange))))
+   maxy = max(f(where(f gt 0. and r le max(xrange))))
+   yrange = [miny,maxy]
+   yrflag = +1
+endif
+if keyword_set(kcor) then begin
+   r    = rad_fit_kcor_A
+   f    = Ne_fit_kcor_Avg/unit
+   miny = min(f(where(f gt 0. and r le max(xrange))))
+   maxy = max(f(where(f gt 0. and r le max(xrange))))
+   if yrflag eq -1. then yrange = [miny,maxy]
+   if yrflag ne -1. then yrange = [min([miny,yrange(0)]),max([maxy,max(yrange(1))])]
+   yrflag = +1
+endif
+if keyword_set(ucomp) then begin
+   r    = rad_fit_ucomp_A
+   f    = Ne_fit_ucomp_Avg/unit
+   miny = min(f(where(f gt 0. and r le max(xrange))))
+   maxy = max(f(where(f gt 0. and r le max(xrange))))
+   if yrflag eq -1. then yrange = [miny,maxy]
+   if yrflag ne -1. then yrange = [min([miny,yrange(0)]),max([maxy,max(yrange(1))])]
+   yrflag = +1
+endif
 plot,rad_fit_kcor_A,Ne_fit_kcor_A(0,*)/unit,charsize=csz,font=0,$
      title='<N!De!N(r)>   Solid: AIA; Dashed: KCOR; Dot-Dashed: UCoMP',$
      ytitle = 'Ne(r) [x 10!U'+unit_power_str+'!N cm!U-3!N]',yr=yrange,ystyle=1,$
