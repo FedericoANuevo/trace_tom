@@ -6,7 +6,7 @@
 ; HISTORY: V1.0 AMV & FAN, CLaSP, October 2023.
 ; 
 
-pro merge_trace_struct_call, nfs1=nfs1, nfs2=nfs2, opcl=opcl
+pro merge_trace_struct_call, nfs1=nfs1, nfs2=nfs2, trace_Bs=trace_Bs
 
 ; Define PROJECT_NAME, a string suffix to construct the full PATHS to the required files.
   PROJECT_NAME = 'CR2254'
@@ -15,7 +15,7 @@ pro merge_trace_struct_call, nfs1=nfs1, nfs2=nfs2, opcl=opcl
 ; filenames of the ASCII files containing the geometry of each line.
   fl_list = 'fdips_field_150x180x360_mrmqs220221t2004c2254_000.ubdat_fline-filenames_list.txt'
 ; Define field_line_geometry_suffix_dir
-  field_line_geometry_suffix_dir='_aunifgrid_1.15Rs_3x3deg/'
+  field_line_geometry_suffix_dir='_aunifgrid_1.15Rs_5x5deg/'
   if not keyword_set(field_line_geometry_suffix_dir) then $
   field_line_geometry_suffix_dir='/'
 
@@ -28,8 +28,8 @@ pro merge_trace_struct_call, nfs1=nfs1, nfs2=nfs2, opcl=opcl
    fl_dir = base_dir+'DATA/trace_tom_files/'+PROJECT_NAME+'/field_lines_geometry'+field_line_geometry_suffix_dir
 ;------------------------------------------------------------------------------------
 
-   merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, opcl=opcl, /aia, /kcor, /ucomp, struture_filename=structure_filename
-  ;merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, opcl=opcl, /aia               , struture_filename=structure_filename
+   merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, trace_Bs=trace_Bs, /aia, /kcor, /ucomp, struture_filename=structure_filename
+   
   return
 end
 

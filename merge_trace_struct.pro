@@ -29,7 +29,7 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
                         aia=aia, euvia=euvia, euvib=euvib, eit=eit, $
                         mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2, $
                         struture_filename=structure_filename,$
-                        opcl=opcl
+                        trace_Bs=trace_Bs
   
   common to_fit_data, trace_data, $
      N_fl, Npt_max, Npt_v,$
@@ -61,13 +61,22 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
   default = -678.
   
 ; Define needed arrays:
-  x_A   = dblarr(N_fl,Npt_max) + default
-  y_A   = dblarr(N_fl,Npt_max) + default
-  z_A   = dblarr(N_fl,Npt_max) + default
+; 1st Line Geometry and Bfield:
+    x_A = dblarr(N_fl,Npt_max) + default
+    y_A = dblarr(N_fl,Npt_max) + default
+    z_A = dblarr(N_fl,Npt_max) + default
   rad_A = dblarr(N_fl,Npt_max) + default
   lat_A = dblarr(N_fl,Npt_max) + default
   lon_A = dblarr(N_fl,Npt_max) + default
-  Npt_v = intarr(N_fl)      
+ if keyword_set(trace_Bs) then begin
+     s_A = dblarr(N_fl,Npt_max) + default
+    Br_A = dblarr(N_fl,Npt_max) + default
+   Bth_A = dblarr(N_fl,Npt_max) + default
+   Bph_A = dblarr(N_fl,Npt_max) + default
+     B_A = dblarr(N_fl,Npt_max) + default
+ endif  
+   Npt_v = intarr(N_fl)
+; 2nd Tomography Products: 
   if keyword_set(aia) then begin
      Ne_aia_A             = fltarr(N_fl,Npt_max) + default
      Tm_aia_A             = fltarr(N_fl,Npt_max) + default
@@ -129,8 +138,12 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
      if keyword_set(aia)   then begin
         file_aia   = filename+'_aia.out'
         if i_fl eq 0 then structure_filename = structure_filename + '_aia'
+        if NOT keyword_set(trace_Bs) then $
         readcol,fl_dir+file_aia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_aia_l,Tm_aia_l,$
                 WT_aia_l, ldem_flag_aia_l, index_aia_l  ,FORMAT='D,D,D,D,D,D'
+        if     keyword_set(trace_Bs) then $
+        readcol,fl_dir+file_aia,x_l,y_l,z_l,s_l,Br_l,Bth_l,Bph_l,B_l,rad_l,lat_l,lon_l,Ne_aia_l,Tm_aia_l,$
+                WT_aia_l, ldem_flag_aia_l, index_aia_l  ,FORMAT='D,D,D,D,D,D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_aia_l, index_l=index_aia_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
            N_l         = n_elements(x_l)
@@ -142,6 +155,13 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
            rad_A (i_fl,0:N_l-1) = rad_l
            lat_A (i_fl,0:N_l-1) = lat_l
            lon_A (i_fl,0:N_l-1) = lon_l
+           if keyword_set(trace_Bs) then begin
+             s_A (i_fl,0:N_l-1) =   s_l
+            Br_A (i_fl,0:N_l-1) =  Br_l
+           Bth_A (i_fl,0:N_l-1) = Bth_l
+           Bph_A (i_fl,0:N_l-1) = Bph_l
+             B_A (i_fl,0:N_l-1) =   B_l
+           endif
         endif
         Ne_aia_A            (i_fl,0:N_l-1) = Ne_aia_l
         Tm_aia_A            (i_fl,0:N_l-1) = Tm_aia_l
@@ -155,8 +175,12 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
      if keyword_set(euvia)  then begin
         file_euvia = filename+'_euvia.out'
         if i_fl eq 0 then structure_filename = structure_filename + '_euvia'
+        if NOT keyword_set(trace_Bs) then $
         readcol,fl_dir+file_euvia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_euvia_l,Tm_euvia_l,$
-                WT_euvia_l,ldem_flag_euvia_l,index_euvia_l,FORMAT='D,D,D,D,D,D'
+                WT_euvia_l, ldem_flag_euvia_l, index_euvia_l  ,FORMAT='D,D,D,D,D,D'
+        if     keyword_set(trace_Bs) then $
+        readcol,fl_dir+file_euvia,x_l,y_l,z_l,s_l,Br_l,Bth_l,Bph_l,B_l,rad_l,lat_l,lon_l,Ne_euvia_l,Tm_euvia_l,$
+                WT_euvia_l, ldem_flag_euvia_l, index_euvia_l  ,FORMAT='D,D,D,D,D,D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_euvia_l, index_l=index_euvia_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
            N_l         = n_elements(x_l)
@@ -168,6 +192,13 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
            rad_A (i_fl,0:N_l-1) = rad_l
            lat_A (i_fl,0:N_l-1) = lat_l
            lon_A (i_fl,0:N_l-1) = lon_l
+           if keyword_set(trace_Bs) then begin
+             s_A (i_fl,0:N_l-1) =   s_l
+            Br_A (i_fl,0:N_l-1) =  Br_l
+           Bth_A (i_fl,0:N_l-1) = Bth_l
+           Bph_A (i_fl,0:N_l-1) = Bph_l
+             B_A (i_fl,0:N_l-1) =   B_l
+           endif
         endif
         Ne_euvia_A            (i_fl,0:N_l-1) = Ne_euvia_l
         Tm_euvia_A            (i_fl,0:N_l-1) = Tm_euvia_l
@@ -181,8 +212,12 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
      if keyword_set(euvib)  then begin
         file_euvib = filename+'_euvib.out'
         if i_fl eq 0 then structure_filename = structure_filename + '_euvib'
-        readcol,fl_dir+file_aia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_euvib_l,Tm_euvib_l,$
-                WT_euvib_l,ldem_flag_euvib_l,index_euvib_l,FORMAT='D,D,D,D,D,D'
+        if NOT keyword_set(trace_Bs) then $
+        readcol,fl_dir+file_euvib,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_euvib_l,Tm_euvib_l,$
+                WT_euvib_l, ldem_flag_euvib_l, index_euvib_l  ,FORMAT='D,D,D,D,D,D'
+        if     keyword_set(trace_Bs) then $
+        readcol,fl_dir+file_euvib,x_l,y_l,z_l,s_l,Br_l,Bth_l,Bph_l,B_l,rad_l,lat_l,lon_l,Ne_euvib_l,Tm_euvib_l,$
+                WT_euvib_l, ldem_flag_euvib_l, index_euvib_l  ,FORMAT='D,D,D,D,D,D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_euvib_l, index_l=index_euvib_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
            N_l         = n_elements(x_l)
@@ -194,6 +229,13 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
            rad_A (i_fl,0:N_l-1) = rad_l
            lat_A (i_fl,0:N_l-1) = lat_l
            lon_A (i_fl,0:N_l-1) = lon_l
+           if keyword_set(trace_Bs) then begin
+             s_A (i_fl,0:N_l-1) =   s_l
+            Br_A (i_fl,0:N_l-1) =  Br_l
+           Bth_A (i_fl,0:N_l-1) = Bth_l
+           Bph_A (i_fl,0:N_l-1) = Bph_l
+             B_A (i_fl,0:N_l-1) =   B_l
+           endif
         endif
         Ne_euvib_A            (i_fl,0:N_l-1) = Ne_euvib_l
         Tm_euvib_A            (i_fl,0:N_l-1) = Tm_euvib_l
@@ -206,8 +248,12 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
      if keyword_set(eit)    then begin
         file_eit = filename+'_eit.out'
         if i_fl eq 0 then structure_filename = structure_filename + '_eit'
-        readcol,fl_dir+file_aia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_eit_l,Tm_eit_l,$
-                WT_eit_l,ldem_flag_eit_l,index_eit_l,FORMAT='D,D,D,D,D,D'
+        if NOT keyword_set(trace_Bs) then $
+        readcol,fl_dir+file_eit,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_eit_l,Tm_eit_l,$
+                WT_eit_l, ldem_flag_eit_l, index_eit_l  ,FORMAT='D,D,D,D,D,D'
+        if     keyword_set(trace_Bs) then $
+        readcol,fl_dir+file_eit,x_l,y_l,z_l,s_l,Br_l,Bth_l,Bph_l,B_l,rad_l,lat_l,lon_l,Ne_eit_l,Tm_eit_l,$
+                WT_eit_l, ldem_flag_eit_l, index_eit_l  ,FORMAT='D,D,D,D,D,D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_eit_l, index_l=index_eit_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
            N_l         = n_elements(x_l)
@@ -219,6 +265,13 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
            rad_A (i_fl,0:N_l-1) = rad_l
            lat_A (i_fl,0:N_l-1) = lat_l
            lon_A (i_fl,0:N_l-1) = lon_l  
+           if keyword_set(trace_Bs) then begin
+             s_A (i_fl,0:N_l-1) =   s_l
+            Br_A (i_fl,0:N_l-1) =  Br_l
+           Bth_A (i_fl,0:N_l-1) = Bth_l
+           Bph_A (i_fl,0:N_l-1) = Bph_l
+             B_A (i_fl,0:N_l-1) =   B_l
+           endif
         endif
         Ne_eit_A            (i_fl,0:N_l-1) = Ne_eit_l
         Tm_eit_A            (i_fl,0:N_l-1) = Tm_eit_l
@@ -232,8 +285,12 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
      if keyword_set(mk4)    then begin
         file_mk4   = filename+'_mk4.out'
         if i_fl eq 0 then structure_filename = structure_filename + '_mk4'
-        readcol,fl_dir+file_mk4,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_mk4_l,$
-                index_mk4_l  ,FORMAT='D,D,D,D,D,D'
+        if NOT keyword_set(trace_Bs) then $
+           readcol,fl_dir+file_mk4,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_mk4_l,$
+                   index_mk4_l  ,FORMAT='D,D,D,D,D,D'
+        if     keyword_set(trace_Bs) then $
+           readcol,fl_dir+file_mk4,x_l,y_l,z_l,s_l,Br_l,Bth_l,Bph_l,B_l,rad_l,lat_l,lon_l,Ne_mk4_l,$
+                   index_mk4_l  ,FORMAT='D,D,D,D,D,D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_mk4_l, index_l=index_mk4_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
            N_l         = n_elements(x_l)
@@ -245,6 +302,13 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
            rad_A (i_fl,0:N_l-1) = rad_l
            lat_A (i_fl,0:N_l-1) = lat_l
            lon_A (i_fl,0:N_l-1) = lon_l
+           if keyword_set(trace_Bs) then begin
+             s_A (i_fl,0:N_l-1) =   s_l
+            Br_A (i_fl,0:N_l-1) =  Br_l
+           Bth_A (i_fl,0:N_l-1) = Bth_l
+           Bph_A (i_fl,0:N_l-1) = Bph_l
+             B_A (i_fl,0:N_l-1) =   B_l
+           endif
         endif
         Ne_mk4_A   (i_fl,0:N_l-1) = Ne_mk4_l
         index_mk4_A(i_fl,0:N_l-1) = index_mk4_l
@@ -255,8 +319,12 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
      if keyword_set(kcor)    then begin
         file_kcor   = filename+'_kcor.out'
         if i_fl eq 0 then structure_filename = structure_filename + '_kcor'
-        readcol,fl_dir+file_kcor,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_kcor_l,$
-                index_kcor_l ,FORMAT='D,D,D,D,D,D'
+        if NOT keyword_set(trace_Bs) then $
+           readcol,fl_dir+file_kcor,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_kcor_l,$
+                   index_kcor_l  ,FORMAT='D,D,D,D,D,D'
+        if     keyword_set(trace_Bs) then $
+           readcol,fl_dir+file_kcor,x_l,y_l,z_l,s_l,Br_l,Bth_l,Bph_l,B_l,rad_l,lat_l,lon_l,Ne_kcor_l,$
+                   index_kcor_l  ,FORMAT='D,D,D,D,D,D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_kcor_l, index_l=index_kcor_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
            N_l         = n_elements(x_l)
@@ -268,6 +336,13 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
            rad_A (i_fl,0:N_l-1) = rad_l
            lat_A (i_fl,0:N_l-1) = lat_l
            lon_A (i_fl,0:N_l-1) = lon_l  
+           if keyword_set(trace_Bs) then begin
+             s_A (i_fl,0:N_l-1) =   s_l
+            Br_A (i_fl,0:N_l-1) =  Br_l
+           Bth_A (i_fl,0:N_l-1) = Bth_l
+           Bph_A (i_fl,0:N_l-1) = Bph_l
+             B_A (i_fl,0:N_l-1) =   B_l
+           endif
         endif
         Ne_kcor_A   (i_fl,0:N_l-1) = Ne_kcor_l
         index_kcor_A(i_fl,0:N_l-1) = index_kcor_l        
@@ -278,8 +353,12 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
        if keyword_set(ucomp)    then begin
         file_ucomp   = filename+'_ucomp.out'
         if i_fl eq 0 then structure_filename = structure_filename + '_ucomp'
-        readcol,fl_dir+file_ucomp,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_ucomp_l,$
-                index_ucomp_l ,FORMAT='D,D,D,D,D,D'
+        if NOT keyword_set(trace_Bs) then $
+           readcol,fl_dir+file_ucomp,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_ucomp_l,$
+                   index_ucomp_l  ,FORMAT='D,D,D,D,D,D'
+        if     keyword_set(trace_Bs) then $
+           readcol,fl_dir+file_ucomp,x_l,y_l,z_l,s_l,Br_l,Bth_l,Bph_l,B_l,rad_l,lat_l,lon_l,Ne_ucomp_l,$
+                   index_ucomp_l  ,FORMAT='D,D,D,D,D,D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_ucomp_l, index_l=index_ucomp_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
            N_l         = n_elements(x_l)
@@ -291,6 +370,13 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
            rad_A (i_fl,0:N_l-1) = rad_l
            lat_A (i_fl,0:N_l-1) = lat_l
            lon_A (i_fl,0:N_l-1) = lon_l  
+           if keyword_set(trace_Bs) then begin
+             s_A (i_fl,0:N_l-1) =   s_l
+            Br_A (i_fl,0:N_l-1) =  Br_l
+           Bth_A (i_fl,0:N_l-1) = Bth_l
+           Bph_A (i_fl,0:N_l-1) = Bph_l
+             B_A (i_fl,0:N_l-1) =   B_l
+           endif
         endif
         Ne_ucomp_A   (i_fl,0:N_l-1) = Ne_ucomp_l
         index_ucomp_A(i_fl,0:N_l-1) = index_ucomp_l        
@@ -301,8 +387,12 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
      if keyword_set(lascoc2) then begin
         file_c2    = filename+'_lascoc2.out'
         if i_fl eq 0 then structure_filename = structure_filename + '_lascoc2'
-        readcol,fl_dir+file_c2 ,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_c2_l,$
-                index_c2_l   ,FORMAT='D,D,D,D,D,D'
+        if NOT keyword_set(trace_Bs) then $
+           readcol,fl_dir+file_c2,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_c2_l,$
+                   index_c2_l  ,FORMAT='D,D,D,D,D,D'
+        if     keyword_set(trace_Bs) then $
+           readcol,fl_dir+file_c2,x_l,y_l,z_l,s_l,Br_l,Bth_l,Bph_l,B_l,rad_l,lat_l,lon_l,Ne_c2_l,$
+                   index_c2_l  ,FORMAT='D,D,D,D,D,D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_c2_l, index_l=index_c2_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
            N_l         = n_elements(x_l)
@@ -314,6 +404,13 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
            rad_A (i_fl,0:N_l-1) = rad_l
            lat_A (i_fl,0:N_l-1) = lat_l
            lon_A (i_fl,0:N_l-1) = lon_l  
+           if keyword_set(trace_Bs) then begin
+             s_A (i_fl,0:N_l-1) =   s_l
+            Br_A (i_fl,0:N_l-1) =  Br_l
+           Bth_A (i_fl,0:N_l-1) = Bth_l
+           Bph_A (i_fl,0:N_l-1) = Bph_l
+             B_A (i_fl,0:N_l-1) =   B_l
+           endif
         endif
         Ne_c2_A   (i_fl,0:N_l-1) = Ne_c2_l
         index_c2_A(i_fl,0:N_l-1) = index_c2_l    
@@ -334,12 +431,18 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
                  lat:     ptr_new(lat_A)   ,$
                  lon:     ptr_new(lon_A)    }
 
-; Define leg label array
+  if keyword_set(trace_Bs) then begin
+     trace_data = create_struct( trace_data,$
+                 's'  ,   ptr_new(s_A)     ,$
+                 'Br' ,   ptr_new(Br_A)    ,$
+                 'Bth',   ptr_new(Bth_A)   ,$
+                 'Bph',   ptr_new(Bph_A)   ,$
+                 'B'  ,   ptr_new(B_A)     )                            
+  endif
+
+if keyword_set(trace_Bs) then begin
+; Read-in the leg-label of all fieldlines.
   leg_label_A = lonarr(N_fl)
-; Define leg footpoint Bfield array
-  leg_footbfield_A = fltarr(N_fl,3)
-if keyword_set(opcl) then begin
-; Read-in the leg-lable of all fieldlines.
   leglab=0L
   openr,1,fl_dir+'legs-label.dat'
   readf,1,N_fl
@@ -348,25 +451,33 @@ if keyword_set(opcl) then begin
      leg_label_A(i_fl)=leglab
   endfor
   close,1
+; Read-in the leg-length of all fieldlines.
+  leg_length_A = fltarr(N_fl)
+  leglength=0.
+  openr,1,fl_dir+'legs-length.dat'
+  readf,1,N_fl
+  for i_fl=0L,N_fl-1 do begin
+     readf,1,leglength
+     leg_length_A(i_fl)=leglength
+  endfor
+  close,1
 ; Read-in the leg footpoint Bfield of all fieldlines.
-  leglab=0L
+  leg_footbfield_A = fltarr(N_fl,3)
+  xx='' & Br=0. & Bth=0. & Bph=0.
   openr,1,fl_dir+'legs-footpoint-Bfield.dat'
   readf,1,N_fl
-  xx='' & Br=0. & Bth=0. & Bph=0.
   readf,1,xx
   for i_fl=0L,N_fl-1 do begin
      readf,1,Br,Bth,Bph
      leg_footbfield_A(i_fl,*)=[Br,Bth,Bph]
   endfor
   close,1
+; Add arrays to structure
+  trace_data = create_struct( trace_data ,$
+               'leg_label'      , ptr_new(leg_label_A)     ,$
+               'leg_length'     , ptr_new(leg_length_A)    ,$
+               'leg_footbfield' , ptr_new(leg_footbfield_A) )
 endif
-; Add leg label array to structure
-     trace_data = create_struct( trace_data ,$
-                   'leg_label' , ptr_new(leg_label_A) )
-
-; Add leg footpoint Bfield array to structure
-     trace_data = create_struct( trace_data ,$
-                   'leg_footbfield' , ptr_new(leg_footbfield_A) )
 
 ; Store into the structure traced tomographic resuls
   if keyword_set(aia) then begin

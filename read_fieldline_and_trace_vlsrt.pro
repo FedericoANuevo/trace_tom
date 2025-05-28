@@ -8,12 +8,15 @@
 ; HISTORY: V1.0 FAN & AMV, CLaSP, October 2023.
 ;
 
-pro read_fieldline_and_trace_vlsrt,instr,dir,file,rad,lat,lon,nr,nt,np,N_e, csv = csv
+pro read_fieldline_and_trace_vlsrt,instr,dir,file,rad,lat,lon,nr,nt,np,N_e,csv=csv,trace_Bs=trace_Bs
 ; Define name of output file
   outfile = file+'_'+instr+'.out'
   if not keyword_set(csv) then begin
-; Read the ASCII fieldline file with readcol (SolarSoft)  
+; Read the ASCII fieldline file with readcol (SolarSoft)
+     if NOT keyword_set(trace_Bs) then $
      readcol,dir+file,x_l,y_l,z_l,FORMAT='D,D,D'
+     if     keyword_set(trace_Bs) then $
+     readcol,dir+file,x_l,y_l,z_l,s_l,Br_l,Bth_l,Bph_l,B_l,FORMAT='D,D,D,D,D,D,D,D'
   endif else begin
      data = read_csv(dir+file,header = header)
      x_l  = reform(data.field2)
@@ -51,11 +54,20 @@ pro read_fieldline_and_trace_vlsrt,instr,dir,file,rad,lat,lon,nr,nt,np,N_e, csv 
   endfor
 ; Write output file
   openw,2,dir+outfile
-      printf,2,'  X [Rs]            Y [Rs]            Z [Rs]                  r [Rs]        lat [deg]          lon [deg]        Ne [cm^ -3]        Cell-3D-index'
-  for i = 0,N-1 do begin
-     printf,2,x_l(i),y_l(i),z_l(i),r_l(i),90. -th_l(i)/!dtor, ph_l(i)/!dtor, Ne_l(i),ind_l(i),$
-            FORMAT = '(7(E18.10)," ",I9)' 
-  endfor
+  if NOT keyword_set(trace_Bs) then begin
+     printf,2,'  X [Rs]            Y [Rs]            Z [Rs]                  r [Rs]        lat [deg]          lon [deg]        Ne [cm^ -3]        Cell-3D-index'
+     for i = 0,N-1 do begin
+        printf,2,x_l(i),y_l(i),z_l(i),r_l(i),90. -th_l(i)/!dtor, ph_l(i)/!dtor, Ne_l(i),ind_l(i),$
+               FORMAT = '(7(E18.10)," ",I9)' 
+     endfor
+  endif
+  if     keyword_set(trace_Bs) then begin
+     printf,2,'  X [Rs]            Y [Rs]            Z [Rs]            s [Rs]            B_r [G]           B_th [G]          B_ph [G]          B [G]             r [Rs]            lat [deg]         lon [deg]         Ne [cm^ -3]        Cell-3D-index'
+     for i = 0,N-1 do begin
+        printf,2,x_l(i),y_l(i),z_l(i),s_l(i),Br_l(i),Bth_l(i),Bph_l(i),B_l(i),r_l(i),90. -th_l(i)/!dtor, ph_l(i)/!dtor, Ne_l(i),ind_l(i),$
+               FORMAT = '(12(E18.10)," ",I9)' 
+     endfor
+  endif
   close,2
   return
 end

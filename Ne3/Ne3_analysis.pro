@@ -1,4 +1,4 @@
-pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, plot_filename_suffix=plot_filename_suffix,$
+=pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, plot_filename_suffix=plot_filename_suffix,$
                   aia=aia, kcor=kcor, ucomp=ucomp,$
                   open=open,closed=closed,connect=connect
 
