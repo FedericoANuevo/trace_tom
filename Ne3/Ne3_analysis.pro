@@ -57,13 +57,19 @@ pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, $
   if not keyword_set(LonLimits) then LonLimits = [  0., 360.]
   if not keyword_set(LatLimits) then LatLimits = [-90.,+ 90.]
 
+; Define a polarity tag
+  tag_polarity_A = reform(leg_footBfield_A(*,0)/abs(leg_footBfield_A(*,0)))
+  if ( where(finite(tag_polarity_A) eq 0) )(0) ne -1 then STOP  ; assumes foot-Br is not ZERO
+  
 ; Tag field lines with footpoints within the BOX., either open or closed.
     tag_box_A = fltarr(N_fl)
     ifl_A = where( (Footpoint_Lon_A ge LonLimits(0) AND Footpoint_Lon_A le LonLimits(1)) AND $
                    (Footpoint_Lat_A ge LatLimits(0) AND Footpoint_Lat_A le LatLimits(1)) )
     tag_box_A(ifl_A) = +1.
-; Now, UNTAG only CLOSED field lines whose other leg's foorpoint is NOT wihin the BOX
-    ifl=0
+
+; Now, UNTAG CLOSED field lines whose other leg's footpoint is NOT wihin the BOX,
+;      as well as CLOSED field lines that do NOT comply with opposite polarity.
+   ifl=0
     while ifl le N_fl-2 do begin
        if leg_label_A(ifl) eq 0. then begin
           ifl=ifl+1
@@ -71,6 +77,7 @@ pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, $
           if leg_label_A(ifl) ne leg_label_A(ifl+1) then STOP ; !this should never happen.
           if (tag_box_A(ifl) eq +1 AND tag_box_A(ifl+1) eq  0) then tag_box_A(ifl  )=0
           if (tag_box_A(ifl) eq  0 AND tag_box_A(ifl+1) eq +1) then tag_box_A(ifl+1)=0
+          if (tag_polarity_A(ifl) eq tag_polarity_A(ifl+1))    then tag_box_A(ifl:ifl+1)=0 
           ifl=ifl+2
        endelse
     endwhile
@@ -78,11 +85,10 @@ pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, $
 ; Create index arrays for closed and open field lines.
   ifl_closed_A = where(leg_label_A ne 0)
   ifl_open_A   = where(leg_label_A eq 0)
-    
+ 
 ; Create index arrays for positive/negative footpoint Brad lines
-  leg_footBr_A = reform(leg_footBfield_A(*,0))
-  ifl_pos_A = where(leg_footBr_A gt 0.)
-  ifl_neg_A = where(leg_footBr_A lt 0.)
+  ifl_pos_A = where(tag_polarity_A eq +1.)
+  ifl_neg_A = where(tag_polarity_A eq -1.)
 
 ; Tag field lines for which the fit is positive at all heights below
 ; R_max, as defined below.
@@ -167,6 +173,7 @@ loadct,0
 !p.background=255
 
 csz=1
+                            opcl_str='open/closed'
 if keyword_set(open)   then opcl_str='open '
 if keyword_set(closed) then opcl_str='closed '
 plot,lon_A,lat_A,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=csz,$
@@ -174,20 +181,18 @@ plot,lon_A,lat_A,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=csz,
 oplot,Footpoint_Lon_A,Footpoint_Lat_A,psym=4
 
 loadct,12
-; Highlight in blue field lines with footpoints within BOX.
-; ifl_A  = where(tag_box_A eq +1)
-; oplot,Footpoint_Lon_A(ifl_A),Footpoint_Lat_A(ifl_A),psym=4,th=2,color=blue
 
 ; Set a maximum threshold for scN
-scN_crit = 0.2
+scN_crit = 0.5
 
-; Highlight in green/blue/red:  all/closed/open field lines within the
-; selected box, for which tag_pos_INSTRUMENT_A = +1 and there
-; is a fit with scN < scN_crit for all instruments.
-;ifl_aia_A   = indgen(N_fl)
-;ifl_kcor_A  = indgen(N_fl)
-;ifl_ucomp_A = indgen(N_fl)
-if keyword_set(aia)   then ifl_aia_A   = where(tag_box_A eq +1 AND tag_pos_aia_A   eq +1 AND fitflag_aia_A   eq +1 AND scN_fit_aia_A   le scN_crit)
+; Tag field lines for which the DPL fit to AIA has all parameters positive
+tag_posfit_aia_A = fltarr(N_Fl)
+index            = where(N1_fit_aia_A gt 0. AND N2_fit_aia_A gt 0. AND p1_fit_aia_A gt 0. AND p2_fit_aia_A gt 0.)
+tag_posfit_aia_A(index) = +1
+
+; Index lines of each instrument that have a good fit to Ne and are in
+; the box
+if keyword_set(aia)   then ifl_aia_A   = where(tag_box_A eq +1 AND tag_pos_aia_A   eq +1 AND fitflag_aia_A   eq +1 AND scN_fit_aia_A   le scN_crit); AND tag_posfit_aia_A eq +1)
 if keyword_set(kcor)  then ifl_kcor_A  = where(tag_box_A eq +1 AND tag_pos_kcor_A  eq +1 AND fitflag_kcor_A  eq +1 AND scN_fit_kcor_A  le scN_crit)
 if keyword_set(ucomp) then ifl_ucomp_A = where(tag_box_A eq +1 AND tag_pos_ucomp_A eq +1 AND fitflag_ucomp_A eq +1 AND scN_fit_ucomp_A le scN_crit)
 ; Make an index array with the common elements of all ifl_INSTRUMENT_A
@@ -199,38 +204,26 @@ if keyword_set(ucomp) then ifl_A = intersect(ifl_A,ifl_ucomp_A)
 if keyword_set(closed) then ifl_A = intersect(ifl_A,ifl_closed_A)
 if keyword_set(open)   then ifl_A = intersect(ifl_A,ifl_open_A  )
 
-if keyword_set(open) then begin
-   indxpos_A = intersect(ifl_A,ifl_pos_A)
-   oplot,Footpoint_Lon_A(indxpos_A),Footpoint_Lat_A(indxpos_A),psym=4,th=2,color=green
-   indxneg_A = intersect(ifl_A,ifl_neg_A)
-   oplot,Footpoint_Lon_A(indxneg_A),Footpoint_Lat_A(indxneg_A),psym=4,th=2,color=red
-endif
-
-if keyword_set(closed) then begin
+; Plot connectivity is requested
+if keyword_set(connect) AND keyword_set(closed) then begin
    ifl_A_orig = ifl_A 
    ifl=0
    while ifl le N_fl-2 do begin
       if leg_label_A(ifl) ne 0 then begin
-         if tag_box_A(ifl) eq +1 and tag_box_A(ifl) eq +1 then begin
-            indxpos_A = intersect([ifl,ifl+1],ifl_pos_A)
-            oplot,Footpoint_Lon_A(indxpos_A),Footpoint_Lat_A(indxpos_A),psym=4,th=2,color=green
-            indxneg_A = intersect([ifl,ifl+1],ifl_neg_A)
-            oplot,Footpoint_Lon_A(indxneg_A),Footpoint_Lat_A(indxneg_A),psym=4,th=2,color=red
-            if     keyword_set(ifl_A) then ifl_A = [ifl_A,ifl,ifl+1]
-            if not keyword_set(ifl_A) then ifl_A = [      ifl,ifl+1]
-            if keyword_set(connect) then begin
-               loadct,0
-               oplot,reform(Footpoint_Lon_A(ifl:ifl+1)),reform(Footpoint_Lat_A(ifl:ifl+1))
-               loadct,12
-            endif
-         endif
+         if tag_box_A(ifl) eq +1 then oplot,reform(Footpoint_Lon_A(ifl:ifl+1)),reform(Footpoint_Lat_A(ifl:ifl+1)),color=blue
          ifl=ifl+2
       endif else begin
          ifl=ifl+1
       endelse
    endwhile
-   loadct,12
 endif
+
+; Now, color-highlight the footpoints indicated by ifl_A
+indxpos_A = intersect(ifl_A,ifl_pos_A)
+oplot,Footpoint_Lon_A(indxpos_A),Footpoint_Lat_A(indxpos_A),psym=4,th=2,color=green
+indxneg_A = intersect(ifl_A,ifl_neg_A)
+oplot,Footpoint_Lon_A(indxneg_A),Footpoint_Lat_A(indxneg_A),psym=4,th=2,color=red
+
 
 if NOT keyword_set(closed) and NOT keyword_set(open) then begin
    loadct,0
@@ -239,16 +232,13 @@ endif
 
 ; Compute the average Ne(r) of each instrument for lines indexed ifl_A
 if keyword_set(aia) then begin
-   Ne_fit_aia_Avg = fltarr(n_elements(rad_fit_aia_A)) - 678.
-   Ne_fit_aia_Avg = total( Ne_fit_aia_A(ifl_A,*) , 1 ) / float(n_elements(ifl_A))
+      Ne_fit_aia_Avg = total( Ne_fit_aia_A(ifl_A,*) , 1 ) / float(n_elements(ifl_A))
 endif
 if keyword_set(kcor) then begin
-   Ne_fit_kcor_Avg = fltarr(n_elements(rad_fit_kcor_A)) - 678.
-   Ne_fit_kcor_Avg = total( Ne_fit_kcor_A(ifl_A,*) , 1 ) / float(n_elements(ifl_A))
+      Ne_fit_kcor_Avg = total( Ne_fit_kcor_A(ifl_A,*) , 1 ) / float(n_elements(ifl_A))
 endif
 if keyword_set(ucomp) then begin
-   Ne_fit_ucomp_Avg = fltarr(n_elements(rad_fit_ucomp_A)) - 678.
-   Ne_fit_ucomp_Avg = total( Ne_fit_ucomp_A(ifl_A,*) , 1 ) / float(n_elements(ifl_A))
+      Ne_fit_ucomp_Avg = total( Ne_fit_ucomp_A(ifl_A,*) , 1 ) / float(n_elements(ifl_A))
 endif
 skip_tag_pos:
 
