@@ -1,6 +1,6 @@
-pro Yeimy_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, $
+pro Yeimy_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits,$
                     plot_filename_suffix=plot_filename_suffix,$
-                    aia=aia, kcor=kcor, ucomp=ucomp,$
+                    aia=aia,$
                     open=open,closed=closed,connect=connect,$
                     not_Bfield=not_Bfield
 
@@ -50,16 +50,13 @@ pro Yeimy_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, $
      dir = '/data1/DATA/trace_tom_files/April24/field_lines_geometry_yeimy/'
      structure_filename='list_yeimy-fl.txt-tracing-structure-merge_aia_lascoc2.sav'
   endif else begin
-;    dir = '/data1/DATA/trace_tom_files/April24/field_lines_geometry/'
-     dir = '/data1/DATA/trace_tom_files/April24/field_lines_geometry_1x1deg_multirad/'
+     dir = '/data1/DATA/trace_tom_files/April24/field_lines_geometry/'
      structure_filename='fdips_field_150X180X360_mrbqs240414t1304c2283_230_shift.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia.sav'
-   endelse
+  endelse
   if keyword_set(load) then begin
      if not keyword_set(not_Bfield) then load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data,/aia,/trace_Bs
      if     keyword_set(not_Bfield) then load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data,/aia
   endif
-    
-  if keyword_set(not_Bfield) then leg_label_A = fltarr(N_fl)
 ; Define plot filename suffix
   if not keyword_set(plot_filename_suffix) then plot_filename_suffix='footpoints-map'
 
@@ -67,12 +64,13 @@ pro Yeimy_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, $
   if not keyword_set(LonLimits) then LonLimits = [  0., 360.]
   if not keyword_set(LatLimits) then LatLimits = [-90.,+ 90.]
 
+  if     keyword_set(not_Bfield) then       leg_label_A = fltarr(N_fl)
   if not keyword_set(not_Bfield) then begin
 ; Define a polarity tag
      tag_polarity_A = reform(leg_footBfield_A(*,0)/abs(leg_footBfield_A(*,0)))
      if ( where(finite(tag_polarity_A) eq 0) )(0) ne -1 then STOP ; assumes foot-Br is not ZERO
   endif else begin
-     tag_polarity_A = leg_label_A 
+     tag_polarity_A = leg_label_A ; Este es un truco para el caso de las f-lines provistas por Yeimy
   endelse
   
 ; Tag field lines with footpoints within the BOX., either open or closed.
@@ -102,7 +100,6 @@ pro Yeimy_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, $
   ifl_closed_A = where(leg_label_A ne 0)
   ifl_open_A   = where(leg_label_A eq 0)
 
-
 ; Create index arrays for positive/negative footpoint Brad lines
   ifl_pos_A = where(tag_polarity_A eq +1.)
   ifl_neg_A = where(tag_polarity_A eq -1.)
@@ -118,25 +115,14 @@ Nsamp = 2
 ; Set two parameters, named R_crit and R_max, using the "bottleneck" instrument,
 ; achieved by organizing these conditionals in increasing "bottleneckless".
 ;
-if keyword_set(kcor ) then begin
-   r_crit = median(rad_fit_kcor_A )
-   r_max  = max   (rad_fit_kcor_A )
-endif
+
 if keyword_set(aia  ) then begin
    r_crit = median(rad_fit_aia_A  )
    r_max  = max   (rad_fit_aia_A  )
 endif
-if keyword_set(ucomp) then begin
-   r_crit = median(rad_fit_ucomp_A)
-   r_max  = max   (rad_fit_ucomp_A)
-endif
 ;
 tag_pos_aia_A          = fltarr(N_fl) - 678.
 tag_fullrange_aia_A    = fltarr(N_fl) - 678.
-tag_pos_kcor_A         = fltarr(N_fl) - 678.
-tag_fullrange_kcor_A   = fltarr(N_fl) - 678.
-tag_pos_ucomp_A        = fltarr(N_fl) - 678.
-tag_fullrange_ucomp_A  = fltarr(N_fl) - 678.
 for ifl=0,N_fl-1 do begin
    if keyword_set(aia) then begin
       ifitpos_aia = where(reform(Ne_fit_aia_A  (ifl,*)) gt 0. and rad_fit_aia_A le R_max)
@@ -150,30 +136,6 @@ for ifl=0,N_fl-1 do begin
       tag_pos_aia_A(ifl) = +1
       tag_fullrange_aia_A(ifl) = +1
    endelse
-   if keyword_set(kcor) then begin
-      ifitpos_kcor = where(reform(Ne_fit_kcor_A (ifl,*)) gt 0. and rad_fit_kcor_A le R_max)
-      ifitrad_kcor = where(rad_fit_kcor_A le R_max) 
-      if ifitpos_kcor(0) ne -1 then begin
-         if n_elements(ifitpos_kcor) eq n_elements(ifitrad_kcor) then tag_pos_kcor_A(ifl) = +1.
-         if n_elements(where(rad_fit_kcor_A(ifitpos_kcor) lt r_crit))                                           ge Nsamp AND  $
-            n_elements(where(rad_fit_kcor_A(ifitpos_kcor) gt r_crit AND rad_fit_kcor_A(ifitpos_kcor) lt r_max)) ge Nsamp then tag_fullrange_kcor_A(ifl) = +1.
-      endif
-   endif else begin
-      tag_pos_kcor_A(ifl) = +1
-      tag_fullrange_kcor_A(ifl) = +1
-   endelse
-   if keyword_set(ucomp) then begin
-      ifitpos_ucomp = where(reform(Ne_fit_ucomp_A(ifl,*)) gt 0. and rad_fit_ucomp_A le R_max)
-      ifitrad_ucomp = where(rad_fit_ucomp_A le R_max) 
-      if ifitpos_ucomp(0) ne -1 then begin
-         if n_elements(ifitpos_ucomp) eq n_elements(ifitrad_ucomp) then tag_pos_ucomp_A(ifl) = +1.
-         if n_elements(where(rad_fit_ucomp_A(ifitpos_ucomp) lt r_crit))                                             ge Nsamp AND  $
-            n_elements(where(rad_fit_ucomp_A(ifitpos_ucomp) gt r_crit AND rad_fit_ucomp_A(ifitpos_ucomp) lt r_max)) ge Nsamp then tag_fullrange_ucomp_A(ifl) = +1.
-      endif
-   endif else begin
-      tag_pos_ucomp_A(ifl) = +1
-      tag_fullrange_ucomp_A(ifl) = +1
-   endelse
 endfor
 
 ;-----------------PLOTS SECTION--------------------------------------------------------------
@@ -185,7 +147,7 @@ green =  16
 ; Lat/Lon plots of FootPoints
 ps1,'./'+structure_filename+'_'+plot_filename_suffix+'.eps'
 np=1000
-!p.multi=[0,1,2]
+!p.multi=[0,1,3]
 loadct,0
 !p.color=0
 !p.background=255
@@ -200,24 +162,17 @@ oplot,Footpoint_Lon_A,Footpoint_Lat_A,psym=4
 
 loadct,12
 
-; Set a maximum threshold for scN
-scN_crit = 0.5
-
-; Tag field lines for which the DPL fit to AIA has all parameters positive
-;tag_posfit_aia_A = fltarr(N_Fl)
-;index            = where(N1_fit_aia_A gt 0. AND N2_fit_aia_A gt 0. AND p1_fit_aia_A gt 0. AND p2_fit_aia_A gt 0.)
-;tag_posfit_aia_A(index) = +1
-
+; Set a maximum threshold for scN and scT
+scN_crit = 0.3
+scT_crit = 0.3
 ; Index lines of each instrument that have a good fit to Ne and are in
 ; the box
-if keyword_set(aia)   then ifl_aia_A   = where(tag_box_A eq +1 AND tag_pos_aia_A   eq +1 AND fitflag_aia_A   eq +1 AND scN_fit_aia_A   le scN_crit); AND tag_posfit_aia_A eq +1)
-if keyword_set(kcor)  then ifl_kcor_A  = where(tag_box_A eq +1 AND tag_pos_kcor_A  eq +1 AND fitflag_kcor_A  eq +1 AND scN_fit_kcor_A  le scN_crit)
-if keyword_set(ucomp) then ifl_ucomp_A = where(tag_box_A eq +1 AND tag_pos_ucomp_A eq +1 AND fitflag_ucomp_A eq +1 AND scN_fit_ucomp_A le scN_crit)
+if keyword_set(aia)   then ifl_aia_A   = where(tag_box_A eq +1 AND tag_pos_aia_A   eq +1 AND fitflag_aia_A   eq +1 AND scN_fit_aia_A   le scN_crit and scT_fit_aia_A le scT_crit)
+
 ; Make an index array with the common elements of all ifl_INSTRUMENT_A
-                           ifl_A = indgen(N_fl)
+ifl_A = indgen(N_fl)
 if keyword_set(aia)   then ifl_A = intersect(ifl_A,ifl_aia_A  )
-if keyword_set(kcor)  then ifl_A = intersect(ifl_A,ifl_kcor_A )
-if keyword_set(ucomp) then ifl_A = intersect(ifl_A,ifl_ucomp_A)
+                           
 ; Intersect with CLOSED or OPEN, if so requested
 if keyword_set(closed) then ifl_A = intersect(ifl_A,ifl_closed_A)
 if keyword_set(open)   then ifl_A = intersect(ifl_A,ifl_open_A  )
@@ -252,16 +207,13 @@ if NOT keyword_set(closed) and NOT keyword_set(open) then begin
    oplot,Footpoint_Lon_A(ifl_A),Footpoint_Lat_A(ifl_A),psym=4,th=2
 endif
 
-; Compute the average Ne(r) of each instrument for lines indexed ifl_A
+; Compute the average Ne(r) and Tm(r) of each instrument for lines indexed ifl_A
 if keyword_set(aia) then begin
-      Ne_fit_aia_Avg = total( Ne_fit_aia_A(ifl_A,*) , 1 ) / float(n_elements(ifl_A))
+   Ne_fit_aia_Avg = total( Ne_fit_aia_A(ifl_A,*) , 1 ) / float(n_elements(ifl_A))
+   Tm_fit_aia_Avg = total( Tm_fit_aia_A(ifl_A,*) , 1 ) / float(n_elements(ifl_A))
 endif
-if keyword_set(kcor) then begin
-      Ne_fit_kcor_Avg = total( Ne_fit_kcor_A(ifl_A,*) , 1 ) / float(n_elements(ifl_A))
-endif
-if keyword_set(ucomp) then begin
-      Ne_fit_ucomp_Avg = total( Ne_fit_ucomp_A(ifl_A,*) , 1 ) / float(n_elements(ifl_A))
-endif
+
+
 skip_tag_pos:
 
 ; Plot the average Ne(r) for all selected instruments.
@@ -278,36 +230,31 @@ if keyword_set(aia) then begin
    yrange = [miny,maxy]
    yrflag = +1
 endif
-if keyword_set(kcor) then begin
-   r    = rad_fit_kcor_A
-   f    = Ne_fit_kcor_Avg/unit
-   miny = min(f(where(f gt 0. and r le max(xrange))))
-   maxy = max(f(where(f gt 0. and r le max(xrange))))
-   if yrflag eq -1. then yrange = [miny,maxy]
-   if yrflag ne -1. then yrange = [min([miny,yrange(0)]),max([maxy,max(yrange(1))])]
-   yrflag = +1
-endif
-if keyword_set(ucomp) then begin
-   r    = rad_fit_ucomp_A
-   f    = Ne_fit_ucomp_Avg/unit
-   miny = min(f(where(f gt 0. and r le max(xrange))))
-   maxy = max(f(where(f gt 0. and r le max(xrange))))
-   if yrflag eq -1. then yrange = [miny,maxy]
-   if yrflag ne -1. then yrange = [min([miny,yrange(0)]),max([maxy,max(yrange(1))])]
-   yrflag = +1
-endif
+
 plot,rad_fit_AiA_A,Ne_fit_AIA_A(0,*)/unit,charsize=csz,font=0,$
-     title='<N!De!N(r)>   Solid: AIA; Dashed: KCOR; Dot-Dashed: UCoMP',$
+     title='<N!De!N(r)>   Solid: AIA',$
      ytitle = 'Ne(r) [x 10!U'+unit_power_str+'!N cm!U-3!N]',yr=yrange,ystyle=1,$
      xtitle = 'r [Rsun]'                                   ,xr=xrange,xstyle=1,$
      /nodata
 
 ;loadct,12
 color=0
-if keyword_set(aia)   then oplot,rad_fit_aia_A  ,Ne_fit_aia_Avg  /unit,color=color,th=2
-if keyword_set(kcor)  then oplot,rad_fit_kcor_A ,Ne_fit_kcor_Avg /unit,color=color,th=2,linestyle=2
-if keyword_set(ucomp) then oplot,rad_fit_ucomp_A,Ne_fit_ucomp_Avg/unit,color=color,th=2,linestyle=3
+if keyword_set(aia) and n_elements(ifl_A) gt 1  then oplot,rad_fit_aia_A  ,Ne_fit_aia_Avg  /unit,color=color,th=2
 loadct,0
+
+yrange = [min(Tm_fit_aia_Avg)/1.e6,max(Tm_fit_aia_Avg)/1.e6]
+plot,rad_fit_AiA_A,Tm_fit_AIA_A(0,*)/unit,charsize=csz,font=0,$
+     title='<T!Dm!N(r)>   Solid: AIA',$
+     ytitle = 'Tm(r) [MK]',yr=yrange,ystyle=1,$
+     xtitle = 'r [Rsun]'                                   ,xr=xrange,xstyle=1,$
+     /nodata
+
+;loadct,12
+color=0
+if keyword_set(aia) and  n_elements(ifl_A) gt 1 then oplot,rad_fit_aia_A  ,Tm_fit_aia_Avg/1.e6,color=color,th=2
+loadct,0
+
+
 !p.multi=0
 ps2
 
