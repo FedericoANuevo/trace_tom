@@ -662,7 +662,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
              dNedr_fit_c2_A(    range_fit) = - A[1]*A[0] * rad_fit_c2_A(range_fit)^(-A[1]-1) - A[3]*A[2] * rad_fit_c2_A(range_fit)^(-A[3]-1) ; cm-3 / Rsun
                 indsamp = where(dNedr_fit_c2_A lt 0. AND dNedr_fit_c2_A ne default)
                 if n_elements(indsamp) gt n_elements(range_fit)/2. then begin
-                   v = abs(dNedr_fit_c2(indsamp)/reform(Ne_fit_c2_A(ifl,indsamp)))^(-1)                                                 ; Rsun
+                   v = abs(dNedr_fit_c2_A(indsamp)/reform(Ne_fit_c2_A(ifl,indsamp)))^(-1)                                                 ; Rsun
                    lN_fit_c2_A(ifl) = int_tabulated(rad_fit_c2_A(indsamp), v) / (max(rad_fit_c2_A(indsamp))-min(rad_fit_c2_A(indsamp))) ; Rsun
                 endif
                  ; print,lN_fit_c2_A(ifl), float(mean(v)), float(median(v))

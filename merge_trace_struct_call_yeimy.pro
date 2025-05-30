@@ -13,9 +13,10 @@ pro merge_trace_struct_call_yeimy, nfs1=nfs1, nfs2=nfs2, trace_Bs=trace_Bs
 
 ; Provide FL_LIST, the file which informs the number of field lines and the
 ; filenames of the ASCII files containing the geometry of each line.
-  fl_list = 'fdips_field_150X180X360_mrbqs240414t1304c2283_230_shift.ubdat_fline-filenames_list.txt'
+; fl_list = 'fdips_field_150X180X360_mrbqs240414t1304c2283_230_shift.ubdat_fline-filenames_list.txt'
+  fl_list = 'list_yeimy-fl.txt'
 ; Define field_line_geometry_suffix_dir
-; field_line_geometry_suffix_dir='_aunifgrid_1.15Rs_3x3deg/'
+  field_line_geometry_suffix_dir='_yeimy/'
   if not keyword_set(field_line_geometry_suffix_dir) then $
   field_line_geometry_suffix_dir='/'
 
@@ -28,7 +29,7 @@ pro merge_trace_struct_call_yeimy, nfs1=nfs1, nfs2=nfs2, trace_Bs=trace_Bs
    fl_dir = base_dir+'DATA/trace_tom_files/'+PROJECT_NAME+'/field_lines_geometry'+field_line_geometry_suffix_dir
 ;------------------------------------------------------------------------------------
 
-   merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, trace_Bs = trace_Bs, /aia 
+   merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, trace_Bs = trace_Bs, /aia ,/lascoc2
    
   return
 end

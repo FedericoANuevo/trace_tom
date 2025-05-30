@@ -16,18 +16,19 @@
 ;
 
 pro tom_trace_call_yeimy,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
-                   nfs1=nfs1,nfs2=nfs2,trace_Bs=trace_Bs
+                   nfs1=nfs1,nfs2=nfs2
   
 ; Define PROJECT_NAME, a string suffix to construct the full PATHS to the required files.
   PROJECT_NAME = 'April24'
 ; Define field_line_geometry_suffix_dir
-; field_line_geometry_suffix_dir='_aunifgrid_1.15Rs_3x3deg/'
+  field_line_geometry_suffix_dir='_yeimy/'
   if not keyword_set(field_line_geometry_suffix_dir) then $
   field_line_geometry_suffix_dir='/'
   
 ; Provide FL_LIST, the file which informs the number of field lines and the
 ; filenames of the ASCII files containing the geometry of each line.
-  fl_list = 'fdips_field_150X180X360_mrbqs240414t1304c2283_230_shift.ubdat_fline-filenames_list.txt'
+; fl_list = 'fdips_field_150X180X360_mrbqs240414t1304c2283_230_shift.ubdat_fline-filenames_list.txt'
+  fl_list = 'list_yeimy-fl.txt'
 
 ; --------------------This block should not require edits.---------------------------
 ; Set  FL_DIR, where the field-lines geometry files should be located,
@@ -54,7 +55,7 @@ pro tom_trace_call_yeimy,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
      Irmin    = 1.02
      Irmax    = 1.25
      tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_list=fl_list,$
-               nr=nr,nt=nt,np=np,rmin=rmin,rmax=rmax,Irmin=Irmin,Irmax=Irmax,/trace_Bs
+               nr=nr,nt=nt,np=np,rmin=rmin,rmax=rmax,Irmin=Irmin,Irmax=Irmax,/csv;,/trace_Bs
   endif
 
   if keyword_set(lasco) then begin
@@ -68,7 +69,7 @@ pro tom_trace_call_yeimy,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
      Irmin    = 2.5
      Irmax    = 6.0
      tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_list=fl_list,$
-               nr=nr,nt=nt,np=np,rmin=rmin,rmax=rmax,Irmin=Irmin,Irmax=Irmax,/trace_Bs
+               nr=nr,nt=nt,np=np,rmin=rmin,rmax=rmax,Irmin=Irmin,Irmax=Irmax,/csv;,/trace_Bs
   endif
 
   if keyword_set(kcor_mk4) then begin
