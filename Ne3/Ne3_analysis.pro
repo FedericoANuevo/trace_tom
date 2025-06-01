@@ -184,7 +184,7 @@ oplot,Footpoint_Lon_A,Footpoint_Lat_A,psym=4
 loadct,12
 
 ; Set a maximum threshold for scN
-scN_crit = 0.5
+scN_crit = 0.25
 
 ; Tag field lines for which the DPL fit to AIA has all parameters positive
 tag_posfit_aia_A = fltarr(N_Fl)
