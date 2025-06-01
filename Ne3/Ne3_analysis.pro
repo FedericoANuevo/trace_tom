@@ -44,7 +44,8 @@ pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, $
      leg_label_A,leg_footbfield_A,leg_length_A,$
      Footpoint_Rad_A, Footpoint_Lon_A, Footpoint_Lat_A
   
-    dir = '/data1/DATA/trace_tom_files/CR2254/field_lines_geometry_aunifgrid_1.15Rs_3x3deg/'
+   ;dir = '/data1/DATA/trace_tom_files/CR2254/field_lines_geometry_aunifgrid_multirad_5x5deg/'
+    dir = '/data1/DATA/trace_tom_files/CR2254/field_lines_geometry_aunifgrid_2.50Rs_2x2deg/'
     structure_filename='fdips_field_150x180x360_mrmqs220221t2004c2254_000.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
 
     if keyword_set(load) then $
@@ -220,10 +221,11 @@ endif
 
 ; Now, color-highlight the footpoints indicated by ifl_A
 indxpos_A = intersect(ifl_A,ifl_pos_A)
+if indxpos_A(0) ne 0 then $
 oplot,Footpoint_Lon_A(indxpos_A),Footpoint_Lat_A(indxpos_A),psym=4,th=2,color=green
 indxneg_A = intersect(ifl_A,ifl_neg_A)
+if indxneg_A(0) ne 0 then $
 oplot,Footpoint_Lon_A(indxneg_A),Footpoint_Lat_A(indxneg_A),psym=4,th=2,color=red
-
 
 if NOT keyword_set(closed) and NOT keyword_set(open) then begin
    loadct,0

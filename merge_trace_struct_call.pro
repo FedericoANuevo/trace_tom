@@ -1,7 +1,8 @@
 ;
-; PURPOSE: This code is the main routine to merge tracings, where the AWSoM fieldline
+; PURPOSE:
+; This code is the main routine to merge tracings. Here the AWSoM fieldline
 ; files are provided, as well as flags are set for every instrument
-; whose already traced tomography is to me merged.
+; for which already traced tomographic prodcuts are to me merged.
 ;
 ; HISTORY: V1.0 AMV & FAN, CLaSP, October 2023.
 ; 
@@ -15,7 +16,8 @@ pro merge_trace_struct_call, nfs1=nfs1, nfs2=nfs2, trace_Bs=trace_Bs
 ; filenames of the ASCII files containing the geometry of each line.
   fl_list = 'fdips_field_150x180x360_mrmqs220221t2004c2254_000.ubdat_fline-filenames_list.txt'
 ; Define field_line_geometry_suffix_dir
-  field_line_geometry_suffix_dir='_aunifgrid_1.15Rs_3x3deg/'
+  field_line_geometry_suffix_dir='_aunifgrid_2.50Rs_1x1deg/'
+
   if not keyword_set(field_line_geometry_suffix_dir) then $
   field_line_geometry_suffix_dir='/'
 
