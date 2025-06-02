@@ -51,13 +51,13 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
     ;tom_file = 'CR2099_AIA_compound2.dat'    & instr = 'aia'
     ;tom_file = 'LDEM.April-2024_aia_Hollow_3Bands_gauss1_lin_Norm-median_singlStart' & instr = 'aia'
      tom_file = 'LDEM.feb-mar_2022_segment2_aia_Hollow_3Bands_ucomp_comparison_gauss1_lin_Norm-median_singlStart' & instr = 'aia'
-     nr       = 21;30
-     nt       = 60;90
+     nr       = 21   ;30
+     nt       = 60   ;90
      np       = 2*nt
-     rmin     = 1.09;1.0
-     rmax     = 1.3;1.3
-     Irmin    = 1.09;1.02
-     Irmax    = 1.25;1.25
+     rmin     = 1.09 ;1.0
+     rmax     = 1.30 ;1.3
+     Irmin    = 1.09 ;1.02
+     Irmax    = 1.25 ;1.25
      tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_list=fl_list,$
                nr=nr,nt=nt,np=np,rmin=rmin,rmax=rmax,Irmin=Irmin,Irmax=Irmax,/trace_Bs
   endif
@@ -81,13 +81,13 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
   if keyword_set(kcor_mk4) then begin
     ;tom_file = 'x_Mk4_CR2099_shifted_Rmin1.15_Rmax1.85_IRmin1.15_IRmax1.50_70x90x180_BF2_L5.e-6' & instr = 'mk4'
      tom_file = 'x_kcor_2022_Feb-Mar_segment2_Rmin1.09_Rmax1.75_IRmin1.09_IRmax1.50_66x60x120_BF2_L2.6e-5_CORRECT-FACT-0.79' & instr = 'kcor'
-     nr       = 66;70
-     nt       = 60;90
+     nr       = 66   ;70
+     nt       = 60   ;90
      np       = 2*nt
-     rmin     = 1.09;1.15
-     rmax     = 1.75;1.85
-     Irmin    = 1.09;1.15
-     Irmax    = 1.50;1.50
+     rmin     = 1.09 ;1.15
+     rmax     = 1.75 ;1.85
+     Irmin    = 1.09 ;1.15
+     Irmax    = 1.50 ;1.50
      tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_list=fl_list,$
                nr=nr,nt=nt,np=np,rmin=rmin,rmax=rmax,Irmin=Irmin,Irmax=Irmax,/trace_Bs
   endif
