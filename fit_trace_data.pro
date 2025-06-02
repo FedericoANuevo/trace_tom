@@ -102,7 +102,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                  Ne_fit_aia_A(ifl,range_fit) = A[0] * rad_fit_aia_A(range_fit)^(-A[1]) + A[2] * rad_fit_aia_A(range_fit)^(-A[3])                 ; cm-3
               dNedr_fit_aia_A(    range_fit) = - A[1]*A[0] * rad_fit_aia_A(range_fit)^(-A[1]-1) - A[3]*A[2] * rad_fit_aia_A(range_fit)^(-A[3]-1) ; cm-3 / Rsun
                  indsamp = where(dNedr_fit_aia_A lt 0. AND dNedr_fit_aia_A ne default)
-                 if n_elements(indsamp) gt n_elements(range_fit)/2. AND indsamp(0) ne -1. then begin
+                 if n_elements(indsamp) gt 4 AND indsamp(0) ne -1. then begin
                    v = abs(dNedr_fit_aia_A(indsamp)/reform(Ne_fit_aia_A(ifl,indsamp)))^(-1)                                                   ; Rsun
                    lN_fit_aia_A(ifl)   =  int_tabulated(rad_fit_aia_A(indsamp),v) / (max(rad_fit_aia_A(indsamp))-min(rad_fit_aia_A(indsamp))) ; Rsun
                    ; print,lN_fit_aia_A(ifl), float(mean(v)), float(median(v))
@@ -208,7 +208,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                 Ne_fit_euvia_A(ifl,range_fit) = A[0] * rad_fit_euvia_A(range_fit)^(-A[1]) + A[2] * rad_fit_euvia_A(range_fit)^(-A[3])                 ; cm-3
              dNedr_fit_euvia_A(    range_fit) = - A[1]*A[0] * rad_fit_euvia_A(range_fit)^(-A[1]-1) - A[3]*A[2] * rad_fit_euvia_A(range_fit)^(-A[3]-1) ; cm-3 / Rsun
              indsamp = where(dNedr_fit_euvia_A lt 0. AND dNedr_fit_euvia_A ne default)
-                if n_elements(indsamp) gt n_elements(range_fit)/2. AND indsamp(0) ne -1. then begin
+                if n_elements(indsamp) gt 4 AND indsamp(0) ne -1. then begin
                    v = abs(dNedr_fit_euvia_A(indsamp)/reform(Ne_fit_euvia_A(ifl,indsamp)))^(-1)                                                    ; Rsun
                    lN_fit_euvia_A(ifl) = int_tabulated(rad_fit_euvia_A(indsamp),v) / (max(rad_fit_euvia_A(indsamp))-min(rad_fit_euvia_A(indsamp))) ; Rsun
                    ; print,lN_fit_euvia_A(ifl), float(mean(v)), float(median(v))
@@ -313,7 +313,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                 Ne_fit_euvib_A(ifl,range_fit) = A[0] * rad_fit_euvib_A(range_fit)^(-A[1]) + A[2] * rad_fit_euvib_A(range_fit)^(-A[3])                 ; cm-3
              dNedr_fit_euvib_A(    range_fit) = - A[1]*A[0] * rad_fit_euvib_A(range_fit)^(-A[1]-1) - A[3]*A[2] * rad_fit_euvib_A(range_fit)^(-A[3]-1) ; cm-3 / Rsun
              indsamp = where(dNedr_fit_euvib_A lt 0. AND dNedr_fit_euvib_A ne default)
-                if n_elements(indsamp) gt n_elements(range_fit)/2. AND indsamp(0) ne -1. then begin
+                if n_elements(indsamp) gt 4 AND indsamp(0) ne -1. then begin
                    v = abs(dNedr_fit_euvib_A(indsamp)/reform(Ne_fit_euvib_A(ifl,indsamp)))^(-1)                                                    ; Rsun
                    lN_fit_euvib_A(ifl) = int_tabulated(rad_fit_euvib_A(indsamp),v) / (max(rad_fit_euvib_A(indsamp))-min(rad_fit_euvib_A(indsamp))) ; Rsun
                    ; print,lN_fit_euvib_A(ifl), float(mean(v)), float(median(v))
@@ -425,7 +425,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                 Ne_fit_mk4_A(ifl,range_fit) = A[0] * rad_fit_mk4_A(range_fit)^(-A[1]) + A[2] * rad_fit_mk4_A(range_fit)^(-A[3])                 ; cm-3
              dNedr_fit_mk4_A(    range_fit) = - A[1]*A[0] * rad_fit_mk4_A(range_fit)^(-A[1]-1) - A[3]*A[2] * rad_fit_mk4_A(range_fit)^(-A[3]-1) ; cm-3 / Rsun
                 indsamp = where(dNedr_fit_mk4_A lt 0. AND dNedr_fit_mk4_A ne default)
-                if n_elements(indsamp) gt n_elements(range_fit)/2. AND indsamp(0) ne -1. then begin
+                if n_elements(indsamp) gt 4 AND indsamp(0) ne -1. then begin
                    v = abs(dNedr_fit_mk4_A(indsamp)/reform(Ne_fit_mk4_A(ifl,indsamp)))^(-1)                                                          ; Rsun
                    lN_fit_mk4_A(ifl) = int_tabulated(rad_fit_mk4_A(indsamp), v) / (max(rad_fit_mk4_A(indsamp))-min(rad_fit_mk4_A(indsamp))) ; Rsun
                    ; print,lN_fit_mk4_A(ifl), float(mean(v)), float(median(v))
@@ -505,7 +505,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                 Ne_fit_kcor_A(ifl,range_fit) = A[0] * rad_fit_kcor_A(range_fit)^(-A[1]) + A[2] * rad_fit_kcor_A(range_fit)^(-A[3])                 ; cm-3
              dNedr_fit_kcor_A(    range_fit) = - A[1]*A[0] * rad_fit_kcor_A(range_fit)^(-A[1]-1) - A[3]*A[2] * rad_fit_kcor_A(range_fit)^(-A[3]-1) ; cm-3 / Rsun
                 indsamp = where(dNedr_fit_kcor_A lt 0. AND dNedr_fit_kcor_A ne default)
-                if n_elements(indsamp) gt n_elements(range_fit)/2. AND indsamp(0) ne -1. then begin
+                if n_elements(indsamp) gt 4 AND indsamp(0) ne -1. then begin
                    v = abs(dNedr_fit_kcor_A(indsamp)/reform(Ne_fit_kcor_A(ifl,indsamp)))^(-1)                                                     ; Rsun
                    lN_fit_kcor_A(ifl)   = int_tabulated(rad_fit_kcor_A(indsamp), v) / (max(rad_fit_kcor_A(indsamp))-min(rad_fit_kcor_A(indsamp))) ; Rsun
                    ; print,lN_fit_mk4_A(ifl), float(mean(v)), float(median(v))
@@ -577,7 +577,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                 Ne_fit_ucomp_A(ifl,range_fit) = A[0] * rad_fit_ucomp_A(range_fit)^(-A[1]) + A[2] * rad_fit_ucomp_A(range_fit)^(-A[3])                 ; cm-3
              dNedr_fit_ucomp_A(    range_fit) = - A[1]*A[0] * rad_fit_ucomp_A(range_fit)^(-A[1]-1) - A[3]*A[2] * rad_fit_ucomp_A(range_fit)^(-A[3]-1) ; cm-3 / Rsun
              indsamp = where(dNedr_fit_ucomp_A lt 0. AND dNedr_fit_ucomp_A ne default)
-                if n_elements(indsamp) gt n_elements(range_fit)/2. AND indsamp(0) ne -1. then begin
+                if n_elements(indsamp) gt 4 AND indsamp(0) ne -1. then begin
                    v = abs(dNedr_fit_ucomp_A(indsamp)/reform(Ne_fit_ucomp_A(ifl,indsamp)))^(-1)
                    lN_fit_ucomp_A(ifl)   = int_tabulated(rad_fit_ucomp_A(indsamp), v) / (max(rad_fit_ucomp_A(indsamp))-min(rad_fit_ucomp_A(indsamp))) ; Rsun
                    ; print,lN_fit_mk4_A(ifl), float(mean(v)), float(median(v))
@@ -661,7 +661,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                 Ne_fit_c2_A(ifl,range_fit) = A[0] * rad_fit_c2_A(range_fit)^(-A[1]) + A[2] * rad_fit_c2_A(range_fit)^(-A[3])                 ; cm-3
              dNedr_fit_c2_A(    range_fit) = - A[1]*A[0] * rad_fit_c2_A(range_fit)^(-A[1]-1) - A[3]*A[2] * rad_fit_c2_A(range_fit)^(-A[3]-1) ; cm-3 / Rsun
                 indsamp = where(dNedr_fit_c2_A lt 0. AND dNedr_fit_c2_A ne default)
-                if n_elements(indsamp) gt n_elements(range_fit)/2. AND indsamp(0) ne -1. then begin
+                if n_elements(indsamp) gt 4 AND indsamp(0) ne -1. then begin
                    v = abs(dNedr_fit_c2_A(indsamp)/reform(Ne_fit_c2_A(ifl,indsamp)))^(-1)                                                 ; Rsun
                    lN_fit_c2_A(ifl) = int_tabulated(rad_fit_c2_A(indsamp), v) / (max(rad_fit_c2_A(indsamp))-min(rad_fit_c2_A(indsamp))) ; Rsun
                 endif
