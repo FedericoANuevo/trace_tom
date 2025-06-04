@@ -3,7 +3,7 @@ pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, $
                   aia=aia, kcor=kcor, ucomp=ucomp,$
                   plotaia=plotaia, plotkcor=plotkcor, plotucomp=plotucomp,$
                   open=open,closed=closed,connect=connect,$
-                  positparam=positparam, ilstep=ilstep 
+                  positparam=positparam, ilstep=ilstep, constep=constep
 
   common data, N_fl, Npt_max, Npt_v, x_A, y_A, z_A, s_A, Br_A, Bth_A, Bph_A, B_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, WT_aia_A, ldem_flag_aia_A, index_aia_A, index_sampling_aia_A,$
@@ -62,8 +62,10 @@ pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, $
 ; Define plot filename suffix
   if not keyword_set(plot_filename_suffix) then plot_filename_suffix='footpoints-map'
 
-; Default index line step for connect and individual line plots
-  if not keyword_set(ilstep) then ilstep=1
+; Default index line step and connect step, for plots only, this does
+; NOT affect average trend computations
+  if not keyword_set(ilstep)  then ilstep=1
+  if not keyword_set(constep) then constep=1
   
 ; Define box of footpoint Lat/Lot to analyze
   if not keyword_set(LonLimits) then LonLimits = [  0., 360.]
@@ -222,8 +224,6 @@ if keyword_set(positparam) then begin
    indpositparam_ucomp = where(tag_posfit_ucomp_A eq +1) &  ifl_ucomp_A = intersect(ifl_ucomp_A,indpositparam_ucomp) 
 endif
 
-
-
 ; Make an index array with the common elements of all ifl_INSTRUMENT_A
                            ifl_A = indgen(N_fl)
 if keyword_set(aia)   then ifl_A = intersect(ifl_A,ifl_aia_A  )
@@ -237,9 +237,12 @@ if keyword_set(open)   then ifl_A = intersect(ifl_A,ifl_open_A  )
 if keyword_set(connect) AND keyword_set(closed) then begin
    ifl_A_orig = ifl_A 
    ifl=0
+   closed_loop_count = -1
    while ifl le N_fl-2 do begin
       if leg_label_A(ifl) ne 0 then begin
-         if tag_box_A(ifl) eq +1 then oplot,reform(Footpoint_Lon_A(ifl:ifl+1)),reform(Footpoint_Lat_A(ifl:ifl+1)),color=blue
+         closed_loop_count = closed_loop_count + 1
+         if (tag_box_A(ifl) eq +1) AND (closed_loop_count mod constep eq 0) then $
+            oplot,reform(Footpoint_Lon_A(ifl:ifl+1)),reform(Footpoint_Lat_A(ifl:ifl+1)),color=blue
          ifl=ifl+2
       endif else begin
          ifl=ifl+1
