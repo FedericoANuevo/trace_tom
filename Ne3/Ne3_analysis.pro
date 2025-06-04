@@ -1,7 +1,8 @@
 pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, $
                   plot_filename_suffix=plot_filename_suffix,$
                   aia=aia, kcor=kcor, ucomp=ucomp,$
-                  open=open,closed=closed,connect=connect
+                  open=open,closed=closed,connect=connect,$
+                  positparam=positparam
 
   common data, N_fl, Npt_max, Npt_v, x_A, y_A, z_A, s_A, Br_A, Bth_A, Bph_A, B_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, WT_aia_A, ldem_flag_aia_A, index_aia_A, index_sampling_aia_A,$
@@ -30,6 +31,8 @@ pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, $
      N1_fit_eit_A,N2_fit_eit_A,p1_fit_eit_A,p2_fit_eit_A,$
      N0_fit_mk4_A,lN_fit_mk4_A,$
      N1_fit_mk4_A,N2_fit_mk4_A,p1_fit_mk4_A,p2_fit_mk4_A,$
+     N1_fit_kcor_A,N2_fit_kcor_A,p1_fit_kcor_A,p2_fit_kcor_A,$
+     N1_fit_ucomp_A,N2_fit_ucomp_A,p1_fit_ucomp_A,p2_fit_ucomp_A,$
      N1_fit_c2_A,N2_fit_c2_A,p1_fit_c2_A,p2_fit_c2_A,$
      lN_fit_c2_A,$
      fit_F_Ne_aia,fit_F_Ne_mk4,fit_F_Ne_c2,$
@@ -190,16 +193,33 @@ loadct,12
 ; Set a maximum threshold for scN
 scN_crit = 0.25
 
-; Tag field lines for which the DPL fit to AIA has all parameters positive
+; Tag INSTRUMENT field lines for which the DPL fit has all parameters positive
 tag_posfit_aia_A = fltarr(N_Fl)
 index            = where(N1_fit_aia_A gt 0. AND N2_fit_aia_A gt 0. AND p1_fit_aia_A gt 0. AND p2_fit_aia_A gt 0.)
 tag_posfit_aia_A(index) = +1
+;
+tag_posfit_kcor_A = fltarr(N_Fl)
+index             = where(N1_fit_kcor_A gt 0. AND N2_fit_kcor_A gt 0. AND p1_fit_kcor_A gt 0. AND p2_fit_kcor_A gt 0.)
+tag_posfit_kcor_A(index) = +1
+;
+tag_posfit_ucomp_A = fltarr(N_Fl)
+index              = where(N1_fit_ucomp_A gt 0. AND N2_fit_ucomp_A gt 0. AND p1_fit_ucomp_A gt 0. AND p2_fit_ucomp_A gt 0.)
+tag_posfit_ucomp_A(index) = +1
+;
 
-; Index lines of each instrument that have a good fit to Ne and are in
-; the box
-if keyword_set(aia)   then ifl_aia_A   = where(tag_box_A eq +1 AND tag_pos_aia_A   eq +1 AND fitflag_aia_A   eq +1 AND scN_fit_aia_A   le scN_crit); AND tag_posfit_aia_A eq +1)
+; Index lines of each instrument that: 1) are in the box, 2) have Ne_fit>0 up to R_max, and 3) have a low chisq fit to Ne
+if keyword_set(aia)   then ifl_aia_A   = where(tag_box_A eq +1 AND tag_pos_aia_A   eq +1 AND fitflag_aia_A   eq +1 AND scN_fit_aia_A   le scN_crit)
 if keyword_set(kcor)  then ifl_kcor_A  = where(tag_box_A eq +1 AND tag_pos_kcor_A  eq +1 AND fitflag_kcor_A  eq +1 AND scN_fit_kcor_A  le scN_crit)
 if keyword_set(ucomp) then ifl_ucomp_A = where(tag_box_A eq +1 AND tag_pos_ucomp_A eq +1 AND fitflag_ucomp_A eq +1 AND scN_fit_ucomp_A le scN_crit)
+; add all parameters positive condition if so requested.
+if keyword_set(positparam) then begin
+   indpositparam_aia   = where(tag_posfit_aia_A   eq +1) &  ifl_aia_A   = intersect(ifl_aia_A  ,indpositparam_aia) 
+   indpositparam_kcor  = where(tag_posfit_kcor_A  eq +1) &  ifl_kcor_A  = intersect(ifl_kcor_A ,indpositparam_kcor) 
+   indpositparam_ucomp = where(tag_posfit_ucomp_A eq +1) &  ifl_ucomp_A = intersect(ifl_ucomp_A,indpositparam_ucomp) 
+endif
+
+
+
 ; Make an index array with the common elements of all ifl_INSTRUMENT_A
                            ifl_A = indgen(N_fl)
 if keyword_set(aia)   then ifl_A = intersect(ifl_A,ifl_aia_A  )
@@ -223,7 +243,8 @@ if keyword_set(connect) AND keyword_set(closed) then begin
    endwhile
 endif
 
-; Now, color-highlight the footpoints indicated by ifl_A
+; Now, color-highlight the footpoints indicated by ifl_A accordind to
+; their polarity
 indxpos_A = intersect(ifl_A,ifl_pos_A)
 if indxpos_A(0) ne 0 then $
 oplot,Footpoint_Lon_A(indxpos_A),Footpoint_Lat_A(indxpos_A),psym=4,th=2,color=green
@@ -231,14 +252,9 @@ indxneg_A = intersect(ifl_A,ifl_neg_A)
 if indxneg_A(0) ne 0 then $
 oplot,Footpoint_Lon_A(indxneg_A),Footpoint_Lat_A(indxneg_A),psym=4,th=2,color=red
 
-if NOT keyword_set(closed) and NOT keyword_set(open) then begin
-   loadct,0
-   oplot,Footpoint_Lon_A(ifl_A),Footpoint_Lat_A(ifl_A),psym=4,th=2
-endif
-
 ; Compute the average Ne(r) of each instrument for lines indexed ifl_A
 if keyword_set(aia) then begin
-      Ne_fit_aia_Avg = total( Ne_fit_aia_A(ifl_A,*) , 1 ) / float(n_elements(ifl_A))
+   Ne_fit_aia_Avg = total( Ne_fit_aia_A(ifl_A,*) , 1 ) / float(n_elements(ifl_A)) 
 endif
 if keyword_set(kcor) then begin
       Ne_fit_kcor_Avg = total( Ne_fit_kcor_A(ifl_A,*) , 1 ) / float(n_elements(ifl_A))
@@ -286,9 +302,22 @@ plot,rad_fit_kcor_A,Ne_fit_kcor_A(0,*)/unit,charsize=csz,font=0,$
      xtitle = 'r [Rsun]'                                   ,xr=xrange,xstyle=1,$
      /nodata
 
-;loadct,12
+loadct,39
+Nifl = n_elements(ifl_A)
+col = 255 * findgen(Nifl)/float(Nifl-1)
+for ifl=0,Nifl-1 do begin
+   if keyword_set(aia) then begin
+      il = (ifl_A(ifl))(0)
+      tmp = reform(index_sampling_aia_A(il,*))
+      ind_samp_aia = where(tmp eq 1)
+      oplot,rad_fit_aia_A         ,Ne_fit_aia_A(il,*)       /unit,color=col(ifl)
+      oplot,rad_A(il,ind_samp_aia),Ne_aia_A(il,ind_samp_aia)/unit,color=col(ifl),psym=4
+   endif
+endfor
+
+loadct,0
 color=0
-if keyword_set(aia)   then oplot,rad_fit_aia_A  ,Ne_fit_aia_Avg  /unit,color=color,th=2
+if keyword_set(aia)   then oplot,rad_fit_aia_A  ,Ne_fit_aia_Avg  /unit,color=color,th=8
 if keyword_set(kcor)  then oplot,rad_fit_kcor_A ,Ne_fit_kcor_Avg /unit,color=color,th=2,linestyle=2
 if keyword_set(ucomp) then oplot,rad_fit_ucomp_A,Ne_fit_ucomp_Avg/unit,color=color,th=2,linestyle=3
 loadct,0

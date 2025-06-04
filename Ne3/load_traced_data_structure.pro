@@ -56,6 +56,8 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
      N1_fit_eit_A,N2_fit_eit_A,p1_fit_eit_A,p2_fit_eit_A,$
      N0_fit_mk4_A,lN_fit_mk4_A,$
      N1_fit_mk4_A,N2_fit_mk4_A,p1_fit_mk4_A,p2_fit_mk4_A,$
+     N1_fit_kcor_A,N2_fit_kcor_A,p1_fit_kcor_A,p2_fit_kcor_A,$
+     N1_fit_ucomp_A,N2_fit_ucomp_A,p1_fit_ucomp_A,p2_fit_ucomp_A,$
      N1_fit_c2_A,N2_fit_c2_A,p1_fit_c2_A,p2_fit_c2_A,$
      lN_fit_c2_A,$
      fit_F_Ne_aia,fit_F_Ne_mk4,fit_F_Ne_c2,$
