@@ -1,8 +1,9 @@
 pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, $
                   plot_filename_suffix=plot_filename_suffix,$
                   aia=aia, kcor=kcor, ucomp=ucomp,$
+                  plotaia=plotaia, plotkcor=plotkcor, plotucomp=plotucomp,$
                   open=open,closed=closed,connect=connect,$
-                  positparam=positparam
+                  positparam=positparam, ilstep=ilstep 
 
   common data, N_fl, Npt_max, Npt_v, x_A, y_A, z_A, s_A, Br_A, Bth_A, Bph_A, B_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, WT_aia_A, ldem_flag_aia_A, index_aia_A, index_sampling_aia_A,$
@@ -61,6 +62,9 @@ pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, $
 ; Define plot filename suffix
   if not keyword_set(plot_filename_suffix) then plot_filename_suffix='footpoints-map'
 
+; Default index line step for connect and individual line plots
+  if not keyword_set(ilstep) then ilstep=1
+  
 ; Define box of footpoint Lat/Lot to analyze
   if not keyword_set(LonLimits) then LonLimits = [  0., 360.]
   if not keyword_set(LatLimits) then LatLimits = [-90.,+ 90.]
@@ -302,24 +306,38 @@ plot,rad_fit_kcor_A,Ne_fit_kcor_A(0,*)/unit,charsize=csz,font=0,$
      xtitle = 'r [Rsun]'                                   ,xr=xrange,xstyle=1,$
      /nodata
 
+if keyword_set(plotaia) or keyword_set(plotkcor) or keyword_set(plotucomp) then begin
 loadct,39
 Nifl = n_elements(ifl_A)
 col = 255 * findgen(Nifl)/float(Nifl-1)
-for ifl=0,Nifl-1 do begin
-   if keyword_set(aia) then begin
-      il = (ifl_A(ifl))(0)
-      tmp = reform(index_sampling_aia_A(il,*))
-      ind_samp_aia = where(tmp eq 1)
-      oplot,rad_fit_aia_A         ,Ne_fit_aia_A(il,*)       /unit,color=col(ifl)
-      oplot,rad_A(il,ind_samp_aia),Ne_aia_A(il,ind_samp_aia)/unit,color=col(ifl),psym=4
+for ifl=0,Nifl-1,ilstep do begin
+   il = (ifl_A(ifl))(0)
+   if keyword_set(plotaia) then begin
+      tmp      = reform(index_sampling_aia_A(il,*))
+      ind_samp = where(tmp eq 1)
+      oplot,rad_fit_aia_A     ,Ne_fit_aia_A(il,*)   /unit,color=col(ifl)
+      oplot,rad_A(il,ind_samp),Ne_aia_A(il,ind_samp)/unit,color=col(ifl),psym=4
+   endif
+   if keyword_set(plotkcor) then begin
+      tmp      = reform(index_sampling_kcor_A(il,*))
+      ind_samp = where(tmp eq 1)
+      oplot,rad_fit_kcor_A    ,Ne_fit_kcor_A(il,*)   /unit,color=col(ifl)
+      oplot,rad_A(il,ind_samp),Ne_kcor_A(il,ind_samp)/unit,color=col(ifl),psym=4
+   endif
+   if keyword_set(plotucomp) then begin
+      tmp      = reform(index_sampling_ucomp_A(il,*))
+      ind_samp = where(tmp eq 1)
+      oplot,rad_fit_ucomp_A   ,Ne_fit_ucomp_A(il,*)   /unit,color=col(ifl)
+      oplot,rad_A(il,ind_samp),Ne_ucomp_A(il,ind_samp)/unit,color=col(ifl),psym=4
    endif
 endfor
+endif
 
 loadct,0
 color=0
 if keyword_set(aia)   then oplot,rad_fit_aia_A  ,Ne_fit_aia_Avg  /unit,color=color,th=8
-if keyword_set(kcor)  then oplot,rad_fit_kcor_A ,Ne_fit_kcor_Avg /unit,color=color,th=2,linestyle=2
-if keyword_set(ucomp) then oplot,rad_fit_ucomp_A,Ne_fit_ucomp_Avg/unit,color=color,th=2,linestyle=3
+if keyword_set(kcor)  then oplot,rad_fit_kcor_A ,Ne_fit_kcor_Avg /unit,color=color,th=8,linestyle=2
+if keyword_set(ucomp) then oplot,rad_fit_ucomp_A,Ne_fit_ucomp_Avg/unit,color=color,th=8,linestyle=3
 loadct,0
 !p.multi=0
 ps2
