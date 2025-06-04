@@ -64,7 +64,7 @@ pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, $
 
 ; Default index line step and connect step, for plots only, this does
 ; NOT affect average trend computations
-  if not keyword_set(ilstep)  then ilstep=1
+  if not keyword_set( ilstep) then  ilstep=1
   if not keyword_set(constep) then constep=1
   
 ; Define box of footpoint Lat/Lot to analyze
