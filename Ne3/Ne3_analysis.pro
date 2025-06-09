@@ -3,7 +3,8 @@ pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, $
                   aia=aia, kcor=kcor, ucomp=ucomp,$
                   plotaia=plotaia, plotkcor=plotkcor, plotucomp=plotucomp,$
                   open=open,closed=closed,connect=connect,$
-                  positparam=positparam, ilstep=ilstep, constep=constep
+                  positparam=positparam, ilstep=ilstep, constep=constep,$
+                  r_max=r_max, only_loops=only_loops
 
   common data, N_fl, Npt_max, Npt_v, x_A, y_A, z_A, s_A, Br_A, Bth_A, Bph_A, B_A, rad_A, lat_A, lon_A,$
      Ne_aia_A, Tm_aia_A, WT_aia_A, ldem_flag_aia_A, index_aia_A, index_sampling_aia_A,$
@@ -77,13 +78,14 @@ pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, $
   
 ; Tag field lines with footpoints within the BOX., either open or closed.
     tag_box_A = fltarr(N_fl)
-    ifl_A = where( (Footpoint_Lon_A ge LonLimits(0) AND Footpoint_Lon_A le LonLimits(1)) AND $
-                   (Footpoint_Lat_A ge LatLimits(0) AND Footpoint_Lat_A le LatLimits(1)) )
-    tag_box_A(ifl_A) = +1.
+    index_box = where( (Footpoint_Lon_A ge LonLimits(0) AND Footpoint_Lon_A le LonLimits(1)) AND $
+                       (Footpoint_Lat_A ge LatLimits(0) AND Footpoint_Lat_A le LatLimits(1)) )
+    tag_box_A(index_box) = +1.
 
 ; Now, UNTAG CLOSED field lines whose other leg's footpoint is NOT wihin the BOX,
 ;      as well as CLOSED field lines that do NOT comply with opposite polarity.
-   ifl=0
+ if keyword_Set(only_loops) then begin
+    ifl=0
     while ifl le N_fl-2 do begin
        if leg_label_A(ifl) eq 0. then begin
           ifl=ifl+1
@@ -95,7 +97,8 @@ pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, $
           ifl=ifl+2
        endelse
     endwhile
-    
+ endif
+ 
 ; Create index arrays for closed and open field lines.
   ifl_closed_A = where(leg_label_A ne 0)
   ifl_open_A   = where(leg_label_A eq 0)
@@ -114,61 +117,64 @@ Nsamp = 2
 ; Set two parameters, named R_crit and R_max, using the "bottleneck" instrument,
 ; achieved by organizing these conditionals in increasing "bottleneckless".
 ;
-if keyword_set(kcor ) then begin
-   r_crit = median(rad_fit_kcor_A )
-   r_max  = max   (rad_fit_kcor_A )
-endif
-if keyword_set(aia  ) then begin
-   r_crit = median(rad_fit_aia_A  )
-   r_max  = max   (rad_fit_aia_A  )
-endif
-if keyword_set(ucomp) then begin
-   r_crit = median(rad_fit_ucomp_A)
-   r_max  = max   (rad_fit_ucomp_A)
+if NOT keyword_set(r_max) then begin
+   stop
+   if keyword_set(kcor ) then begin
+      r_crit = median(rad_fit_kcor_A )
+      r_max  = max   (rad_fit_kcor_A )
+   endif
+   if keyword_set(aia  ) then begin
+      r_crit = median(rad_fit_aia_A  )
+      r_max  = max   (rad_fit_aia_A  )
+   endif
+   if keyword_set(ucomp) then begin
+      r_crit = median(rad_fit_ucomp_A)
+      r_max  = max   (rad_fit_ucomp_A)
+   endif
 endif
 ;
-tag_pos_aia_A          = fltarr(N_fl) - 678.
-tag_fullrange_aia_A    = fltarr(N_fl) - 678.
-tag_pos_kcor_A         = fltarr(N_fl) - 678.
-tag_fullrange_kcor_A   = fltarr(N_fl) - 678.
-tag_pos_ucomp_A        = fltarr(N_fl) - 678.
-tag_fullrange_ucomp_A  = fltarr(N_fl) - 678.
+ tag_pos_aia_A          = fltarr(N_fl) - 678.
+;tag_fullrange_aia_A    = fltarr(N_fl) - 678.
+ tag_pos_kcor_A         = fltarr(N_fl) - 678.
+;tag_fullrange_kcor_A   = fltarr(N_fl) - 678.
+ tag_pos_ucomp_A        = fltarr(N_fl) - 678.
+;tag_fullrange_ucomp_A  = fltarr(N_fl) - 678.
 for ifl=0,N_fl-1 do begin
    if keyword_set(aia) then begin
       ifitpos_aia = where(reform(Ne_fit_aia_A  (ifl,*)) gt 0. and rad_fit_aia_A le R_max)
       ifitrad_aia = where(rad_fit_aia_A le R_max) 
       if ifitpos_aia(0) ne -1 then begin
          if n_elements(ifitpos_aia) eq n_elements(ifitrad_aia) then tag_pos_aia_A(ifl) = +1.
-         if n_elements(where(rad_fit_aia_A(ifitpos_aia) lt r_crit))                                         ge Nsamp AND  $
-            n_elements(where(rad_fit_aia_A(ifitpos_aia) gt r_crit AND rad_fit_aia_A(ifitpos_aia) lt r_max)) ge Nsamp then tag_fullrange_aia_A(ifl) = +1.
+;         if n_elements(where(rad_fit_aia_A(ifitpos_aia) lt r_crit))                                         ge Nsamp AND  $
+;            n_elements(where(rad_fit_aia_A(ifitpos_aia) gt r_crit AND rad_fit_aia_A(ifitpos_aia) lt r_max)) ge Nsamp then tag_fullrange_aia_A(ifl) = +1.
       endif
    endif else begin
       tag_pos_aia_A(ifl) = +1
-      tag_fullrange_aia_A(ifl) = +1
+;      tag_fullrange_aia_A(ifl) = +1
    endelse
    if keyword_set(kcor) then begin
       ifitpos_kcor = where(reform(Ne_fit_kcor_A (ifl,*)) gt 0. and rad_fit_kcor_A le R_max)
       ifitrad_kcor = where(rad_fit_kcor_A le R_max) 
       if ifitpos_kcor(0) ne -1 then begin
          if n_elements(ifitpos_kcor) eq n_elements(ifitrad_kcor) then tag_pos_kcor_A(ifl) = +1.
-         if n_elements(where(rad_fit_kcor_A(ifitpos_kcor) lt r_crit))                                           ge Nsamp AND  $
-            n_elements(where(rad_fit_kcor_A(ifitpos_kcor) gt r_crit AND rad_fit_kcor_A(ifitpos_kcor) lt r_max)) ge Nsamp then tag_fullrange_kcor_A(ifl) = +1.
+;         if n_elements(where(rad_fit_kcor_A(ifitpos_kcor) lt r_crit))                                           ge Nsamp AND  $
+;            n_elements(where(rad_fit_kcor_A(ifitpos_kcor) gt r_crit AND rad_fit_kcor_A(ifitpos_kcor) lt r_max)) ge Nsamp then tag_fullrange_kcor_A(ifl) = +1.
       endif
    endif else begin
       tag_pos_kcor_A(ifl) = +1
-      tag_fullrange_kcor_A(ifl) = +1
+;      tag_fullrange_kcor_A(ifl) = +1
    endelse
    if keyword_set(ucomp) then begin
       ifitpos_ucomp = where(reform(Ne_fit_ucomp_A(ifl,*)) gt 0. and rad_fit_ucomp_A le R_max)
       ifitrad_ucomp = where(rad_fit_ucomp_A le R_max) 
       if ifitpos_ucomp(0) ne -1 then begin
          if n_elements(ifitpos_ucomp) eq n_elements(ifitrad_ucomp) then tag_pos_ucomp_A(ifl) = +1.
-         if n_elements(where(rad_fit_ucomp_A(ifitpos_ucomp) lt r_crit))                                             ge Nsamp AND  $
-            n_elements(where(rad_fit_ucomp_A(ifitpos_ucomp) gt r_crit AND rad_fit_ucomp_A(ifitpos_ucomp) lt r_max)) ge Nsamp then tag_fullrange_ucomp_A(ifl) = +1.
+;         if n_elements(where(rad_fit_ucomp_A(ifitpos_ucomp) lt r_crit))                                             ge Nsamp AND  $
+;            n_elements(where(rad_fit_ucomp_A(ifitpos_ucomp) gt r_crit AND rad_fit_ucomp_A(ifitpos_ucomp) lt r_max)) ge Nsamp then tag_fullrange_ucomp_A(ifl) = +1.
       endif
    endif else begin
       tag_pos_ucomp_A(ifl) = +1
-      tag_fullrange_ucomp_A(ifl) = +1
+;      tag_fullrange_ucomp_A(ifl) = +1
    endelse
 endfor
 
@@ -199,7 +205,7 @@ loadct,12
 ; Set a maximum threshold for scN
 scN_crit = 0.25
 
-; Tag INSTRUMENT field lines for which the DPL fit has all parameters positive
+; Independently for each instrument, tag field lines for which their DPL Ne-fit has all parameters positive
 tag_posfit_aia_A = fltarr(N_Fl)
 index            = where(N1_fit_aia_A gt 0. AND N2_fit_aia_A gt 0. AND p1_fit_aia_A gt 0. AND p2_fit_aia_A gt 0.)
 tag_posfit_aia_A(index) = +1
@@ -211,31 +217,39 @@ tag_posfit_kcor_A(index) = +1
 tag_posfit_ucomp_A = fltarr(N_Fl)
 index              = where(N1_fit_ucomp_A gt 0. AND N2_fit_ucomp_A gt 0. AND p1_fit_ucomp_A gt 0. AND p2_fit_ucomp_A gt 0.)
 tag_posfit_ucomp_A(index) = +1
-;
 
-; Index lines of each instrument that: 1) are in the box, 2) have Ne_fit>0 up to R_max, and 3) have a low chisq fit to Ne
-if keyword_set(aia)   then ifl_aia_A   = where(tag_box_A eq +1 AND tag_pos_aia_A   eq +1 AND fitflag_aia_A   eq +1 AND scN_fit_aia_A   le scN_crit)
-if keyword_set(kcor)  then ifl_kcor_A  = where(tag_box_A eq +1 AND tag_pos_kcor_A  eq +1 AND fitflag_kcor_A  eq +1 AND scN_fit_kcor_A  le scN_crit)
-if keyword_set(ucomp) then ifl_ucomp_A = where(tag_box_A eq +1 AND tag_pos_ucomp_A eq +1 AND fitflag_ucomp_A eq +1 AND scN_fit_ucomp_A le scN_crit)
-; add all parameters positive condition if so requested.
+; Independently for each instrument, index lines that:
+; 1) are in the box, 2) have a fit, 3) have Ne_fit>0 up to R_max, and 4) have a low chisq fit to Ne
+ifl_aia_A   = where(tag_box_A eq +1 AND tag_pos_aia_A   eq +1 AND fitflag_aia_A   eq +1 AND scN_fit_aia_A   le scN_crit)
+ifl_kcor_A  = where(tag_box_A eq +1 AND tag_pos_kcor_A  eq +1 AND fitflag_kcor_A  eq +1 AND scN_fit_kcor_A  le scN_crit)
+ifl_ucomp_A = where(tag_box_A eq +1 AND tag_pos_ucomp_A eq +1 AND fitflag_ucomp_A eq +1 AND scN_fit_ucomp_A le scN_crit)
+; Also independently for each instrument,
+; filter OUT lines for which NOT all their DPL Ne-fit parameters are positive
 if keyword_set(positparam) then begin
-   indpositparam_aia   = where(tag_posfit_aia_A   eq +1) &  ifl_aia_A   = intersect(ifl_aia_A  ,indpositparam_aia) 
-   indpositparam_kcor  = where(tag_posfit_kcor_A  eq +1) &  ifl_kcor_A  = intersect(ifl_kcor_A ,indpositparam_kcor) 
-   indpositparam_ucomp = where(tag_posfit_ucomp_A eq +1) &  ifl_ucomp_A = intersect(ifl_ucomp_A,indpositparam_ucomp) 
+   indpositparam_aia   = where(tag_posfit_aia_A   eq +1)  &  ifl_aia_A   = intersect(ifl_aia_A  ,indpositparam_aia  ) 
+   indpositparam_kcor  = where(tag_posfit_kcor_A  eq +1)  &  ifl_kcor_A  = intersect(ifl_kcor_A ,indpositparam_kcor ) 
+   indpositparam_ucomp = where(tag_posfit_ucomp_A eq +1)  &  ifl_ucomp_A = intersect(ifl_ucomp_A,indpositparam_ucomp) 
 endif
 
 ; Make an index array with the common elements of all ifl_INSTRUMENT_A
-                           ifl_A = indgen(N_fl)
-if keyword_set(aia)   then ifl_A = intersect(ifl_A,ifl_aia_A  )
-if keyword_set(kcor)  then ifl_A = intersect(ifl_A,ifl_kcor_A )
-if keyword_set(ucomp) then ifl_A = intersect(ifl_A,ifl_ucomp_A)
+                            ifl_A = indgen(N_fl) ; start index with ALL lines
+if keyword_set(aia)    then ifl_A = intersect(ifl_A,ifl_aia_A  )
+if keyword_set(kcor)   then ifl_A = intersect(ifl_A,ifl_kcor_A )
+if keyword_set(ucomp)  then ifl_A = intersect(ifl_A,ifl_ucomp_A)
 ; Intersect with CLOSED or OPEN, if so requested
 if keyword_set(closed) then ifl_A = intersect(ifl_A,ifl_closed_A)
 if keyword_set(open)   then ifl_A = intersect(ifl_A,ifl_open_A  )
 
-; Plot connectivity is requested
+; Color-highlight all footpoints indicated by ifl_A accordind to their polarity
+indxpos_A = intersect(ifl_A,ifl_pos_A)
+if indxpos_A(0) ne 0 then $
+oplot,Footpoint_Lon_A(indxpos_A),Footpoint_Lat_A(indxpos_A),psym=4,th=2,color=green
+indxneg_A = intersect(ifl_A,ifl_neg_A)
+if indxneg_A(0) ne 0 then $
+oplot,Footpoint_Lon_A(indxneg_A),Footpoint_Lat_A(indxneg_A),psym=4,th=2,color=red
+
+; Add to plot the connectivity of closed loops if requested
 if keyword_set(connect) AND keyword_set(closed) then begin
-   ifl_A_orig = ifl_A 
    ifl=0
    closed_loop_count = -1
    while ifl le N_fl-2 do begin
@@ -250,24 +264,15 @@ if keyword_set(connect) AND keyword_set(closed) then begin
    endwhile
 endif
 
-; Now, color-highlight the footpoints indicated by ifl_A accordind to
-; their polarity
-indxpos_A = intersect(ifl_A,ifl_pos_A)
-if indxpos_A(0) ne 0 then $
-oplot,Footpoint_Lon_A(indxpos_A),Footpoint_Lat_A(indxpos_A),psym=4,th=2,color=green
-indxneg_A = intersect(ifl_A,ifl_neg_A)
-if indxneg_A(0) ne 0 then $
-oplot,Footpoint_Lon_A(indxneg_A),Footpoint_Lat_A(indxneg_A),psym=4,th=2,color=red
-
 ; Compute the average Ne(r) of each instrument for lines indexed ifl_A
 if keyword_set(aia) then begin
-   Ne_fit_aia_Avg = total( Ne_fit_aia_A(ifl_A,*) , 1 ) / float(n_elements(ifl_A)) 
+   Ne_fit_aia_Avg   = total( Ne_fit_aia_A(ifl_A,*)   , 1 ) / float(n_elements(ifl_A)) 
 endif
 if keyword_set(kcor) then begin
-      Ne_fit_kcor_Avg = total( Ne_fit_kcor_A(ifl_A,*) , 1 ) / float(n_elements(ifl_A))
+   Ne_fit_kcor_Avg  = total( Ne_fit_kcor_A(ifl_A,*)  , 1 ) / float(n_elements(ifl_A))
 endif
 if keyword_set(ucomp) then begin
-      Ne_fit_ucomp_Avg = total( Ne_fit_ucomp_A(ifl_A,*) , 1 ) / float(n_elements(ifl_A))
+   Ne_fit_ucomp_Avg = total( Ne_fit_ucomp_A(ifl_A,*) , 1 ) / float(n_elements(ifl_A))
 endif
 skip_tag_pos:
 
@@ -275,7 +280,7 @@ skip_tag_pos:
 loadct,0
 unit           = 1.e8 ; cm-3
 unit_power_str =   '8'
-xrange = [1.095,1.195]
+xrange = [1.095,r_max]
 yrflag = -1
 if keyword_set(aia) then begin
    r    = rad_fit_aia_A
@@ -304,7 +309,7 @@ if keyword_set(ucomp) then begin
    yrflag = +1
 endif
 plot,rad_fit_kcor_A,Ne_fit_kcor_A(0,*)/unit,charsize=csz,font=0,$
-     title='<N!De!N(r)>   Solid: AIA; Dashed: KCOR; Dot-Dashed: UCoMP',$
+     title  = '<N!De!N(r)>   Solid: AIA; Dashed: KCOR; Dot-Dashed: UCoMP',$
      ytitle = 'Ne(r) [x 10!U'+unit_power_str+'!N cm!U-3!N]',yr=yrange,ystyle=1,$
      xtitle = 'r [Rsun]'                                   ,xr=xrange,xstyle=1,$
      /nodata
