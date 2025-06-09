@@ -10,15 +10,16 @@
 pro merge_trace_struct_call, nfs1=nfs1, nfs2=nfs2, trace_Bs=trace_Bs
 
 ; Define PROJECT_NAME, a string suffix to construct the full PATHS to the required files.
-  PROJECT_NAME = 'CR2261'
+  PROJECT_NAME = 'CR2254'
 
 ; Provide FL_LIST, the file which informs the number of field lines and the
 ; filenames of the ASCII files containing the geometry of each line.
 ; fl_list = 'fdips_field_150x180x360_mrmqs220221t2004c2254_000.ubdat_fline-filenames_list.txt'
-  fl_list = 'fdips_field_150X180X360_mrmqs220831t1302c2261_000.ubdat_fline-filenames_list.txt'
-
+; fl_list = 'fdips_field_150X180X360_mrmqs220831t1302c2261_000.ubdat_fline-filenames_list.txt'
+  fl_list = 'fdips_field_150X180X360_hmi.Synoptic_Mr.2254.ubdat_fline-filenames_list.txt'
+  
 ; Define field_line_geometry_suffix_dir
-  field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg/'
+  field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI/'
 
   if not keyword_set(field_line_geometry_suffix_dir) then $
   field_line_geometry_suffix_dir='/'
