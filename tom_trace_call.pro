@@ -21,7 +21,7 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
 ; Define PROJECT_NAME, a string suffix to construct the full PATHS to the required files.
   PROJECT_NAME = 'CR2254'
 ; Define field_line_geometry_suffix_dir
-  field_line_geometry_suffix_dir='_aunifgrid_multirad_5x5deg_HMI/'
+  field_line_geometry_suffix_dir='_aunifgrid_2.50Rs_2x2deg_HMI/'
   if not keyword_set(field_line_geometry_suffix_dir) then $
   field_line_geometry_suffix_dir='/'
   

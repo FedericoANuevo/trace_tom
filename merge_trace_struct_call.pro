@@ -19,7 +19,7 @@ pro merge_trace_struct_call, nfs1=nfs1, nfs2=nfs2, trace_Bs=trace_Bs
   fl_list = 'fdips_field_150X180X360_hmi.Synoptic_Mr.2254.ubdat_fline-filenames_list.txt'
   
 ; Define field_line_geometry_suffix_dir
-  field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI/'
+  field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_2x2deg_HMI/'
 
   if not keyword_set(field_line_geometry_suffix_dir) then $
   field_line_geometry_suffix_dir='/'

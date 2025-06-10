@@ -1,4 +1,4 @@
-qqpro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, $
+pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, $
                   plot_filename_suffix=plot_filename_suffix,$
                   aia=aia, kcor=kcor, ucomp=ucomp,$
                   plotaia=plotaia, plotkcor=plotkcor, plotucomp=plotucomp,$
@@ -51,13 +51,16 @@ qqpro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, $
 
 ; Select the project to analyze:
   PROJECT_NAME                   = 'CR2254'
-  field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI/'
-  dir = '/data1/DATA/trace_tom_files/'+PROJECT_NAME+'/field_lines_geometry'+field_line_geometry_suffix_dir
- ;structure_filename='fdips_field_150x180x360_mrmqs220221t2004c2254_000.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
+ ;field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI/'
+  field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_2x2deg/'
+  structure_filename='fdips_field_150x180x360_mrmqs220221t2004c2254_000.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
  ;structure_filename='fdips_field_150X180X360_mrmqs220831t1302c2261_000.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
+
   structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr.2254.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
-  
+  field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_2x2deg_HMI/'
+
 ; Load structure if so requested:
+  dir = '/data1/DATA/trace_tom_files/'+PROJECT_NAME+'/field_lines_geometry'+field_line_geometry_suffix_dir
   if keyword_set(load) then $
      load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data,/aia,/ucomp,/kcor,/trace_Bs
 
@@ -192,14 +195,15 @@ np=1000
 loadct,0
 !p.color=0
 !p.background=255
-
 csz=1
                             opcl_str='open/closed'
 if keyword_set(open)   then opcl_str='open '
 if keyword_set(closed) then opcl_str='closed '
 plot,lon_A,lat_A,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=csz,$
      title='Location of '+opcl_str+'footpoints',ytitle='Carrington Latitude [deg]',font=0
-oplot,Footpoint_Lon_A,Footpoint_Lat_A,psym=4
+if not keyword_set(open) and not keyword_set(closed) then oplot,Footpoint_Lon_A              ,Footpoint_Lat_A              ,psym=4
+if     keyword_set(open)                             then oplot,Footpoint_Lon_A(ifl_open_A)  ,Footpoint_Lat_A(ifl_open_A)  ,psym=4
+if                               keyword_set(closed) then oplot,Footpoint_Lon_A(ifl_closed_A),Footpoint_Lat_A(ifl_closed_A),psym=4
 
 loadct,12
 
@@ -243,10 +247,10 @@ if keyword_set(open)   then ifl_A = intersect(ifl_A,ifl_open_A  )
 
 ; Color-highlight all footpoints indicated by ifl_A accordind to their polarity
 indxpos_A = intersect(ifl_A,ifl_pos_A)
-if indxpos_A(0) ne 0 then $
+if n_elements(indxpos_A) gt 1 then $
 oplot,Footpoint_Lon_A(indxpos_A),Footpoint_Lat_A(indxpos_A),psym=4,th=2,color=green
 indxneg_A = intersect(ifl_A,ifl_neg_A)
-if indxneg_A(0) ne 0 then $
+if n_elements(indxneg_A) gt 1 then $
 oplot,Footpoint_Lon_A(indxneg_A),Footpoint_Lat_A(indxneg_A),psym=4,th=2,color=red
 
 ; Add to plot the connectivity of closed loops if requested
