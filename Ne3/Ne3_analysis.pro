@@ -60,9 +60,9 @@ pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, $
   structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2254.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
 
 ; Select dir where the structure is located (labeled after the selection of starting points) 
- ;field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI/'
- ;field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI-PolFil/'
- ;field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_2x2deg_HMI/'
+; field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI/'
+; field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI-PolFil/'
+; field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_2x2deg_HMI/'
   field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_2x2deg_HMI-PolFil/'
 ;===============================================================================================
   
@@ -252,14 +252,6 @@ if keyword_set(ucomp)  then ifl_A = intersect(ifl_A,ifl_ucomp_A)
 if keyword_set(closed) then ifl_A = intersect(ifl_A,ifl_closed_A)
 if keyword_set(open)   then ifl_A = intersect(ifl_A,ifl_open_A  )
 
-; Color-highlight all footpoints indicated by ifl_A accordind to their polarity
-indxpos_A = intersect(ifl_A,ifl_pos_A)
-if n_elements(indxpos_A) gt 1 then $
-oplot,Footpoint_Lon_A(indxpos_A),Footpoint_Lat_A(indxpos_A),psym=4,th=2,color=green
-indxneg_A = intersect(ifl_A,ifl_neg_A)
-if n_elements(indxneg_A) gt 1 then $
-oplot,Footpoint_Lon_A(indxneg_A),Footpoint_Lat_A(indxneg_A),psym=4,th=2,color=red
-
 ; Add to plot the connectivity of closed loops if requested
 if keyword_set(connect) AND keyword_set(closed) then begin
    ifl=0
@@ -275,6 +267,14 @@ if keyword_set(connect) AND keyword_set(closed) then begin
       endelse
    endwhile
 endif
+
+; Color-highlight all footpoints indicated by ifl_A accordind to their polarity
+indxpos_A = intersect(ifl_A,ifl_pos_A)
+if n_elements(indxpos_A) gt 1 then $
+oplot,Footpoint_Lon_A(indxpos_A),Footpoint_Lat_A(indxpos_A),psym=4,th=2,color=green
+indxneg_A = intersect(ifl_A,ifl_neg_A)
+if n_elements(indxneg_A) gt 1 then $
+oplot,Footpoint_Lon_A(indxneg_A),Footpoint_Lat_A(indxneg_A),psym=4,th=2,color=red
 
 ; Compute the average Ne(r) of each instrument for lines indexed ifl_A
 if keyword_set(aia) then begin
