@@ -1,6 +1,6 @@
 pro Yeimy_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits,$
                     plot_filename_suffix=plot_filename_suffix,$
-                    aia=aia,$
+                    aia=aia,lascoc2=lascoc2,$
                     open=open,closed=closed,connect=connect,$
                     not_Bfield=not_Bfield
 
@@ -50,12 +50,13 @@ pro Yeimy_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits,$
      dir = '/data1/DATA/trace_tom_files/April24/field_lines_geometry_yeimy/'
      structure_filename='list_yeimy-fl.txt-tracing-structure-merge_aia_lascoc2.sav'
   endif else begin
-     dir = '/data1/DATA/trace_tom_files/April24/field_lines_geometry/'
+   ; dir = '/data1/DATA/trace_tom_files/April24/field_lines_geometry/'
+     dir = '/data1/DATA/trace_tom_files/April24/field_lines_geometry_1x1deg_multirad/'
      structure_filename='fdips_field_150X180X360_mrbqs240414t1304c2283_230_shift.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia.sav'
   endelse
   if keyword_set(load) then begin
      if not keyword_set(not_Bfield) then load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data,/aia,/trace_Bs
-     if     keyword_set(not_Bfield) then load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data,/aia
+     if     keyword_set(not_Bfield) then load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data,/aia,/lascoc2
   endif
 ; Define plot filename suffix
   if not keyword_set(plot_filename_suffix) then plot_filename_suffix='footpoints-map'
@@ -120,9 +121,19 @@ if keyword_set(aia  ) then begin
    r_crit = median(rad_fit_aia_A  )
    r_max  = max   (rad_fit_aia_A  )
 endif
+
+if keyword_set(lascoc2) then begin
+   r_crit = median(rad_fit_c2_A  )
+   r_max  = max   (rad_fit_c2_A  )
+endif
+
+
 ;
 tag_pos_aia_A          = fltarr(N_fl) - 678.
 tag_fullrange_aia_A    = fltarr(N_fl) - 678.
+tag_pos_c2_A           = fltarr(N_fl) - 678.
+tag_fullrange_c2_A     = fltarr(N_fl) - 678.
+
 for ifl=0,N_fl-1 do begin
    if keyword_set(aia) then begin
       ifitpos_aia = where(reform(Ne_fit_aia_A  (ifl,*)) gt 0. and rad_fit_aia_A le R_max)
@@ -136,6 +147,18 @@ for ifl=0,N_fl-1 do begin
       tag_pos_aia_A(ifl) = +1
       tag_fullrange_aia_A(ifl) = +1
    endelse
+   if keyword_set(lascoc2) then begin
+      ifitpos_c2 = where(reform(Ne_fit_c2_A  (ifl,*)) gt 0. and rad_fit_c2_A le R_max)
+      ifitrad_c2 = where(rad_fit_c2_A le R_max) 
+      if ifitpos_c2(0) ne -1 then begin
+         if n_elements(ifitpos_c2) eq n_elements(ifitrad_c2) then tag_pos_c2_A(ifl) = +1.
+         if n_elements(where(rad_fit_c2_A(ifitpos_c2) lt r_crit))                                        ge Nsamp AND  $
+            n_elements(where(rad_fit_c2_A(ifitpos_c2) gt r_crit AND rad_fit_c2_A(ifitpos_c2) lt r_max))  ge Nsamp then tag_fullrange_c2_A(ifl) = +1.
+      endif
+   endif else begin
+      tag_pos_c2_A(ifl) = +1
+      tag_fullrange_c2_A(ifl) = +1
+   endelse
 endfor
 
 ;-----------------PLOTS SECTION--------------------------------------------------------------
@@ -147,7 +170,8 @@ green =  16
 ; Lat/Lon plots of FootPoints
 ps1,'./'+structure_filename+'_'+plot_filename_suffix+'.eps'
 np=1000
-!p.multi=[0,1,3]
+if keyword_set(aia)     then !p.multi=[0,1,3]
+if keyword_set(lascoc2) then !p.multi=[0,1,2]
 loadct,0
 !p.color=0
 !p.background=255
@@ -163,15 +187,17 @@ oplot,Footpoint_Lon_A,Footpoint_Lat_A,psym=4
 loadct,12
 
 ; Set a maximum threshold for scN and scT
-scN_crit = 0.3
-scT_crit = 0.3
+scN_crit = 0.25
+scT_crit = 0.25
 ; Index lines of each instrument that have a good fit to Ne and are in
 ; the box
-if keyword_set(aia)   then ifl_aia_A   = where(tag_box_A eq +1 AND tag_pos_aia_A   eq +1 AND fitflag_aia_A   eq +1 AND scN_fit_aia_A   le scN_crit and scT_fit_aia_A le scT_crit)
+if keyword_set(aia)    then ifl_aia_A  = where(tag_box_A eq +1 AND tag_pos_aia_A   eq +1 AND fitflag_aia_A   eq +1 AND scN_fit_aia_A   le scN_crit and scT_fit_aia_A le scT_crit)
+if keyword_set(lascoc2)then ifl_c2_A   = where(tag_box_A eq +1 AND tag_pos_c2_A   eq +1 AND fitflag_c2_A   eq +1 AND scN_fit_c2_A   le scN_crit)
 
 ; Make an index array with the common elements of all ifl_INSTRUMENT_A
 ifl_A = indgen(N_fl)
-if keyword_set(aia)   then ifl_A = intersect(ifl_A,ifl_aia_A  )
+if keyword_set(aia)       then ifl_A = intersect(ifl_A,ifl_aia_A  )
+if keyword_set(lascoc2)   then ifl_A = intersect(ifl_A,ifl_c2_A  )
                            
 ; Intersect with CLOSED or OPEN, if so requested
 if keyword_set(closed) then ifl_A = intersect(ifl_A,ifl_closed_A)
@@ -212,45 +238,116 @@ if keyword_set(aia) then begin
    Ne_fit_aia_Avg = total( Ne_fit_aia_A(ifl_A,*) , 1 ) / float(n_elements(ifl_A))
    Tm_fit_aia_Avg = total( Tm_fit_aia_A(ifl_A,*) , 1 ) / float(n_elements(ifl_A))
 endif
+if keyword_set(lascoc2) then begin
+   Ne_fit_c2_Avg = total( Ne_fit_c2_A(ifl_A,*) , 1 ) / float(n_elements(ifl_A))
+endif
 
 
 skip_tag_pos:
 
 ; Plot the average Ne(r) for all selected instruments.
-loadct,0
-unit           = 1.e8 ; cm-3
-unit_power_str =   '8'
-xrange = [1.02,1.2]
-yrflag = -1
 if keyword_set(aia) then begin
+   loadct,0
+   unit           = 1.e8        ; cm-3
+   unit_power_str =   '8'
+   xrange = [1.02,1.2]
+   yrflag = -1
    r    = rad_fit_aia_A
    f    = Ne_fit_aia_Avg/unit
    miny = min(f(where(f gt 0. and r le max(xrange))))
    maxy = max(f(where(f gt 0. and r le max(xrange))))
    yrange = [miny,maxy]
    yrflag = +1
+   plot,rad_fit_AiA_A,Ne_fit_AIA_A(0,*)/unit,charsize=csz,font=0,$
+        title='<N!De!N(r)>   Solid: AIA',$
+        ytitle = 'Ne(r) [x 10!U'+unit_power_str+'!N cm!U-3!N]',yr=yrange,ystyle=1,$
+        xtitle = 'r [Rsun]'                                   ,xr=xrange,xstyle=1,$
+        /nodata  
+  ;loadct,12
+   color=0
+endif
+if keyword_set(lascoc2) then begin
+   loadct,0
+   unit           = 1.e5        ; cm-3
+   unit_power_str =   '5'
+   xrange = [2.5,6.0]
+   yrflag = -1
+   r    = rad_fit_c2_A
+   f    = Ne_fit_c2_Avg/unit
+   miny = min(f(where(f gt 0. and r le max(xrange))))
+   maxy = max(f(where(f gt 0. and r le max(xrange))))
+   yrange = [miny,maxy]
+   yrflag = +1
+   plot,rad_fit_c2_A,Ne_fit_c2_A(0,*)/unit,charsize=csz,font=0,$
+        title='<N!De!N(r)>   Solid: C2',$
+        ytitle = 'Ne(r) [x 10!U'+unit_power_str+'!N cm!U-3!N]',yr=yrange,ystyle=1,$
+        xtitle = 'r [Rsun]'                                   ,xr=xrange,xstyle=1,$
+        /nodata  
+  ;loadct,12
+   color=0
 endif
 
-plot,rad_fit_AiA_A,Ne_fit_AIA_A(0,*)/unit,charsize=csz,font=0,$
-     title='<N!De!N(r)>   Solid: AIA',$
-     ytitle = 'Ne(r) [x 10!U'+unit_power_str+'!N cm!U-3!N]',yr=yrange,ystyle=1,$
-     xtitle = 'r [Rsun]'                                   ,xr=xrange,xstyle=1,$
-     /nodata
+loadct,39
+if keyword_set(lascoc2) then begin
+   Nifl = n_elements(ifl_A)
+   col = 255 * findgen(Nifl)/float(Nifl-1)
+   ilstep = 1
+   for ifl=0,Nifl-1,ilstep do begin
+      il = (ifl_A(ifl))(0)
+      tmp      = reform(index_sampling_c2_A(il,*))
+      ind_samp = where(tmp eq 1)
+      oplot,rad_fit_c2_A     ,Ne_fit_c2_A(il,*)   /unit,color=col(ifl)
+      oplot,rad_A(il,ind_samp),Ne_c2_A(il,ind_samp)/unit,color=col(ifl),psym=4
+   endfor
+endif
+if keyword_set(aia) then begin
+   Nifl = n_elements(ifl_A)
+   col = 255 * findgen(Nifl)/float(Nifl-1)
+   ilstep = 1
+   for ifl=0,Nifl-1,ilstep do begin
+      il = (ifl_A(ifl))(0)
+      tmp      = reform(index_sampling_aia_A(il,*))
+      ind_samp = where(tmp eq 1)
+      oplot,rad_fit_aia_A     ,Ne_fit_aia_A(il,*)   /unit,color=col(ifl)
+      oplot,rad_A(il,ind_samp),Ne_aia_A(il,ind_samp)/unit,color=col(ifl),psym=4
+   endfor
+endif
 
-;loadct,12
-color=0
-if keyword_set(aia) and n_elements(ifl_A) gt 1  then oplot,rad_fit_aia_A  ,Ne_fit_aia_Avg  /unit,color=color,th=2
+
+
+
+loadct,0
+color = 0
+if keyword_set(lascoc2) and n_elements(ifl_A) gt 1  then oplot,rad_fit_c2_A  ,Ne_fit_c2_Avg  /unit,color=color,th=8
 loadct,0
 
+if keyword_set(aia) then begin
 yrange = [min(Tm_fit_aia_Avg)/1.e6,max(Tm_fit_aia_Avg)/1.e6]
 plot,rad_fit_AiA_A,Tm_fit_AIA_A(0,*)/unit,charsize=csz,font=0,$
      title='<T!Dm!N(r)>   Solid: AIA',$
      ytitle = 'Tm(r) [MK]',yr=yrange,ystyle=1,$
      xtitle = 'r [Rsun]'                                   ,xr=xrange,xstyle=1,$
      /nodata
-
 ;loadct,12
 color=0
+endif
+
+loadct,39
+if keyword_set(aia) then begin
+   Nifl = n_elements(ifl_A)
+   col = 255 * findgen(Nifl)/float(Nifl-1)
+   ilstep = 1
+   for ifl=0,Nifl-1,ilstep do begin
+      il = (ifl_A(ifl))(0)
+      tmp      = reform(index_sampling_aia_A(il,*))
+      ind_samp = where(tmp eq 1)
+      oplot,rad_fit_aia_A     ,Tm_fit_aia_A(il,*)   /1.e6,color=col(ifl)
+      oplot,rad_A(il,ind_samp),Tm_aia_A(il,ind_samp)/1.e6,color=col(ifl),psym=4
+   endfor
+endif
+
+loadct,0
+color =0
 if keyword_set(aia) and  n_elements(ifl_A) gt 1 then oplot,rad_fit_aia_A  ,Tm_fit_aia_Avg/1.e6,color=color,th=2
 loadct,0
 
