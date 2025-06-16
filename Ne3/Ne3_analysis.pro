@@ -49,16 +49,23 @@ pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, $
      leg_label_A,leg_footbfield_A,leg_length_A,$
      Footpoint_Rad_A, Footpoint_Lon_A, Footpoint_Lat_A
 
+;===============================================================================================
 ; Select the project to analyze:
   PROJECT_NAME                   = 'CR2254'
- ;field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI/'
-  field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_2x2deg/'
-  structure_filename='fdips_field_150x180x360_mrmqs220221t2004c2254_000.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
+
+; Select structure to read:
+ ;structure_filename='fdips_field_150x180x360_mrmqs220221t2004c2254_000.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
  ;structure_filename='fdips_field_150X180X360_mrmqs220831t1302c2261_000.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
+ ;structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr.2254.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
+  structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2254.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
 
-  structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr.2254.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
-  field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_2x2deg_HMI/'
-
+; Select dir where the structure is located (labeled after the selection of starting points) 
+ ;field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI/'
+ ;field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI-PolFil/'
+ ;field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_2x2deg_HMI/'
+  field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_2x2deg_HMI-PolFil/'
+;===============================================================================================
+  
 ; Load structure if so requested:
   dir = '/data1/DATA/trace_tom_files/'+PROJECT_NAME+'/field_lines_geometry'+field_line_geometry_suffix_dir
   if keyword_set(load) then $
