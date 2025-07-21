@@ -456,7 +456,13 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
                  'Br' ,   ptr_new(Br_A)    ,$
                  'Bth',   ptr_new(Bth_A)   ,$
                  'Bph',   ptr_new(Bph_A)   ,$
-                 'B'  ,   ptr_new(B_A)     )                            
+                 'B'  ,   ptr_new(B_A)     )
+;    FEDE:     
+;     undefine,s_A
+;     undefine,Br_A    
+;     undefine,Bth_A
+;     undefine,Bph_A
+;     unefine,B_A     
   endif
 
 if keyword_set(trace_Bs) then begin
@@ -496,6 +502,10 @@ if keyword_set(trace_Bs) then begin
                'leg_label'      , ptr_new(leg_label_A)     ,$
                'leg_length'     , ptr_new(leg_length_A)    ,$
                'leg_footbfield' , ptr_new(leg_footbfield_A) )
+; FEDE:  
+;  undefine,leg_label_A
+;  undefine,leg_length_A
+;  undefine,leg_footbfield_A
 endif
 
 ; Store into the structure traced tomographic resuls
@@ -507,6 +517,14 @@ endif
             'ldem_flag_aia' , ptr_new(     ldem_flag_aia_A) ,$     
                 'index_aia' , ptr_new(         index_aia_A) ,$
        'index_sampling_aia' , ptr_new(index_sampling_aia_A)  )
+   ; FEDE: 
+;     undefine,Ne_aia_A
+;     undefine,Tm_aia_A
+;     undefine,WT_aia_A
+;     undefine,ldem_flag_aia_A
+;     undefine,index_aia_A
+;     undefine,index_sampling_aia_A
+     
   endif
   if keyword_set(euvia) then begin
      trace_data = create_struct( trace_data ,$
@@ -563,7 +581,7 @@ endif
 ; Perform fits:
   fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                   mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2,$
-                  fl_dir=fl_dir
+                  fl_dir=fl_dir ;, trace_data = trace_data ; FEDE
   
  ; Save structure in fl_dir:
   save, trace_data, filename = fl_dir + structure_filename + '.sav'
