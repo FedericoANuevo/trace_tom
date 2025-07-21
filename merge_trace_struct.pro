@@ -30,7 +30,8 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
                         mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2, $
                         struture_filename=structure_filename,$
                         trace_Bs=trace_Bs
-  
+; FEDE  
+; ----- este common sería eliminado por lo editado mas abajo ------  
   common to_fit_data, trace_data, $
      N_fl, Npt_max, Npt_v,$
      x_A, y_A, z_A, rad_A, lat_A, lon_A,$
@@ -42,7 +43,7 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
      Ne_kcor_A, index_kcor_A, index_sampling_kcor_A,$
      Ne_ucomp_A, index_ucomp_A, index_sampling_ucomp_A,$
      Ne_c2_A, index_c2_A, index_sampling_c2_A
-  
+; ----- este common sería eliminado por lo editado mas abajo ------   
   if not keyword_set(fl_dir) or not keyword_set(fl_list) then STOP
 
 ; Set up filename for output structure:
@@ -420,6 +421,10 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
   endfor                        ; End loop in fieldlines    
   close,1
 
+; FEDE
+; Acá se duplica la memoria RAM. Ya que los diversos arrays existen
+; tanto "sueltos" como detro de trace_data
+  
 ; Create a pointer structure to store field line extraction information  
   trace_data = { N_fl:    ptr_new(N_fl)    ,$
                  Npt_max: ptr_new(Npt_max) ,$
@@ -430,7 +435,21 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
                  rad:     ptr_new(rad_A)   ,$
                  lat:     ptr_new(lat_A)   ,$
                  lon:     ptr_new(lon_A)    }
-
+; FEDE
+; usar undefine o delvar para eliminar todos estos arrays que ya
+; fueron incorporados a la estructura. Ejemplo:
+;  undefine,N_fl
+;  undefine,Npt_max
+;  undefine,Npt_v
+;  undefine,x_A
+;  undefine,y_A
+;  undefine,z_A
+;  undefine,rad_A
+;  undefine,lat_A
+;  undefine,lon_A
+; Esta estrategia debe repetirse cada vez que se incorporan arrays a
+; la estructura ...
+  
   if keyword_set(trace_Bs) then begin
      trace_data = create_struct( trace_data,$
                  's'  ,   ptr_new(s_A)     ,$

@@ -24,6 +24,11 @@
 ;          V1.4, AMV, May      2025, CLaSP. Expanded to ucomp, 
 ;                                    opcl, tom and fit grids.
 ;
+
+; FEDE:
+; Esta rutina basicamente duplica la memoria RAM utilizada. No
+; es el enfoque más correcto si queremos optimizar RAM ...
+
 pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, trace_data=trace_data, $
                                 aia=aia, euvia=euvia, euvib=euvib, eit=eit, $
                                 mk4=mk4, kcor=kcor, lascoc2=lascoc2, ucomp=ucomp, $

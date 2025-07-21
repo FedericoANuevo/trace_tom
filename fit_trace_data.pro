@@ -22,11 +22,18 @@
 ;
 ;          v2.0, AMV & FAN, May 2025, CLaSP, expanded to include closed fl.
 ;                           involving many edits, new arrays, new subroutines.
-;
+; FEDE:
 pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                     mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2,$
-                    fl_dir=fl_dir
+                    fl_dir=fl_dir ;, trace_data = trace_data
+; Trace_data debería ahora ser un input de esta rutina
+  
+; FEDE:
+; Teniendo en cuenta que este COMMON desapareceria es necesario editar
+; bastante este código. Ahora, cualquier variable de la estructura de
+; usarse: var > *trace_data.var
 
+  
     common to_fit_data, trace_data, $
      N_fl, Npt_max, Npt_v,$
      x_A, y_A, z_A, rad_A, lat_A, lon_A,$
@@ -43,7 +50,9 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
 
    ;Set a default value for all the elements of all the [NAME]_A arrays
     default = -678.
-    
+
+   ;FEDE: Ejemplo de linea necesaria ahora que NO está el common
+   ;N_fl = *trace_data.N_fl
     if keyword_set(aia) then begin
        read_tomgrid_and_define_fitgrid,fl_dir=fl_dir,instr_string='aia'
        fitflag_aia_A = fltarr(N_fl        ) + default
@@ -62,7 +71,10 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
        rad_fit_aia_A = radmin_fit + drad_fit/2. + drad_fit * findgen(Npt_fit)
        for ifl=0L,N_fl-1 do begin
           dNedr_fit_aia_A = fltarr(Npt_fit) + default
-          tmp = reform(index_sampling_aia_A(ifl,*))
+         ;FEDE: Habría que reemplazar esta linea por la de abajo
+         ; y así en el resto del código ... 
+          tmp = reform(            index_sampling_aia_A(ifl,*))
+       ;  tmp = reform(*trace_data.index_sampling_aia  (ifl,*))
           ind_samp_aia = where(tmp eq 1)
           if ind_samp_aia[0] ne -1 then begin
             ;Determine maximum heiht of the fl geometry (apex if closed).
