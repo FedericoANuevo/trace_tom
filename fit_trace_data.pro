@@ -74,7 +74,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
          ;FEDE: Habría que reemplazar esta linea por la de abajo
          ; y así en el resto del código ... 
           tmp = reform(            index_sampling_aia_A(ifl,*))
-       ;  tmp = reform(*trace_data.index_sampling_aia  (ifl,*))
+       ;  tmp = reform((*trace_data.index_sampling_aia)(ifl,*))
           ind_samp_aia = where(tmp eq 1)
           if ind_samp_aia[0] ne -1 then begin
             ;Determine maximum heiht of the fl geometry (apex if closed).
