@@ -31,7 +31,8 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
 ; FEDE:
 ; Teniendo en cuenta que este COMMON desapareceria es necesario editar
 ; bastante este código. Ahora, cualquier variable de la estructura de
-; usarse: var > *trace_data.var
+; usarse: var_A  > (*trace_data.var)
+;   var_A(index) >   (*trace_data.var)(index)
 
   
     common to_fit_data, trace_data, $
@@ -79,6 +80,8 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
           if ind_samp_aia[0] ne -1 then begin
             ;Determine maximum heiht of the fl geometry (apex if closed).
              rad_fl_max = max(rad_A(ifl,0:Npt_v(ifl)-1))
+            ;FEDE: La linea de arriba se reeemplaza por 
+            ;rad_fl_max = max((*trace_data.rad)(ifl,0:(*trace_data.Npt_v)(ifl)-1))
             ;Make 1-D array with the actual sampling heights.
              radsamp = reform(rad_A(ifl,ind_samp_aia)) ; Rsun
             ;Determine critical fit heights and range

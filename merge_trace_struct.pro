@@ -56,7 +56,8 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
   openr,1,fl_dir+fl_list
   readf,1,N_fl
 
-; Maximum number of point along the fieldline  
+; Maximum number of point along the fieldline
+; FEDE: me pregunto si este valor no está exagerado ...  
   Npt_max = 10100 ; Ask JUDIT for an optimal value.
 ; Default value in all arrays.
   default = -678.
