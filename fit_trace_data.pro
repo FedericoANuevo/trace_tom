@@ -180,21 +180,21 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
        rad_fit_euvia_A = radmin_fit + drad_fit/2. + drad_fit * findgen(Npt_fit)
        for ifl=0L,N_fl-1 do begin      
           dNedr_fit_euvia_A = fltarr(Npt_fit) + default
-          tmp = reform(index_sampling_euvia_A(ifl,*))
+          tmp = reform((*trace_data.index_sampling_euvia)(ifl,*))
           ind_samp_euvia = where(tmp eq 1)
           if ind_samp_euvia[0] ne -1 then begin
             ;Determine maximum heiht of the fl geometry (apex if closed).
-             rad_fl_max = max(rad_A(ifl,0:Npt_v(ifl)-1))
+             rad_fl_max = max((*trace_data.rad)(ifl,0:(*trace_data.Npt_v)(ifl)-1))
             ;Make 1-D array with the actual sampling heights.
-             radsamp = reform(rad_A(ifl,ind_samp_euvia)) ; Rsun
+             radsamp = reform((*trace_data.rad)(ifl,ind_samp_euvia)) ; Rsun
             ;Determine critical fit heights and range
              determine_fit_critical_parameters, radsamp=radsamp, rad_fit=rad_fit_euvia_A, $
                                                 radfit_min=radfit_min, radfit_max=radfit_max, range_fit=range_fit
             ;Test if there is proper coverage of actual sample data for a decent least squares fit.
              test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, rad_fl_max=rad_fl_max, covgflag=covgflag
              if covgflag eq 'yes' then begin
-                Nesamp = reform(Ne_euvia_A(ifl,ind_samp_euvia))
-                Tmsamp = reform(Tm_euvia_A(ifl,ind_samp_euvia))
+                Nesamp = reform((*trace_data.Ne_euvia)(ifl,ind_samp_euvia))
+                Tmsamp = reform((*trace_data.Tm_euvia)(ifl,ind_samp_euvia))
                 goto,skip_euvia_isohthermal_hydrostatic
                 fit_F_Ne_euvia  = 'IHS'
                 linear_fit, 1./radsamp   , alog(Nesamp), AN, r2N, /linfit_idl
@@ -250,15 +250,33 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                                    'T0_fit_euvia',ptr_new(  T0_fit_euvia_A) ,$
                                  'dTdr_fit_euvia',ptr_new(dTdr_fit_euvia_A) ,$
                                    'lN_fit_euvia',ptr_new(  lN_fit_euvia_A) )
-       if fit_F_Ne_euvia eq 'IHS' then $
+       undefine,fitflag_euvia_A
+       undefine,fit_F_Ne_euvia
+       undefine,scN_fit_euvia_A
+       undefine,scT_fit_euvia_A
+       undefine,rad_fit_euvia_A
+       undefine,Ne_fit_euvia_A
+       undefine,Tm_fit_euvia_A
+       undefine,T0_fit_euvia_A
+       undefine,dTdr_fit_euvia_A
+       undefine,lN_fit_euvia_A
+       
+       if fit_F_Ne_euvia eq 'IHS' then begin
           trace_data = create_struct( trace_data                        ,$
-                                 'N0_fit_euvia',ptr_new(  N0_fit_euvia_A) )                                                                        
-       if fit_F_Ne_euvia eq 'DPL' then $
+                                      'N0_fit_euvia',ptr_new(  N0_fit_euvia_A) )
+          undefine,N0_fit_euvia_A
+       endif
+       if fit_F_Ne_euvia eq 'DPL' then begin
           trace_data = create_struct( trace_data                        ,$
                                     'N1_fit_euvia',ptr_new( N1_fit_euvia_A) ,$
                                     'N2_fit_euvia',ptr_new( N2_fit_euvia_A) ,$
                                     'p1_fit_euvia',ptr_new( p1_fit_euvia_A) ,$
                                     'p2_fit_euvia',ptr_new( p2_fit_euvia_A) )
+          undefine,N1_fit_euvia_A
+          undefine,N2_fit_euvia_A
+          undefine,p1_fit_euvia_A
+          undefine,p2_fit_euvia_A
+       endif
        ;Add to structure the parameters of the tomography and fit grids of this INSTRUMENT.
        trace_data = create_struct( trace_data                                                                    ,$
                                    'tomgrid_euvia_hdr',ptr_new(['nr','nt','np','rmin','rmax','Irmin','Irmax'])   ,$
@@ -285,21 +303,21 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
        rad_fit_euvib_A = radmin_fit + drad_fit/2. + drad_fit * findgen(Npt_fit)
        for ifl=0L,N_fl-1 do begin      
           dNedr_fit_euvib_A = fltarr(Npt_fit) + default
-          tmp = reform(index_sampling_euvib_A(ifl,*))
+          tmp = reform((*trace_data.index_sampling_euvib)(ifl,*))
           ind_samp_euvib = where(tmp eq 1)
           if ind_samp_euvib[0] ne -1 then begin
             ;Determine maximum heiht of the fl geometry (apex if closed).
-             rad_fl_max = max(rad_A(ifl,0:Npt_v(ifl)-1))
+             rad_fl_max = max((*trace_data.rad)(ifl,0:(*trace_data.Npt_v)(ifl)-1))
             ;Make 1-D array with the actual sampling heights.
-             radsamp = reform(rad_A(ifl,ind_samp_euvib)) ; Rsun
+             radsamp = reform((*trace_data.rad)(ifl,ind_samp_euvib)) ; Rsun
             ;Determine critical fit heights and range
              determine_fit_critical_parameters, radsamp=radsamp, rad_fit=rad_fit_euvib_A, $
                                                 radfit_min=radfit_min, radfit_max=radfit_max, range_fit=range_fit
             ;Test if there is proper coverage of actual sample data for a decent least squares fit.
              test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, rad_fl_max=rad_fl_max, covgflag=covgflag
              if covgflag eq 'yes' then begin
-                Nesamp = reform(Ne_euvib_A(ifl,ind_samp_euvib))
-                Tmsamp = reform(Tm_euvib_A(ifl,ind_samp_euvib))
+                Nesamp = reform((*trace_data.Ne_euvib)(ifl,ind_samp_euvib))
+                Tmsamp = reform((*trace_data.Tm_euvib)(ifl,ind_samp_euvib))
                 goto,skip_euvib_isohthermal_hydrostatic
                 fit_F_Ne_euvib  = 'IHS'
                 linear_fit, 1./radsamp   , alog(Nesamp), AN, r2N, /linfit_idl
@@ -355,15 +373,32 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                                    'T0_fit_euvib',ptr_new(  T0_fit_euvib_A) ,$
                                  'dTdr_fit_euvib',ptr_new(dTdr_fit_euvib_A) ,$
                                    'lN_fit_euvib',ptr_new(  lN_fit_euvib_A) )
-       if fit_F_Ne_euvib eq 'IHS' then $
+       undefine,fitflag_euvib_A
+       undefine,fit_F_Ne_euvib
+       undefine,scN_fit_euvib_A
+       undefine,scT_fit_euvib_A
+       undefine,rad_fit_euvib_A
+       undefine,Ne_fit_euvib_A
+       undefine,Tm_fit_euvib_A
+       undefine,T0_fit_euvib_A
+       undefine,dTdr_fit_euvib_A
+       undefine,lN_fit_euvib_A
+       
+       if fit_F_Ne_euvib eq 'IHS' then begin
           trace_data = create_struct( trace_data                        ,$
                                  'N0_fit_euvib',ptr_new(  N0_fit_euvib_A) )                                                                        
-       if fit_F_Ne_euvib eq 'DPL' then $
+       endif
+       if fit_F_Ne_euvib eq 'DPL' then begin
           trace_data = create_struct( trace_data                        ,$
                                     'N1_fit_euvib',ptr_new( N1_fit_euvib_A) ,$
                                     'N2_fit_euvib',ptr_new( N2_fit_euvib_A) ,$
                                     'p1_fit_euvib',ptr_new( p1_fit_euvib_A) ,$
                                     'p2_fit_euvib',ptr_new( p2_fit_euvib_A) )
+          undefine,N1_fit_euvib_A
+          undefine,N2_fit_euvib_A
+          undefine,p1_fit_euvib_A
+          undefine,p2_fit_euvib_A
+       endif
        ;Add to structure the parameters of the tomography and fit grids of this INSTRUMENT.
        trace_data = create_struct( trace_data                                                                    ,$
                                    'tomgrid_euvib_hdr',ptr_new(['nr','nt','np','rmin','rmax','Irmin','Irmax'])   ,$
