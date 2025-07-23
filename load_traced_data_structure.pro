@@ -76,7 +76,9 @@ pro load_traced_data_structure, dir=dir, structure_filename=structure_filename, 
      tomgrid_c2_hdr_A,tomgrid_c2_A,fitgrid_c2_hdr_A,fitgrid_c2_A,$
      leg_label_A,leg_footbfield_A,leg_length_A,$
      Footpoint_Rad_A, Footpoint_Lon_A, Footpoint_Lat_A
-  
+
+  print,'this routine doubles the used ram memory. It is preferable to use the trace_data structure directly.'
+  STOP
   restore, filename = dir + structure_filename
 
   N_fl    = *trace_data.N_fl

@@ -22,38 +22,20 @@
 ;
 ;          v2.0, AMV & FAN, May 2025, CLaSP, expanded to include closed fl.
 ;                           involving many edits, new arrays, new subroutines.
-; FEDE:
+;          v3.0, FAN, May 2025, IAFE, optimization of used RAM memory.
+
 pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                     mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2,$
-                    fl_dir=fl_dir ;, trace_data = trace_data
-; Trace_data debería ahora ser un input de esta rutina
+                    fl_dir=fl_dir, trace_data = trace_data
   
-; FEDE:
-; Teniendo en cuenta que este COMMON desapareceria es necesario editar
-; bastante este código. Ahora, cualquier variable de la estructura de
-; usarse: var_A  > (*trace_data.var)
-;   var_A(index) >   (*trace_data.var)(index)
-
-  
-    common to_fit_data, trace_data, $
-     N_fl, Npt_max, Npt_v,$
-     x_A, y_A, z_A, rad_A, lat_A, lon_A,$
-     Ne_aia_A, Tm_aia_A, index_aia_A, index_sampling_aia_A,$
-     Ne_euvia_A, Tm_euvia_A, index_euvia_A, index_sampling_euvia_A,$
-     Ne_euvib_A, Tm_euvib_A, index_euvib_A, index_sampling_euvib_A,$
-     Ne_eit_A, Tm_eit_A, index_eit_A, index_sampling_eit_A,$
-     Ne_mk4_A, index_mk4_A, index_sampling_mk4_A,$
-     Ne_kcor_A, index_kcor_A, index_sampling_kcor_A,$
-     Ne_ucomp_A, index_ucomp_A, index_sampling_ucomp_A,$
-     Ne_c2_A, index_c2_A, index_sampling_c2_A
     common tomgrid,nr,nt,np,rmin,rmax,Irmin,Irmax
     common fitgrid,radmin_fit,radmax_fit,drad_fit,Npt_fit
 
    ;Set a default value for all the elements of all the [NAME]_A arrays
     default = -678.
-
-   ;FEDE: Ejemplo de linea necesaria ahora que NO está el common
-   ;N_fl = *trace_data.N_fl
+   ;Set the number of field-lines 
+    N_fl    = *trace_data.N_fl
+    
     if keyword_set(aia) then begin
        read_tomgrid_and_define_fitgrid,fl_dir=fl_dir,instr_string='aia'
        fitflag_aia_A = fltarr(N_fl        ) + default
@@ -72,26 +54,21 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
        rad_fit_aia_A = radmin_fit + drad_fit/2. + drad_fit * findgen(Npt_fit)
        for ifl=0L,N_fl-1 do begin
           dNedr_fit_aia_A = fltarr(Npt_fit) + default
-         ;FEDE: Habría que reemplazar esta linea por la de abajo
-         ; y así en el resto del código ... 
-          tmp = reform(            index_sampling_aia_A(ifl,*))
-       ;  tmp = reform((*trace_data.index_sampling_aia)(ifl,*))
+          tmp = reform((*trace_data.index_sampling_aia) (ifl,*))
           ind_samp_aia = where(tmp eq 1)
           if ind_samp_aia[0] ne -1 then begin
-            ;Determine maximum heiht of the fl geometry (apex if closed).
-             rad_fl_max = max(rad_A(ifl,0:Npt_v(ifl)-1))
-            ;FEDE: La linea de arriba se reeemplaza por 
-            ;rad_fl_max = max((*trace_data.rad)(ifl,0:(*trace_data.Npt_v)(ifl)-1))
+            ;Determine maximum heiht of the fl geometry (apex if closed). 
+             rad_fl_max = max((*trace_data.rad) (ifl,0:(*trace_data.Npt_v)(ifl)-1))
             ;Make 1-D array with the actual sampling heights.
-             radsamp = reform(rad_A(ifl,ind_samp_aia)) ; Rsun
+             radsamp = reform((*trace_data.rad) (ifl,ind_samp_aia)) ; Rsun
             ;Determine critical fit heights and range
              determine_fit_critical_parameters, radsamp=radsamp, rad_fit=rad_fit_aia_A, $
                                                 radfit_min=radfit_min, radfit_max=radfit_max, range_fit=range_fit
             ;Test if there is proper coverage of actual sample data for a decent least squares fit.
              test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, rad_fl_max=rad_fl_max, covgflag=covgflag
              if covgflag eq 'yes' then begin
-                Nesamp = reform(Ne_aia_A(ifl,ind_samp_aia))
-                Tmsamp = reform(Tm_aia_A(ifl,ind_samp_aia))
+                Nesamp = reform((*trace_data.Ne_aia)(ifl,ind_samp_aia))
+                Tmsamp = reform((*trace_data.Tm_aia)(ifl,ind_samp_aia))
                 goto,skip_aia_isohthermal_hydrostatic
                 fit_F_Ne_aia  = 'IHS'
                 linear_fit, 1./radsamp   , alog(Nesamp), AN, r2N, /linfit_idl
@@ -148,15 +125,35 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                                    'T0_fit_aia',ptr_new(  T0_fit_aia_A) ,$
                                  'dTdr_fit_aia',ptr_new(dTdr_fit_aia_A) ,$
                                    'lN_fit_aia',ptr_new(  lN_fit_aia_A) )
-       if fit_F_Ne_aia eq 'IHS' then $
+       undefine,fitflag_aia_A
+       undefine,fit_F_Ne_aia
+       undefine,scN_fit_aia_A
+       undefine,scT_fit_aia_A
+       undefine,rad_fit_aia_A
+       undefine,Ne_fit_aia_A
+       undefine,Tm_fit_aia_A
+       undefine,T0_fit_aia_A
+       undefine,dTdr_fit_aia_A
+       undefine,lN_fit_aia_A
+       
+       if fit_F_Ne_aia eq 'IHS' then begin
           trace_data = create_struct( trace_data                        ,$
-                                   'N0_fit_aia',ptr_new(  N0_fit_aia_A) )                                                                        
-       if fit_F_Ne_aia eq 'DPL' then $
+                                      'N0_fit_aia',ptr_new(  N0_fit_aia_A) )
+          undefine,N0_fit_aia_A
+       endif
+       
+       if fit_F_Ne_aia eq 'DPL' then begin
           trace_data = create_struct( trace_data                        ,$
                                     'N1_fit_aia',ptr_new( N1_fit_aia_A) ,$
                                     'N2_fit_aia',ptr_new( N2_fit_aia_A) ,$
                                     'p1_fit_aia',ptr_new( p1_fit_aia_A) ,$
                                     'p2_fit_aia',ptr_new( p2_fit_aia_A) )
+          undefine,N1_fit_aia_A
+          undefine,N2_fit_aia_A
+          undefine,p1_fit_aia_A
+          undefine,p2_fit_aia_A
+       endif
+          
        ;Add to structure the parameters of the tomography and fit grids of this INSTRUMENT.
        trace_data = create_struct( trace_data                                                      ,$
                                    'tomgrid_aia_hdr',ptr_new(['nr','nt','np','rmin','rmax','Irmin','Irmax'])   ,$

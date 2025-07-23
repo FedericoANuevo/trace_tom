@@ -24,26 +24,14 @@
 ;          traced result.
 ;          V2.4 AMV, CLaSP, May 2024, expanded to include closed FL,
 ;          added line-label to structure
-;
+;          V3.0 FAN, IAFE, JUL 2025, optimization of the used RAM memory.
+;          Add the calculation of footpoints vectors (before in load_traced_data_structure)
 pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
                         aia=aia, euvia=euvia, euvib=euvib, eit=eit, $
                         mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2, $
                         struture_filename=structure_filename,$
                         trace_Bs=trace_Bs
-; FEDE  
-; ----- este common sería eliminado por lo editado mas abajo ------  
-  common to_fit_data, trace_data, $
-     N_fl, Npt_max, Npt_v,$
-     x_A, y_A, z_A, rad_A, lat_A, lon_A,$
-     Ne_aia_A, Tm_aia_A, index_aia_A, index_sampling_aia_A,$
-     Ne_euvia_A, Tm_euvia_A, index_euvia_A, index_sampling_euvia_A,$
-     Ne_euvib_A, Tm_euvib_A, index_euvib_A, index_sampling_euvib_A,$
-     Ne_eit_A, Tm_eit_A, index_eit_A, index_sampling_eit_A,$
-     Ne_mk4_A, index_mk4_A, index_sampling_mk4_A,$
-     Ne_kcor_A, index_kcor_A, index_sampling_kcor_A,$
-     Ne_ucomp_A, index_ucomp_A, index_sampling_ucomp_A,$
-     Ne_c2_A, index_c2_A, index_sampling_c2_A
-; ----- este common sería eliminado por lo editado mas abajo ------   
+
   if not keyword_set(fl_dir) or not keyword_set(fl_list) then STOP
 
 ; Set up filename for output structure:
@@ -57,7 +45,6 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
   readf,1,N_fl
 
 ; Maximum number of point along the fieldline
-; FEDE: me pregunto si este valor no está exagerado ...  
   Npt_max = 10100 ; Ask JUDIT for an optimal value.
 ; Default value in all arrays.
   default = -678.
@@ -422,10 +409,7 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
   endfor                        ; End loop in fieldlines    
   close,1
 
-; FEDE
-; Acá se duplica la memoria RAM. Ya que los diversos arrays existen
-; tanto "sueltos" como detro de trace_data
-  
+; POINTER-STRUCTURE  
 ; Create a pointer structure to store field line extraction information  
   trace_data = { N_fl:    ptr_new(N_fl)    ,$
                  Npt_max: ptr_new(Npt_max) ,$
@@ -436,20 +420,39 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
                  rad:     ptr_new(rad_A)   ,$
                  lat:     ptr_new(lat_A)   ,$
                  lon:     ptr_new(lon_A)    }
-; FEDE
-; usar undefine o delvar para eliminar todos estos arrays que ya
-; fueron incorporados a la estructura. Ejemplo:
-;  undefine,N_fl
-;  undefine,Npt_max
-;  undefine,Npt_v
-;  undefine,x_A
-;  undefine,y_A
-;  undefine,z_A
-;  undefine,rad_A
-;  undefine,lat_A
-;  undefine,lon_A
-; Esta estrategia debe repetirse cada vez que se incorporan arrays a
-; la estructura ...
+; undefine,N_fl
+  undefine,Npt_max
+  undefine,Npt_v
+  undefine,x_A
+  undefine,y_A
+  undefine,z_A
+  undefine,rad_A
+  undefine,lat_A
+  undefine,lon_A
+
+
+; Determine the Rad, Lat and Lon of the footppoint of each field line.
+; 1D Arrays: radial index corresponding to Rmin for each field line:
+  irmin=intarr(N_fl)
+  for i=0,N_fl-1 do irmin(i)=where(abs( (*trace_data.rad)(i,*) ) eq min(abs( (*trace_data.rad)(i,*) ) ) )
+; 1D Arrays: Footpoint Lon and Lat for each field line:
+  Footpoint_Rad_A = fltarr(N_fl)
+  Footpoint_Lon_A = fltarr(N_fl)
+  Footpoint_Lat_A = fltarr(N_fl)
+  for ifl = 0,N_fl-1 do begin
+     Footpoint_Rad_A(ifl) = (*trace_data.rad)(ifl,irmin[ifl])
+     Footpoint_Lon_A(ifl) = (*trace_data.lon)(ifl,irmin[ifl])
+     Footpoint_Lat_A(ifl) = (*trace_data.lat)(ifl,irmin[ifl])
+  endfor
+
+  trace_data = create_struct( trace_data       ,$
+     'footpoint_rad', ptr_new(Footpoint_Rad_A),$
+     'footpoint_lat', ptr_new(Footpoint_Lat_A),$
+     'footpoint_lon', ptr_new(Footpoint_Lon_A) )
+
+  undefine,Footpoint_Rad_A
+  undefine,Footpoint_Lat_A
+  undefine,Footpoint_Lon_A
   
   if keyword_set(trace_Bs) then begin
      trace_data = create_struct( trace_data,$
@@ -458,12 +461,11 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
                  'Bth',   ptr_new(Bth_A)   ,$
                  'Bph',   ptr_new(Bph_A)   ,$
                  'B'  ,   ptr_new(B_A)     )
-;    FEDE:     
-;     undefine,s_A
-;     undefine,Br_A    
-;     undefine,Bth_A
-;     undefine,Bph_A
-;     unefine,B_A     
+     undefine,s_A
+     undefine,Br_A    
+     undefine,Bth_A
+     undefine,Bph_A
+     undefine,B_A     
   endif
 
 if keyword_set(trace_Bs) then begin
@@ -503,10 +505,9 @@ if keyword_set(trace_Bs) then begin
                'leg_label'      , ptr_new(leg_label_A)     ,$
                'leg_length'     , ptr_new(leg_length_A)    ,$
                'leg_footbfield' , ptr_new(leg_footbfield_A) )
-; FEDE:  
-;  undefine,leg_label_A
-;  undefine,leg_length_A
-;  undefine,leg_footbfield_A
+  undefine,leg_label_A
+  undefine,leg_length_A
+  undefine,leg_footbfield_A
 endif
 
 ; Store into the structure traced tomographic resuls
@@ -518,15 +519,14 @@ endif
             'ldem_flag_aia' , ptr_new(     ldem_flag_aia_A) ,$     
                 'index_aia' , ptr_new(         index_aia_A) ,$
        'index_sampling_aia' , ptr_new(index_sampling_aia_A)  )
-   ; FEDE: 
-;     undefine,Ne_aia_A
-;     undefine,Tm_aia_A
-;     undefine,WT_aia_A
-;     undefine,ldem_flag_aia_A
-;     undefine,index_aia_A
-;     undefine,index_sampling_aia_A
-     
+     undefine,Ne_aia_A
+     undefine,Tm_aia_A
+     undefine,WT_aia_A
+     undefine,ldem_flag_aia_A
+     undefine,index_aia_A
+     undefine,index_sampling_aia_A     
   endif
+  
   if keyword_set(euvia) then begin
      trace_data = create_struct( trace_data ,$
                  'Ne_euvia' , ptr_new(            Ne_euvia_A) ,$
@@ -535,6 +535,12 @@ endif
           'ldem_flag_euvia' , ptr_new(     ldem_flag_euvia_A) ,$
               'index_euvia' , ptr_new(         index_euvia_A) ,$
      'index_sampling_euvia' , ptr_new(index_sampling_euvia_A)  )
+     undefine,Ne_euvia_A
+     undefine,Tm_euvia_A
+     undefine,WT_euvia_A
+     undefine,ldem_flag_euvia_A
+     undefine,index_euvia_A
+     undefine,index_sampling_euvia_A
   endif
   if keyword_set(euvib) then begin
      trace_data = create_struct( trace_data ,$
@@ -544,6 +550,12 @@ endif
           'ldem_flag_euvib' , ptr_new(     ldem_flag_euvib_A) ,$
               'index_euvib' , ptr_new(         index_euvib_A) ,$
      'index_sampling_euvib' , ptr_new(index_sampling_euvib_A)  )
+     undefine,Ne_euvib_A
+     undefine,Tm_euvib_A
+     undefine,WT_euvib_A
+     undefine,ldem_flag_euvib_A
+     undefine,index_euvib_A
+     undefine,index_sampling_euvib_A
   endif
   if keyword_set(eit) then begin
      trace_data = create_struct( trace_data ,$
@@ -553,36 +565,54 @@ endif
             'ldem_flag_eit' , ptr_new(     ldem_flag_eit_A) ,$
                 'index_eit' , ptr_new(         index_eit_A) ,$
        'index_sampling_eit' , ptr_new(index_sampling_eit_A)  )
+     undefine,Ne_eit_A
+     undefine,Tm_eit_A
+     undefine,WT_eit_A
+     undefine,ldem_flag_eit_A
+     undefine,index_eit_A
+     undefine,index_sampling_eit_A
   endif
   if keyword_set(mk4) then begin
      trace_data = create_struct( trace_data ,$
                    'Ne_mk4' , ptr_new(            Ne_mk4_A) ,$
                 'index_mk4' , ptr_new(         index_mk4_A) ,$
        'index_sampling_mk4' , ptr_new(index_sampling_mk4_A)  )
+     undefine,Ne_mk4_A
+     undefine,index_mk4_A
+     undefine,index_sampling_mk4_A
   endif
   if keyword_set(kcor) then begin
      trace_data = create_struct( trace_data ,$
                  'Ne_kcor' , ptr_new(            Ne_kcor_A) ,$
               'index_kcor' , ptr_new(         index_kcor_A) ,$
      'index_sampling_kcor' , ptr_new(index_sampling_kcor_A)  )
+     undefine,Ne_kcor_A
+     undefine,index_kcor_A
+     undefine,index_sampling_kcor_A
   endif
   if keyword_set(ucomp) then begin
      trace_data = create_struct( trace_data ,$
                  'Ne_ucomp' , ptr_new(            Ne_ucomp_A) ,$
               'index_ucomp' , ptr_new(         index_ucomp_A) ,$
      'index_sampling_ucomp' , ptr_new(index_sampling_ucomp_A)  )
+     undefine,Ne_ucomp_A
+     undefine,index_ucomp_A
+     undefine,index_sampling_ucomp_A
   endif
   if keyword_set(lascoc2) then begin
      trace_data = create_struct( trace_data ,$
                    'Ne_c2' , ptr_new(            Ne_c2_A) ,$
                 'index_c2' , ptr_new(         index_c2_A) ,$
        'index_sampling_c2' , ptr_new(index_sampling_c2_A)  )
+     undefine,Ne_c2_A
+     undefine,index_c2_A
+     undefine,index_sampling_c2_A
   endif
 
 ; Perform fits:
   fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                   mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2,$
-                  fl_dir=fl_dir ;, trace_data = trace_data ; FEDE
+                  fl_dir=fl_dir, trace_data = trace_data 
   
  ; Save structure in fl_dir:
   save, trace_data, filename = fl_dir + structure_filename + '.sav'
