@@ -223,8 +223,17 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
            rad_aia_A           (i_fl,0:Nl_samp-1) = rad_l(indsamp)
            lat_aia_A           (i_fl,0:Nl_samp-1) = lat_l(indsamp)
            lon_aia_A           (i_fl,0:Nl_samp-1) = lon_l(indsamp)
+           if keyword_set(trace_Bs) then begin
+               s_aia_A          (i_fl,0:Nl_samp-1) =   S_l (indsamp)
+              Br_aia_A          (i_fl,0:Nl_samp-1) =  Br_l (indsamp)
+             Bth_aia_A          (i_fl,0:Nl_samp-1) = Bth_l (indsamp)
+             Bph_aia_A          (i_fl,0:Nl_samp-1) = Bph_l (indsamp)
+               B_aia_A          (i_fl,0:Nl_samp-1) =   B_l (indsamp)
+           endif
         endif
      endif
+; Nota del coder: Hay que repetir lo que se codeó con AIA para los
+; demás instrumentos ...
      
    ; EUVI-A
      if keyword_set(euvia)  then begin
@@ -477,61 +486,24 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
   STOP
 ; POINTER-STRUCTURE  
 ; Create a pointer structure to store field line extraction information  
-  trace_data = { N_fl:    ptr_new(N_fl)    ,$
-                 Npt_max: ptr_new(Npt_max) ,$
-                 Npt_v:   ptr_new(Npt_v)   ,$
-                 x:       ptr_new(x_A)     ,$
-                 y:       ptr_new(y_A)     ,$
-                 z:       ptr_new(z_A)     ,$
-                 rad:     ptr_new(rad_A)   ,$
-                 lat:     ptr_new(lat_A)   ,$
-                 lon:     ptr_new(lon_A)    }
-; undefine,N_fl
-  undefine,Npt_max
-  undefine,Npt_v
-  undefine,x_A
-  undefine,y_A
-  undefine,z_A
-  undefine,rad_A
-  undefine,lat_A
-  undefine,lon_A
+  trace_data = { N_fl:                ptr_new(N_fl)                ,$
+                 Npt_max_samp:        ptr_new(Npt_max_samp)        ,$
+                 Npt_v_samp:          ptr_new(Npt_v)               ,$
+                 footpoint_rad:       ptr_new(footpoint_rad_A)     ,$
+                 footpoint_lat:       ptr_new(footpoint_lat_A)     ,$
+                 footpoint_lon:       ptr_new(footpoint_lon_A)     ,$
+                 apex_rad:            ptr_new(apex_rad_A)          ,$
+                 apex_lat:            ptr_new(apex_lat_A)          ,$
+                 apex_lon:            ptr_new(apex_lon_A)           }
+  undefine,Npt_max_samp
+  undefine,Npt_v_samp
+  undefine,footpoint_rad_A
+  undefine,footpoint_lat_A
+  undefine,footpoint_lon_A
+  undefine,apex_rad_A
+  undefine,apex_lat_A
+  undefine,apex_lon_A
 
-  goto,skip_footpoints
-; Determine the Rad, Lat and Lon of the footppoint of each field line.
-; 1D Arrays: radial index corresponding to Rmin for each field line:
-  irmin=intarr(N_fl)
-  for i=0,N_fl-1 do irmin(i)=where(abs( (*trace_data.rad)(i,*) ) eq min(abs( (*trace_data.rad)(i,*) ) ) )
-; 1D Arrays: Footpoint Lon and Lat for each field line:
-  Footpoint_Rad_A = fltarr(N_fl)
-  Footpoint_Lon_A = fltarr(N_fl)
-  Footpoint_Lat_A = fltarr(N_fl)
-  for ifl = 0,N_fl-1 do begin
-     Footpoint_Rad_A(ifl) = (*trace_data.rad)(ifl,irmin[ifl])
-     Footpoint_Lon_A(ifl) = (*trace_data.lon)(ifl,irmin[ifl])
-     Footpoint_Lat_A(ifl) = (*trace_data.lat)(ifl,irmin[ifl])
-  endfor
-  trace_data = create_struct( trace_data       ,$
-     'footpoint_rad', ptr_new(Footpoint_Rad_A),$
-     'footpoint_lat', ptr_new(Footpoint_Lat_A),$
-     'footpoint_lon', ptr_new(Footpoint_Lon_A) )
-  undefine,Footpoint_Rad_A
-  undefine,Footpoint_Lat_A
-  undefine,Footpoint_Lon_A
-  skip_footpoints:
-  
-  if keyword_set(trace_Bs) then begin
-     trace_data = create_struct( trace_data,$
-                 's'  ,   ptr_new(s_A)     ,$
-                 'Br' ,   ptr_new(Br_A)    ,$
-                 'Bth',   ptr_new(Bth_A)   ,$
-                 'Bph',   ptr_new(Bph_A)   ,$
-                 'B'  ,   ptr_new(B_A)     )
-     undefine,s_A
-     undefine,Br_A    
-     undefine,Bth_A
-     undefine,Bph_A
-     undefine,B_A     
-  endif
 
 if keyword_set(trace_Bs) then begin
 ; Read-in the leg-label of all fieldlines.
@@ -581,16 +553,33 @@ endif
                    'Ne_aia' , ptr_new(            Ne_aia_A) ,$
                    'Tm_aia' , ptr_new(            Tm_aia_A) ,$
                    'WT_aia' , ptr_new(            WT_aia_A) ,$
-            'ldem_flag_aia' , ptr_new(     ldem_flag_aia_A) ,$     
-                'index_aia' , ptr_new(         index_aia_A) ,$
-       'index_sampling_aia' , ptr_new(index_sampling_aia_A)  )
+            'ldem_flag_aia' , ptr_new(     ldem_flag_aia_A) ,$
+                  'rad_aia' , ptr_new(           rad_aia_A) ,$
+                  'lat_aia' , ptr_new(           lat_aia_A) ,$
+                  'lon_aia' , ptr_new(           lon_aia_A) )
      undefine,Ne_aia_A
      undefine,Tm_aia_A
      undefine,WT_aia_A
      undefine,ldem_flag_aia_A
-     undefine,index_aia_A
-     undefine,index_sampling_aia_A     
+     undefine,rad_aia_A
+     undefine,lat_aia_A
+     undefine,lon_aia_A
+     if keyword_set(trace_Bs) then begin
+        trace_data = create_struct( trace_data ,$
+                                    's_aia', ptr_new(s_aia_A), $
+                                    'B_aia', ptr_new(B_aia_A), $
+                                    'Br_aia', ptr_new(Br_aia_A), $
+                                    'Bth_aia', ptr_new(Bth_aia_A), $
+                                    'Bph_aia', ptr_new(Bph_aia_A) )
+        undefine,s_aia_A
+        undefine,B_aia_A
+        undefine,Br_aia_A
+        undefine,Bth_aia_A
+        undefine,Bph_aia_A
+     endif
   endif
+; Nota del coder: Hay que repetir lo que se codeó con AIA para los
+; demás instrumentos ...
   
   if keyword_set(euvia) then begin
      trace_data = create_struct( trace_data ,$
