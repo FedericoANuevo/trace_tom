@@ -26,17 +26,17 @@
 ;          added line-label to structure
 ;          V3.0 FAN, IAFE, JUL 2025, optimization of the used RAM memory.
 ;          Add the calculation of footpoints vectors (before in load_traced_data_structure)
-pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
-                        aia=aia, euvia=euvia, euvib=euvib, eit=eit, $
-                        mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2, $
-                        struture_filename=structure_filename,$
-                        trace_Bs=trace_Bs
+pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
+                             aia=aia, euvia=euvia, euvib=euvib, eit=eit, $
+                             mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2, $
+                             struture_filename=structure_filename,$
+                             trace_Bs=trace_Bs
 
   if not keyword_set(fl_dir) or not keyword_set(fl_list) then STOP
 
 ; Set up filename for output structure:
   if not keyword_set(structure_filename) then structure_filename = fl_list
-  structure_filename = structure_filename + '-tracing-structure-merge'
+  structure_filename = structure_filename + '-tracing-structure-merge-samp'
 
 ; Read the list with the field-lines  
   N_fl     = 0L
@@ -47,84 +47,141 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
 ; Maximum number of point along the fieldline
 ; FEDE: Tal vez podemos optimizar el valor de esta
 ; variable. Crucial para optimizar el uso de RAM.  
-  Npt_max = 10100  
+  Npt_max_samp = 1200
+  
 ; Default value in all arrays.
   default = -678.
-  
-; Define needed arrays:
-; 1st Line Geometry and Bfield:
-    x_A = dblarr(N_fl,Npt_max) + default
-    y_A = dblarr(N_fl,Npt_max) + default
-    z_A = dblarr(N_fl,Npt_max) + default
-  rad_A = dblarr(N_fl,Npt_max) + default
-  lat_A = dblarr(N_fl,Npt_max) + default
-  lon_A = dblarr(N_fl,Npt_max) + default
- if keyword_set(trace_Bs) then begin
-     s_A = dblarr(N_fl,Npt_max) + default
-    Br_A = dblarr(N_fl,Npt_max) + default
-   Bth_A = dblarr(N_fl,Npt_max) + default
-   Bph_A = dblarr(N_fl,Npt_max) + default
-     B_A = dblarr(N_fl,Npt_max) + default
- endif  
-   Npt_v = intarr(N_fl)
+; Number of point in each sampled field-line 
+  Npt_v_samp = intarr(N_fl)
+
 ; 2nd Tomography Products: 
   if keyword_set(aia) then begin
-     Ne_aia_A             = fltarr(N_fl,Npt_max) + default
-     Tm_aia_A             = fltarr(N_fl,Npt_max) + default
-     WT_aia_A             = fltarr(N_fl,Npt_max) + default
-     ldem_flag_aia_A      = fltarr(N_fl,Npt_max) + default
-     index_aia_A          = intarr(N_fl,Npt_max) + default
-     index_sampling_aia_A = intarr(N_fl,Npt_max) + default
+     Ne_aia_A             = fltarr(N_fl,Npt_max_samp) + default
+     Tm_aia_A             = fltarr(N_fl,Npt_max_samp) + default
+     WT_aia_A             = fltarr(N_fl,Npt_max_samp) + default
+     ldem_flag_aia_A      = fltarr(N_fl,Npt_max_samp) + default
+     rad_aia_A            = fltarr(N_fl,Npt_max_samp) + default
+     lat_aia_A            = fltarr(N_fl,Npt_max_samp) + default
+     lon_aia_A            = fltarr(N_fl,Npt_max_samp) + default
+     if keyword_set(trace_Bs) then begin
+        s_aia_A            = fltarr(N_fl,Npt_max_samp) + default
+        Br_aia_A           = fltarr(N_fl,Npt_max_samp) + default
+        Bth_aia_A          = fltarr(N_fl,Npt_max_samp) + default
+        Bph_aia_A          = fltarr(N_fl,Npt_max_samp) + default
+        B_aia_A            = fltarr(N_fl,Npt_max_samp) + default
+     endif
   endif
+  
   if keyword_set(euvia) then begin
-     Ne_euvia_A             = fltarr(N_fl,Npt_max) + default
-     Tm_euvia_A             = fltarr(N_fl,Npt_max) + default
-     WT_euvia_A             = fltarr(N_fl,Npt_max) + default
-     ldem_flag_euvia_A      = fltarr(N_fl,Npt_max) + default
-     index_euvia_A          = intarr(N_fl,Npt_max) + default
-     index_sampling_euvia_A = intarr(N_fl,Npt_max) + default
-  endif
+     Ne_euvia_A             = fltarr(N_fl,Npt_max_samp) + default
+     Tm_euvia_A             = fltarr(N_fl,Npt_max_samp) + default
+     WT_euvia_A             = fltarr(N_fl,Npt_max_samp) + default
+     ldem_flag_euvia_A      = fltarr(N_fl,Npt_max_samp) + default
+      rad_euvia_A           = fltarr(N_fl,Npt_max_samp) + default
+      lat_euvia_A           = fltarr(N_fl,Npt_max_samp) + default
+      lon_euvia_A           = fltarr(N_fl,Npt_max_samp) + default
+      if keyword_set(trace_Bs) then begin
+         s_euvia_A           = fltarr(N_fl,Npt_max_samp) + default
+         Br_euvia_A          = fltarr(N_fl,Npt_max_samp) + default
+         Bth_euvia_A         = fltarr(N_fl,Npt_max_samp) + default
+         Bph_euvia_A         = fltarr(N_fl,Npt_max_samp) + default
+         B_euvia_A           = fltarr(N_fl,Npt_max_samp) + default
+      endif
+   endif
+  
   if keyword_set(euvib) then begin
-     Ne_euvib_A             = fltarr(N_fl,Npt_max) + default
-     Tm_euvib_A             = fltarr(N_fl,Npt_max) + default
-     WT_euvib_A             = fltarr(N_fl,Npt_max) + default
-     ldem_flag_euvib_A      = fltarr(N_fl,Npt_max) + default
-     index_euvib_A          = intarr(N_fl,Npt_max) + default
-     index_sampling_euvib_A = intarr(N_fl,Npt_max) + default
-  endif
+     Ne_euvib_A             = fltarr(N_fl,Npt_max_samp) + default
+     Tm_euvib_A             = fltarr(N_fl,Npt_max_samp) + default
+     WT_euvib_A             = fltarr(N_fl,Npt_max_samp) + default
+     ldem_flag_euvib_A      = fltarr(N_fl,Npt_max_samp) + default
+      rad_euvib_A           = fltarr(N_fl,Npt_max_samp) + default
+      lat_euvib_A           = fltarr(N_fl,Npt_max_samp) + default
+      lon_euvib_A           = fltarr(N_fl,Npt_max_samp) + default
+      if keyword_set(trace_Bs) then begin
+         s_euvib_A           = fltarr(N_fl,Npt_max_samp) + default
+         Br_euvib_A          = fltarr(N_fl,Npt_max_samp) + default
+         Bth_euvib_A         = fltarr(N_fl,Npt_max_samp) + default
+         Bph_euvib_A         = fltarr(N_fl,Npt_max_samp) + default
+         B_euvib_A           = fltarr(N_fl,Npt_max_samp) + default
+      endif
+   endif
+
   if keyword_set(eit) then begin
-     Ne_eit_A             = fltarr(N_fl,Npt_max) + default
-     Tm_eit_A             = fltarr(N_fl,Npt_max) + default
-     WT_eit_A             = fltarr(N_fl,Npt_max) + default
-     ldem_flag_eit_A      = fltarr(N_fl,Npt_max) + default
-     index_eit_A          = intarr(N_fl,Npt_max) + default
-     index_sampling_eit_A = intarr(N_fl,Npt_max) + default
-  endif
+     Ne_eit_A             = fltarr(N_fl,Npt_max_samp) + default
+     Tm_eit_A             = fltarr(N_fl,Npt_max_samp) + default
+     WT_eit_A             = fltarr(N_fl,Npt_max_samp) + default
+     ldem_flag_eit_A      = fltarr(N_fl,Npt_max_samp) + default
+      rad_eit_A           = fltarr(N_fl,Npt_max_samp) + default
+      lat_eit_A           = fltarr(N_fl,Npt_max_samp) + default
+      lon_eit_A           = fltarr(N_fl,Npt_max_samp) + default
+      if keyword_set(trace_Bs) then begin
+        s_eit_A           = fltarr(N_fl,Npt_max_samp) + default
+        Br_eit_A          = fltarr(N_fl,Npt_max_samp) + default
+        Bth_eit_A         = fltarr(N_fl,Npt_max_samp) + default
+        Bph_eit_A         = fltarr(N_fl,Npt_max_samp) + default
+        B_eit_A           = fltarr(N_fl,Npt_max_samp) + default
+     endif
+   endif
+  
   if keyword_set(mk4) then begin
-     Ne_mk4_A    = fltarr(N_fl,Npt_max) + default
-     index_mk4_A = intarr(N_fl,Npt_max) + default
-     index_sampling_mk4_A = intarr(N_fl,Npt_max) + default
+     Ne_mk4_A             = fltarr(N_fl,Npt_max_samp) + default
+     rad_mk4_A            = fltarr(N_fl,Npt_max_samp) + default
+     lat_mk4_A            = fltarr(N_fl,Npt_max_samp) + default
+     lon_mk4_A            = fltarr(N_fl,Npt_max_samp) + default
+     if keyword_set(trace_Bs) then begin
+        s_mk4_A           = fltarr(N_fl,Npt_max_samp) + default
+        Br_mk4_A          = fltarr(N_fl,Npt_max_samp) + default
+        Bth_mk4_A         = fltarr(N_fl,Npt_max_samp) + default
+        Bph_mk4_A         = fltarr(N_fl,Npt_max_samp) + default
+        B_mk4_A           = fltarr(N_fl,Npt_max_samp) + default
+     endif
   endif
+  
   if keyword_set(kcor) then begin
-     Ne_kcor_A    = fltarr(N_fl,Npt_max) + default
-     index_kcor_A = intarr(N_fl,Npt_max) + default
-     index_sampling_kcor_A = intarr(N_fl,Npt_max) + default
+     Ne_kcor_A             = fltarr(N_fl,Npt_max_samp) + default
+     rad_kcor_A            = fltarr(N_fl,Npt_max_samp) + default
+     lat_kcor_A            = fltarr(N_fl,Npt_max_samp) + default
+     lon_kcor_A            = fltarr(N_fl,Npt_max_samp) + default
+     if keyword_set(trace_Bs) then begin
+        s_kcor_A           = fltarr(N_fl,Npt_max_samp) + default
+        Br_kcor_A          = fltarr(N_fl,Npt_max_samp) + default
+        Bth_kcor_A         = fltarr(N_fl,Npt_max_samp) + default
+        Bph_kcor_A         = fltarr(N_fl,Npt_max_samp) + default
+        B_kcor_A           = fltarr(N_fl,Npt_max_samp) + default
+     endif
   endif
   if keyword_set(ucomp) then begin
-     Ne_ucomp_A    = fltarr(N_fl,Npt_max) + default
-     index_ucomp_A = intarr(N_fl,Npt_max) + default
-     index_sampling_ucomp_A = intarr(N_fl,Npt_max) + default
-  endif  
+     Ne_ucomp_A             = fltarr(N_fl,Npt_max_samp) + default
+     rad_ucomp_A            = fltarr(N_fl,Npt_max_samp) + default
+     lat_ucomp_A            = fltarr(N_fl,Npt_max_samp) + default
+     lon_ucomp_A            = fltarr(N_fl,Npt_max_samp) + default
+     if keyword_set(trace_Bs) then begin
+        s_ucomp_A           = fltarr(N_fl,Npt_max_samp) + default
+        Br_ucomp_A          = fltarr(N_fl,Npt_max_samp) + default
+        Bth_ucomp_A         = fltarr(N_fl,Npt_max_samp) + default
+        Bph_ucomp_A         = fltarr(N_fl,Npt_max_samp) + default
+        B_ucomp_A           = fltarr(N_fl,Npt_max_samp) + default
+     endif
+  endif
+  
   if keyword_set(lascoc2) then begin
-     Ne_c2_A    = fltarr(N_fl,Npt_max) + default
-     index_c2_A = intarr(N_fl,Npt_max) + default
-     index_sampling_c2_A = intarr(N_fl,Npt_max) + default
+     Ne_c2_A               = fltarr(N_fl,Npt_max_samp) + default
+     rad_c2_A            = fltarr(N_fl,Npt_max_samp) + default
+     lat_c2_A            = fltarr(N_fl,Npt_max_samp) + default
+     lon_c2_A            = fltarr(N_fl,Npt_max_samp) + default
+     if keyword_set(trace_Bs) then begin
+        s_c2_A           = fltarr(N_fl,Npt_max_samp) + default
+        Br_c2_A          = fltarr(N_fl,Npt_max_samp) + default
+        Bth_c2_A         = fltarr(N_fl,Npt_max_samp) + default
+        Bph_c2_A         = fltarr(N_fl,Npt_max_samp) + default
+        B_c2_A           = fltarr(N_fl,Npt_max_samp) + default
+     endif
+  
   endif
            
   for i_fl = 0L,N_fl-1 do begin ; Start loop in fieldlines  
-     initialized = 'no'
      readf,1,filename
-     
+  
    ; AIA
      if keyword_set(aia)   then begin
         file_aia   = filename+'_aia.out'
@@ -136,32 +193,20 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
         readcol,fl_dir+file_aia,x_l,y_l,z_l,s_l,Br_l,Bth_l,Bph_l,B_l,rad_l,lat_l,lon_l,Ne_aia_l,Tm_aia_l,$
                 WT_aia_l, ldem_flag_aia_l, index_aia_l  ,FORMAT='D,D,D,D,D,D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_aia_l, index_l=index_aia_l, index_sampling_l=index_sampling_l
-        if initialized eq 'no' then begin
-           N_l         = n_elements(x_l)
-           Npt_v(i_fl) = N_l
-           initialized = 'yes'
-           x_A   (i_fl,0:N_l-1) = x_l
-           y_A   (i_fl,0:N_l-1) = y_l
-           z_A   (i_fl,0:N_l-1) = z_l
-           rad_A (i_fl,0:N_l-1) = rad_l
-           lat_A (i_fl,0:N_l-1) = lat_l
-           lon_A (i_fl,0:N_l-1) = lon_l
-           if keyword_set(trace_Bs) then begin
-             s_A (i_fl,0:N_l-1) =   s_l
-            Br_A (i_fl,0:N_l-1) =  Br_l
-           Bth_A (i_fl,0:N_l-1) = Bth_l
-           Bph_A (i_fl,0:N_l-1) = Bph_l
-             B_A (i_fl,0:N_l-1) =   B_l
-           endif
+        indsamp = where(index_sampling_l eq 1)
+        if indsamp[0] ne -1 then begin
+           Nl_samp          = n_elements(indsamp)
+           Npt_v_samp(i_fl) = Nl_samp 
+           Ne_aia_A            (i_fl,0:Nl_samp-1) = Ne_aia_l(indsamp)
+           Tm_aia_A            (i_fl,0:Nl_samp-1) = Tm_aia_l(indsamp)
+           WT_aia_A            (i_fl,0:Nl_samp-1) = WT_aia_l(indsamp)
+           ldem_flag_aia_A     (i_fl,0:Nl_samp-1) = ldem_flag_aia_l(indsamp)
+           rad_aia_A           (i_fl,0:Nl_samp-1) = rad_l(indsamp)
+           lat_aia_A           (i_fl,0:Nl_samp-1) = lat_l(indsamp)
+           lon_aia_A           (i_fl,0:Nl_samp-1) = lon_l(indsamp)
         endif
-        Ne_aia_A            (i_fl,0:N_l-1) = Ne_aia_l
-        Tm_aia_A            (i_fl,0:N_l-1) = Tm_aia_l
-        WT_aia_A            (i_fl,0:N_l-1) = WT_aia_l
-        ldem_flag_aia_A     (i_fl,0:N_l-1) = ldem_flag_aia_l
-        index_aia_A         (i_fl,0:N_l-1) = index_aia_l
-        index_sampling_aia_A(i_fl,0:N_l-1) = index_sampling_l
      endif
-
+        
    ; EUVI-A
      if keyword_set(euvia)  then begin
         file_euvia = filename+'_euvia.out'
