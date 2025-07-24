@@ -51,9 +51,17 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
   
 ; Default value in all arrays.
   default = -678.
-; Number of point in each sampled field-line 
-  Npt_v_samp = intarr(N_fl)
+  
+; Define needed arrays:
+; 1st Line Geometry and Bfield:
 
+  Footpoint_Rad_A = fltarr(N_fl)
+  Footpoint_Lon_A = fltarr(N_fl)
+  Footpoint_Lat_A = fltarr(N_fl)
+  Apex_Rad_A      = fltarr(N_fl)
+  Apex_Lon_A      = fltarr(N_fl)
+  Apex_Lat_A      = fltarr(N_fl)
+  Npt_v_samp      = intarr(N_fl)
 ; 2nd Tomography Products: 
   if keyword_set(aia) then begin
      Ne_aia_A             = fltarr(N_fl,Npt_max_samp) + default
@@ -180,8 +188,9 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
   endif
            
   for i_fl = 0L,N_fl-1 do begin ; Start loop in fieldlines  
+     initialized = 'no'
      readf,1,filename
-  
+     
    ; AIA
      if keyword_set(aia)   then begin
         file_aia   = filename+'_aia.out'
@@ -193,6 +202,16 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
         readcol,fl_dir+file_aia,x_l,y_l,z_l,s_l,Br_l,Bth_l,Bph_l,B_l,rad_l,lat_l,lon_l,Ne_aia_l,Tm_aia_l,$
                 WT_aia_l, ldem_flag_aia_l, index_aia_l  ,FORMAT='D,D,D,D,D,D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_aia_l, index_l=index_aia_l, index_sampling_l=index_sampling_l
+        if initialized eq 'no' then begin
+           index_foot = where( rad_l eq min(rad_l))
+           index_apex = where( rad_l eq max(rad_l))
+           footpoint_rad_A(i_fl) = rad_l(index_foot[0])
+           footpoint_lat_A(i_fl)=  lat_l(index_foot[0])
+           footpoint_lon_A(i_fl) = lon_l(index_foot[0])
+           apex_rad_A(i_fl) = rad_l(index_apex[0])
+           apex_lat_A(i_fl)=  lat_l(index_apex[0])
+           apex_lon_A(i_fl) = lon_l(index_apex[0])
+        endif
         indsamp = where(index_sampling_l eq 1)
         if indsamp[0] ne -1 then begin
            Nl_samp          = n_elements(indsamp)
@@ -206,7 +225,7 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
            lon_aia_A           (i_fl,0:Nl_samp-1) = lon_l(indsamp)
         endif
      endif
-        
+     
    ; EUVI-A
      if keyword_set(euvia)  then begin
         file_euvia = filename+'_euvia.out'
