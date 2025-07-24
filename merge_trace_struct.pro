@@ -45,7 +45,9 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
   readf,1,N_fl
 
 ; Maximum number of point along the fieldline
-  Npt_max = 10100 ; Ask JUDIT for an optimal value.
+; FEDE: Tal vez podemos optimizar el valor de esta
+; variable. Crucial para optimizar el uso de RAM.  
+  Npt_max = 10100  
 ; Default value in all arrays.
   default = -678.
   
@@ -408,7 +410,7 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
                               
   endfor                        ; End loop in fieldlines    
   close,1
-
+  STOP
 ; POINTER-STRUCTURE  
 ; Create a pointer structure to store field line extraction information  
   trace_data = { N_fl:    ptr_new(N_fl)    ,$
