@@ -1,4 +1,4 @@
-pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, $
+pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
                   plot_filename_suffix=plot_filename_suffix,$
                   aia=aia, kcor=kcor, ucomp=ucomp,$
                   plotaia=plotaia, plotkcor=plotkcor, plotucomp=plotucomp,$
@@ -16,14 +16,14 @@ pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, $
 ; structure_filename='fdips_field_150x180x360_mrmqs220221t2004c2254_000.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
 ; structure_filename='fdips_field_150X180X360_mrmqs220831t1302c2261_000.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
 ; structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr.2254.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
-; structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2254.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
-  structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2261.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
+  structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2254.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
+; structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2261.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
   
 ; Select dir where the structure is located (labeled after the selection of starting points) 
 ; field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI/'
 ; field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_2x2deg_HMI/'
-; field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI-PolFil/'
-  field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_2x2deg_HMI-PolFil/'
+  field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI-PolFil/'
+; field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_2x2deg_HMI-PolFil/'
 ;===============================================================================================
   
 ; Load structure if so requested:
@@ -175,7 +175,7 @@ if                               keyword_set(closed) then oplot,(*trace_data.Foo
 
 loadct,12
 
-; LLEGUÉ HASTA ACÁ ...
+
 
 ; Set a maximum threshold for scN
 scN_crit = 0.25
@@ -234,20 +234,23 @@ endif
 ; Color-highlight all footpoints indicated by ifl_A accordind to their polarity
 indxpos_A = intersect(ifl_A,ifl_pos_A)
 if n_elements(indxpos_A) gt 1 then $
-oplot,Footpoint_Lon_A(indxpos_A),Footpoint_Lat_A(indxpos_A),psym=4,th=2,color=green
+oplot,(*trace_data.Footpoint_Lon)(indxpos_A),(*trace_data.Footpoint_Lat)(indxpos_A),psym=4,th=2,color=green
 indxneg_A = intersect(ifl_A,ifl_neg_A)
 if n_elements(indxneg_A) gt 1 then $
-oplot,Footpoint_Lon_A(indxneg_A),Footpoint_Lat_A(indxneg_A),psym=4,th=2,color=red
+oplot,Footpoint_Lon_A(indxneg_A),(*trace_data.Footpoint_Lat)(indxneg_A),psym=4,th=2,color=red
+
+
+; LLEGUÉ HASTA ACÁ ...
 
 ; Compute the average Ne(r) of each instrument for lines indexed ifl_A
 if keyword_set(aia) then begin
-   Ne_fit_aia_Avg   = total( Ne_fit_aia_A(ifl_A,*)   , 1 ) / float(n_elements(ifl_A)) 
+   Ne_fit_aia_Avg   = total((*trace_data.Ne_fit_aia)(ifl_A,*)   , 1 ) / float(n_elements(ifl_A)) 
 endif
 if keyword_set(kcor) then begin
-   Ne_fit_kcor_Avg  = total( Ne_fit_kcor_A(ifl_A,*)  , 1 ) / float(n_elements(ifl_A))
+   Ne_fit_kcor_Avg  = total((*trace_data.Ne_fit_kcor)(ifl_A,*)  , 1 ) / float(n_elements(ifl_A))
 endif
 if keyword_set(ucomp) then begin
-   Ne_fit_ucomp_Avg = total( Ne_fit_ucomp_A(ifl_A,*) , 1 ) / float(n_elements(ifl_A))
+   Ne_fit_ucomp_Avg = total((*trace_data.Ne_fit_ucomp)(ifl_A,*) , 1 ) / float(n_elements(ifl_A))
 endif
 skip_tag_pos:
 
@@ -258,7 +261,7 @@ unit_power_str =   '8'
 xrange = [1.095,r_max]
 yrflag = -1
 if keyword_set(aia) then begin
-   r    = rad_fit_aia_A
+   r    = *trace_data.rad_fit_aia
    f    = Ne_fit_aia_Avg/unit
    miny = min(f(where(f gt 0. and r le max(xrange))))
    maxy = max(f(where(f gt 0. and r le max(xrange))))
@@ -266,7 +269,7 @@ if keyword_set(aia) then begin
    yrflag = +1
 endif
 if keyword_set(kcor) then begin
-   r    = rad_fit_kcor_A
+   r    = *trace_data.rad_fit_kcor
    f    = Ne_fit_kcor_Avg/unit
    miny = min(f(where(f gt 0. and r le max(xrange))))
    maxy = max(f(where(f gt 0. and r le max(xrange))))
@@ -275,7 +278,7 @@ if keyword_set(kcor) then begin
    yrflag = +1
 endif
 if keyword_set(ucomp) then begin
-   r    = rad_fit_ucomp_A
+   r    = *trace_data.rad_fit_ucomp
    f    = Ne_fit_ucomp_Avg/unit
    miny = min(f(where(f gt 0. and r le max(xrange))))
    maxy = max(f(where(f gt 0. and r le max(xrange))))
@@ -283,7 +286,7 @@ if keyword_set(ucomp) then begin
    if yrflag ne -1. then yrange = [min([miny,yrange(0)]),max([maxy,max(yrange(1))])]
    yrflag = +1
 endif
-plot,rad_fit_kcor_A,Ne_fit_kcor_A(0,*)/unit,charsize=csz,font=0,$
+plot,*trace_data.rad_fit_kcor,(*trace_data.Ne_fit_kcor)(0,*)/unit,charsize=csz,font=0,$
      title  = '<N!De!N(r)>   Solid: AIA; Dashed: KCOR; Dot-Dashed: UCoMP',$
      ytitle = 'Ne(r) [x 10!U'+unit_power_str+'!N cm!U-3!N]',yr=yrange,ystyle=1,$
      xtitle = 'r [Rsun]'                                   ,xr=xrange,xstyle=1,$
@@ -296,31 +299,31 @@ col = 255 * findgen(Nifl)/float(Nifl-1)
 for ifl=0,Nifl-1,ilstep do begin
    il = (ifl_A(ifl))(0)
    if keyword_set(plotaia) then begin
-      tmp      = reform(index_sampling_aia_A(il,*))
+      tmp      = reform((*trace_data.index_sampling_aia)(il,*))
       ind_samp = where(tmp eq 1)
-      oplot,rad_fit_aia_A     ,Ne_fit_aia_A(il,*)   /unit,color=col(ifl)
-      oplot,rad_A(il,ind_samp),Ne_aia_A(il,ind_samp)/unit,color=col(ifl),psym=4
+      oplot,*trace_data.rad_fit_aia     ,(*trace_data.Ne_fit_aia)(il,*)   /unit,color=col(ifl)
+      oplot,(*trace_data.rad)(il,ind_samp),(*trace_data.Ne_aia)(il,ind_samp)/unit,color=col(ifl),psym=4
    endif
    if keyword_set(plotkcor) then begin
-      tmp      = reform(index_sampling_kcor_A(il,*))
+      tmp      = reform((*trace_data.index_sampling_kcor)(il,*))
       ind_samp = where(tmp eq 1)
-      oplot,rad_fit_kcor_A    ,Ne_fit_kcor_A(il,*)   /unit,color=col(ifl)
-      oplot,rad_A(il,ind_samp),Ne_kcor_A(il,ind_samp)/unit,color=col(ifl),psym=4
+      oplot,*trace_data.rad_fit_kcor    ,  (*trace_data.Ne_fit_kcor)(il,*)   /unit,color=col(ifl)
+      oplot,(*trace_data.rad)(il,ind_samp),(*trace_data.Ne_kcor)(il,ind_samp)/unit,color=col(ifl),psym=4
    endif
    if keyword_set(plotucomp) then begin
-      tmp      = reform(index_sampling_ucomp_A(il,*))
+      tmp      = reform((*trace_data.index_sampling_ucomp)(il,*))
       ind_samp = where(tmp eq 1)
-      oplot,rad_fit_ucomp_A   ,Ne_fit_ucomp_A(il,*)   /unit,color=col(ifl)
-      oplot,rad_A(il,ind_samp),Ne_ucomp_A(il,ind_samp)/unit,color=col(ifl),psym=4
+      oplot,*trace_data.rad_fit_ucomp   ,(*trace_data.Ne_fit_ucomp)(il,*)   /unit,color=col(ifl)
+      oplot,(*trace_data.rad)(il,ind_samp),(*trace_data.Ne_ucomp)(il,ind_samp)/unit,color=col(ifl),psym=4
    endif
 endfor
 endif
 
 loadct,0
 color=0
-if keyword_set(aia)   then oplot,rad_fit_aia_A  ,Ne_fit_aia_Avg  /unit,color=color,th=8
-if keyword_set(kcor)  then oplot,rad_fit_kcor_A ,Ne_fit_kcor_Avg /unit,color=color,th=8,linestyle=2
-if keyword_set(ucomp) then oplot,rad_fit_ucomp_A,Ne_fit_ucomp_Avg/unit,color=color,th=8,linestyle=3
+if keyword_set(aia)   then oplot,*trace_data.rad_fit_aia  ,Ne_fit_aia_Avg  /unit,color=color,th=8
+if keyword_set(kcor)  then oplot,*trace_data.rad_fit_kcor ,Ne_fit_kcor_Avg /unit,color=color,th=8,linestyle=2
+if keyword_set(ucomp) then oplot,*trace_data.rad_fit_ucomp,Ne_fit_ucomp_Avg/unit,color=color,th=8,linestyle=3
 loadct,0
 !p.multi=0
 ps2
