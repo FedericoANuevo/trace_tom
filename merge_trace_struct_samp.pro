@@ -61,9 +61,10 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
   Apex_Rad_A      = fltarr(N_fl)
   Apex_Lon_A      = fltarr(N_fl)
   Apex_Lat_A      = fltarr(N_fl)
-  Npt_v_samp      = intarr(N_fl)
+  Npt_v_aia       = intarr(N_fl)
 ; 2nd Tomography Products: 
   if keyword_set(aia) then begin
+     Npt_v_aia            = intarr(N_fl)
      Ne_aia_A             = fltarr(N_fl,Npt_max_samp) + default
      Tm_aia_A             = fltarr(N_fl,Npt_max_samp) + default
      WT_aia_A             = fltarr(N_fl,Npt_max_samp) + default
@@ -81,6 +82,7 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
   endif
   
   if keyword_set(euvia) then begin
+     Npt_v_euvia            = intarr(N_fl)
      Ne_euvia_A             = fltarr(N_fl,Npt_max_samp) + default
      Tm_euvia_A             = fltarr(N_fl,Npt_max_samp) + default
      WT_euvia_A             = fltarr(N_fl,Npt_max_samp) + default
@@ -215,7 +217,7 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
         indsamp = where(index_sampling_l eq 1)
         if indsamp[0] ne -1 then begin
            Nl_samp          = n_elements(indsamp)
-           Npt_v_samp(i_fl) = Nl_samp 
+           Npt_v_aia(i_fl)  = Nl_samp 
            Ne_aia_A            (i_fl,0:Nl_samp-1) = Ne_aia_l(indsamp)
            Tm_aia_A            (i_fl,0:Nl_samp-1) = Tm_aia_l(indsamp)
            WT_aia_A            (i_fl,0:Nl_samp-1) = WT_aia_l(indsamp)
