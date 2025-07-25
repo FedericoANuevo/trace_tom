@@ -169,33 +169,35 @@ if keyword_set(open)   then opcl_str='open '
 if keyword_set(closed) then opcl_str='closed '
 plot,lon_A,lat_A,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=csz,$
      title='Location of '+opcl_str+'footpoints',ytitle='Carrington Latitude [deg]',font=0
-if not keyword_set(open) and not keyword_set(closed) then oplot,*trace_data.Footpoint_Lon              ,*trace_data.Footpoint_Lat              ,psym=4
-if     keyword_set(open)                             then oplot,Footpoint_Lon_A(ifl_open_A)  ,Footpoint_Lat_A(ifl_open_A)  ,psym=4
-if                               keyword_set(closed) then oplot,Footpoint_Lon_A(ifl_closed_A),Footpoint_Lat_A(ifl_closed_A),psym=4
+if not keyword_set(open) and not keyword_set(closed) then oplot,*trace_data.Footpoint_Lon                , *trace_data.Footpoint_Lat               ,psym=4
+if     keyword_set(open)                             then oplot,(*trace_data.Footpoint_Lon)(ifl_open_A)  ,(*trace_data.Footpoint_Lat)(ifl_open_A)  ,psym=4
+if                               keyword_set(closed) then oplot,(*trace_data.Footpoint_Lon)(ifl_closed_A),(*trace_data.Footpoint_Lat)(ifl_closed_A),psym=4
 
 loadct,12
+
+; LLEGUÉ HASTA ACÁ ...
 
 ; Set a maximum threshold for scN
 scN_crit = 0.25
 
 ; Independently for each instrument, tag field lines for which their DPL Ne-fit has all parameters positive
 tag_posfit_aia_A = fltarr(N_Fl)
-index            = where(N1_fit_aia_A gt 0. AND N2_fit_aia_A gt 0. AND p1_fit_aia_A gt 0. AND p2_fit_aia_A gt 0.)
+index            = where(*trace_data.N1_fit_aia gt 0. AND *trace_data.N2_fit_aia gt 0. AND *trace_data.p1_fit_aia gt 0. AND *trace_data.p2_fit_aia gt 0.)
 tag_posfit_aia_A(index) = +1
 ;
 tag_posfit_kcor_A = fltarr(N_Fl)
-index             = where(N1_fit_kcor_A gt 0. AND N2_fit_kcor_A gt 0. AND p1_fit_kcor_A gt 0. AND p2_fit_kcor_A gt 0.)
+index             = where(*trace_data.N1_fit_kcor gt 0. AND *trace_data.N2_fit_kcor gt 0. AND *trace_data.p1_fit_kcor gt 0. AND *trace_data.p2_fit_kcor gt 0.)
 tag_posfit_kcor_A(index) = +1
 ;
 tag_posfit_ucomp_A = fltarr(N_Fl)
-index              = where(N1_fit_ucomp_A gt 0. AND N2_fit_ucomp_A gt 0. AND p1_fit_ucomp_A gt 0. AND p2_fit_ucomp_A gt 0.)
+index              = where(*trace_data.N1_fit_ucomp gt 0. AND *trace_data.N2_fit_ucomp gt 0. AND *trace_data.p1_fit_ucomp gt 0. AND *trace_data.p2_fit_ucomp gt 0.)
 tag_posfit_ucomp_A(index) = +1
 
 ; Independently for each instrument, index lines that:
 ; 1) are in the box, 2) have a fit, 3) have Ne_fit>0 up to R_max, and 4) have a low chisq fit to Ne
-ifl_aia_A   = where(tag_box_A eq +1 AND tag_pos_aia_A   eq +1 AND fitflag_aia_A   eq +1 AND scN_fit_aia_A   le scN_crit)
-ifl_kcor_A  = where(tag_box_A eq +1 AND tag_pos_kcor_A  eq +1 AND fitflag_kcor_A  eq +1 AND scN_fit_kcor_A  le scN_crit)
-ifl_ucomp_A = where(tag_box_A eq +1 AND tag_pos_ucomp_A eq +1 AND fitflag_ucomp_A eq +1 AND scN_fit_ucomp_A le scN_crit)
+ifl_aia_A   = where(tag_box_A eq +1 AND tag_pos_aia_A   eq +1 AND fitflag_aia_A   eq +1 AND *trace_data.scN_fit_aia   le scN_crit)
+ifl_kcor_A  = where(tag_box_A eq +1 AND tag_pos_kcor_A  eq +1 AND fitflag_kcor_A  eq +1 AND *trace_data.scN_fit_kcor  le scN_crit)
+ifl_ucomp_A = where(tag_box_A eq +1 AND tag_pos_ucomp_A eq +1 AND fitflag_ucomp_A eq +1 AND *trace_data.scN_fit_ucomp le scN_crit)
 ; Also independently for each instrument,
 ; filter OUT lines for which NOT all their DPL Ne-fit parameters are positive
 if keyword_set(positparam) then begin
@@ -221,7 +223,7 @@ if keyword_set(connect) AND keyword_set(closed) then begin
       if leg_label_A(ifl) ne 0 then begin
          closed_loop_count = closed_loop_count + 1
          if (tag_box_A(ifl) eq +1) AND (closed_loop_count mod constep eq 0) then $
-            oplot,reform(Footpoint_Lon_A(ifl:ifl+1)),reform(Footpoint_Lat_A(ifl:ifl+1)),color=blue
+            oplot,reform((*trace_data.Footpoint_Lon)(ifl:ifl+1)),reform((*trace_data.Footpoint_Lat)(ifl:ifl+1)),color=blue
          ifl=ifl+2
       endif else begin
          ifl=ifl+1
