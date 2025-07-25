@@ -1,6 +1,6 @@
 ;
 ; PURPOSE: This code merges the tracing of tomographic products based
-; on data from different instruments along given AWSoM fieldlines, and
+; on data from different instruments along given AWSoM/FDIPS-PFSS fieldlines, and
 ; store all the information in a pointer structure.
 ;
 ; It also performs, if requested (/fits) analytical fits to the
@@ -14,18 +14,8 @@
 ; FLAGS: one per allowed instrument, use those for which you want to
 ; merge results, provided in any order.
 ;
-; HISTORY: V1.0 AMV & FAN, CLaSP, October 2023.
-;          V1.1 AMV, IAFE, November 2023. Added Sampling, expanded to
-;          all instruments and performed overall polishing.
-;          V2.0 AMV, IAFE, January 2024. Added fit to tomographic resuls.
-;          V2.1 AMV, CLASP, May 2024. pointers for each instrument are
-;          defined only if its data is used.
-;          V2.2 FAN, CLASP, May 2024. Added WT and LDEM_FLAG to the
-;          traced result.
-;          V2.4 AMV, CLaSP, May 2024, expanded to include closed FL,
-;          added line-label to structure
-;          V3.0 FAN, IAFE, JUL 2025, optimization of the used RAM memory.
-;          Add the calculation of footpoints vectors (before in load_traced_data_structure)
+; HISTORY: V1.0 FAN, IAFE, July 2025.
+
 pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
                              aia=aia, euvia=euvia, euvib=euvib, eit=eit, $
                              mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2, $
@@ -47,7 +37,7 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
 ; Maximum number of point along the fieldline
 ; FEDE: Tal vez podemos optimizar el valor de esta
 ; variable. Crucial para optimizar el uso de RAM.  
-  Npt_max_samp = 1200
+  Npt_max_samp = 150
   
 ; Default value in all arrays.
   default = -678.
@@ -61,7 +51,7 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
   Apex_Rad_A      = fltarr(N_fl)
   Apex_Lon_A      = fltarr(N_fl)
   Apex_Lat_A      = fltarr(N_fl)
-  Npt_v_aia       = intarr(N_fl)
+
 ; 2nd Tomography Products: 
   if keyword_set(aia) then begin
      Npt_v_aia            = intarr(N_fl)
@@ -100,6 +90,7 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
    endif
   
   if keyword_set(euvib) then begin
+     Npt_v_euvib            = intarr(N_fl)
      Ne_euvib_A             = fltarr(N_fl,Npt_max_samp) + default
      Tm_euvib_A             = fltarr(N_fl,Npt_max_samp) + default
      WT_euvib_A             = fltarr(N_fl,Npt_max_samp) + default
@@ -117,6 +108,7 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
    endif
 
   if keyword_set(eit) then begin
+     Npt_v_eit            = intarr(N_fl)
      Ne_eit_A             = fltarr(N_fl,Npt_max_samp) + default
      Tm_eit_A             = fltarr(N_fl,Npt_max_samp) + default
      WT_eit_A             = fltarr(N_fl,Npt_max_samp) + default
@@ -134,6 +126,7 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
    endif
   
   if keyword_set(mk4) then begin
+     Npt_v_mk4            = intarr(N_fl)
      Ne_mk4_A             = fltarr(N_fl,Npt_max_samp) + default
      rad_mk4_A            = fltarr(N_fl,Npt_max_samp) + default
      lat_mk4_A            = fltarr(N_fl,Npt_max_samp) + default
@@ -148,6 +141,7 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
   endif
   
   if keyword_set(kcor) then begin
+     Npt_v_kcor            = intarr(N_fl)
      Ne_kcor_A             = fltarr(N_fl,Npt_max_samp) + default
      rad_kcor_A            = fltarr(N_fl,Npt_max_samp) + default
      lat_kcor_A            = fltarr(N_fl,Npt_max_samp) + default
@@ -161,6 +155,7 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
      endif
   endif
   if keyword_set(ucomp) then begin
+     Npt_v_ucomp            = intarr(N_fl)
      Ne_ucomp_A             = fltarr(N_fl,Npt_max_samp) + default
      rad_ucomp_A            = fltarr(N_fl,Npt_max_samp) + default
      lat_ucomp_A            = fltarr(N_fl,Npt_max_samp) + default
@@ -175,7 +170,8 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
   endif
   
   if keyword_set(lascoc2) then begin
-     Ne_c2_A               = fltarr(N_fl,Npt_max_samp) + default
+     Npt_v_c2            = intarr(N_fl)
+     Ne_c2_A             = fltarr(N_fl,Npt_max_samp) + default
      rad_c2_A            = fltarr(N_fl,Npt_max_samp) + default
      lat_c2_A            = fltarr(N_fl,Npt_max_samp) + default
      lon_c2_A            = fltarr(N_fl,Npt_max_samp) + default
