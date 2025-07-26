@@ -136,13 +136,13 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
        undefine,dTdr_fit_aia_A
        undefine,lN_fit_aia_A
        
-       if fit_F_Ne_aia eq 'IHS' then begin
+       if *trace_data.fit_F_Ne_aia eq 'IHS' then begin
           trace_data = create_struct( trace_data                        ,$
                                       'N0_fit_aia',ptr_new(  N0_fit_aia_A) )
           undefine,N0_fit_aia_A
        endif
        
-       if fit_F_Ne_aia eq 'DPL' then begin
+       if *trace_data.fit_F_Ne_aia eq 'DPL' then begin
           trace_data = create_struct( trace_data                        ,$
                                     'N1_fit_aia',ptr_new( N1_fit_aia_A) ,$
                                     'N2_fit_aia',ptr_new( N2_fit_aia_A) ,$
@@ -261,12 +261,12 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
        undefine,dTdr_fit_euvia_A
        undefine,lN_fit_euvia_A
        
-       if fit_F_Ne_euvia eq 'IHS' then begin
+       if *trace_data.fit_F_Ne_euvia eq 'IHS' then begin
           trace_data = create_struct( trace_data                        ,$
                                       'N0_fit_euvia',ptr_new(  N0_fit_euvia_A) )
           undefine,N0_fit_euvia_A
        endif
-       if fit_F_Ne_euvia eq 'DPL' then begin
+       if *trace_data.fit_F_Ne_euvia eq 'DPL' then begin
           trace_data = create_struct( trace_data                        ,$
                                     'N1_fit_euvia',ptr_new( N1_fit_euvia_A) ,$
                                     'N2_fit_euvia',ptr_new( N2_fit_euvia_A) ,$
@@ -384,11 +384,11 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
        undefine,dTdr_fit_euvib_A
        undefine,lN_fit_euvib_A
        
-       if fit_F_Ne_euvib eq 'IHS' then begin
+       if *trace_data.fit_F_Ne_euvib eq 'IHS' then begin
           trace_data = create_struct( trace_data                        ,$
                                  'N0_fit_euvib',ptr_new(  N0_fit_euvib_A) )                                                                        
        endif
-       if fit_F_Ne_euvib eq 'DPL' then begin
+       if *trace_data.fit_F_Ne_euvib eq 'DPL' then begin
           trace_data = create_struct( trace_data                        ,$
                                     'N1_fit_euvib',ptr_new( N1_fit_euvib_A) ,$
                                     'N2_fit_euvib',ptr_new( N2_fit_euvib_A) ,$
@@ -498,19 +498,19 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
        undefine,rad_fit_mk4_A
        undefine,Ne_fit_mk4_A
        undefine,lN_fit_mk4_A
-       if fit_F_Ne_mk4 eq 'IHS' then begin
+       if *trace_data.fit_F_Ne_mk4 eq 'IHS' then begin
           trace_data = create_struct( trace_data                        ,$
                                     'N0_fit_mk4',ptr_new(  N0_fit_mk4_A) )
           undefine, N0_fit_mk4_A
        endif
-       if fit_F_Ne_mk4 eq 'SPL' then begin
+       if *trace_data.fit_F_Ne_mk4 eq 'SPL' then begin
           trace_data = create_struct( trace_data                        ,$
                                     'N1_fit_mk4',ptr_new( N1_fit_mk4_A) ,$
                                     'p1_fit_mk4',ptr_new( p1_fit_mk4_A) )
           undefine,N1_fit_mk4_A
           undefine,p1_fit_mk4_A
        endif
-       if fit_F_Ne_mk4 eq 'DPL' then begin
+       if *trace_data.fit_F_Ne_mk4 eq 'DPL' then begin
           trace_data = create_struct( trace_data                        ,$
                                     'N1_fit_mk4',ptr_new( N1_fit_mk4_A) ,$
                                     'N2_fit_mk4',ptr_new( N2_fit_mk4_A) ,$
@@ -549,7 +549,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
             ;Determine maximum heiht of the fl geometry (apex if closed).
              rad_fl_max = max((*trace_data.rad)(ifl,0:(*trace_data.Npt_v)(ifl)-1))
             ;Make 1-D array with the actual sampling heights.
-             radsamp = reform(rad_A(ifl,ind_samp_kcor)) ; Rsun
+             radsamp = reform((*trace_data.rad)(ifl,ind_samp_kcor)) ; Rsun
             ;Determine critical fit heights and range
              determine_fit_critical_parameters, radsamp=radsamp, rad_fit=rad_fit_kcor_A, $
                                                 radfit_min=radfit_min, radfit_max=radfit_max, range_fit=range_fit
@@ -594,7 +594,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
        undefine,Ne_fit_kcor_A
        undefine,lN_fit_kcor_A
        
-       if fit_F_Ne_kcor eq 'DPL' then begin
+       if *trace_data.fit_F_Ne_kcor eq 'DPL' then begin
           trace_data = create_struct( trace_data                        ,$
                                     'N1_fit_kcor',ptr_new( N1_fit_kcor_A) ,$
                                     'N2_fit_kcor',ptr_new( N2_fit_kcor_A) ,$
@@ -633,7 +633,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
             ;Determine maximum heiht of the fl geometry (apex if closed).
              rad_fl_max = max((*trace_data.rad)(ifl,0:(*trace_data.Npt_v)(ifl)-1))
             ;Make 1-D array with the actual sampling heights.
-             radsamp = reform(rad_A(ifl,ind_samp_ucomp)) ; Rsun
+             radsamp = reform((*trace_data.rad)(ifl,ind_samp_ucomp)) ; Rsun
             ;Determine critical fit heights and range
              determine_fit_critical_parameters, radsamp=radsamp, rad_fit=rad_fit_ucomp_A, $
                                                 radfit_min=radfit_min, radfit_max=radfit_max, range_fit=range_fit
@@ -678,7 +678,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
        undefine,Ne_fit_ucomp_A
        undefine,lN_fit_ucomp_A
        
-       if fit_F_Ne_kcor eq 'DPL' then begin
+       if *trace_data.fit_F_Ne_kcor eq 'DPL' then begin
           trace_data = create_struct( trace_data                        ,$
                                     'N1_fit_ucomp',ptr_new( N1_fit_ucomp_A) ,$
                                     'N2_fit_ucomp',ptr_new( N2_fit_ucomp_A) ,$
@@ -774,14 +774,14 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
        undefine,rad_fit_c2_A
        undefine,Ne_fit_c2_A
        undefine,lN_fit_c2_A
-       if fit_F_Ne_c2 eq 'SPL' then begin
+       if *trace_data.fit_F_Ne_c2 eq 'SPL' then begin
           trace_data = create_struct( trace_data                     ,$
                                    'N1_fit_c2',ptr_new( N1_fit_c2_A) ,$
                                    'p1_fit_c2',ptr_new( p1_fit_c2_A) )
           undefine,N1_fit_c2_A
           undefine,p1_fit_c2_A
        endif
-       if fit_F_Ne_c2 eq 'DPL' then begin
+       if *trace_data.fit_F_Ne_c2 eq 'DPL' then begin
           trace_data = create_struct( trace_data                     ,$
                                    'N1_fit_c2',ptr_new( N1_fit_c2_A) ,$
                                    'N2_fit_c2',ptr_new( N2_fit_c2_A) ,$
