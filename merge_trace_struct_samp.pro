@@ -7,6 +7,10 @@
 ; various tomographic products along individual field lines, including
 ; the fits as part of the structure.
 ;
+; NOTA: La idea es hacer un código similar a merge_trace_struct.pro
+; pero que guarde los resultados ya sampleados.
+
+;
 ; INPUTS:
 ; fir_fl and fl_list: STRINGS. directory where field lines are
 ; located, and filename of list of names of field lines filenames.
@@ -54,7 +58,7 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
 
 ; 2nd Tomography Products: 
   if keyword_set(aia) then begin
-     Npt_v_aia            = intarr(N_fl)
+     Npt_aia              = intarr(N_fl)              + default
      Ne_aia_A             = fltarr(N_fl,Npt_max_samp) + default
      Tm_aia_A             = fltarr(N_fl,Npt_max_samp) + default
      WT_aia_A             = fltarr(N_fl,Npt_max_samp) + default
@@ -72,7 +76,7 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
   endif
   
   if keyword_set(euvia) then begin
-     Npt_v_euvia            = intarr(N_fl)
+     Npt_euvia              = intarr(N_fl)              + default
      Ne_euvia_A             = fltarr(N_fl,Npt_max_samp) + default
      Tm_euvia_A             = fltarr(N_fl,Npt_max_samp) + default
      WT_euvia_A             = fltarr(N_fl,Npt_max_samp) + default
@@ -90,7 +94,7 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
    endif
   
   if keyword_set(euvib) then begin
-     Npt_v_euvib            = intarr(N_fl)
+     Npt_euvib              = intarr(N_fl)              + default
      Ne_euvib_A             = fltarr(N_fl,Npt_max_samp) + default
      Tm_euvib_A             = fltarr(N_fl,Npt_max_samp) + default
      WT_euvib_A             = fltarr(N_fl,Npt_max_samp) + default
@@ -108,7 +112,7 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
    endif
 
   if keyword_set(eit) then begin
-     Npt_v_eit            = intarr(N_fl)
+     Npt_eit              = intarr(N_fl)              + default
      Ne_eit_A             = fltarr(N_fl,Npt_max_samp) + default
      Tm_eit_A             = fltarr(N_fl,Npt_max_samp) + default
      WT_eit_A             = fltarr(N_fl,Npt_max_samp) + default
@@ -126,7 +130,7 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
    endif
   
   if keyword_set(mk4) then begin
-     Npt_v_mk4            = intarr(N_fl)
+     Npt_mk4              = intarr(N_fl)              + default
      Ne_mk4_A             = fltarr(N_fl,Npt_max_samp) + default
      rad_mk4_A            = fltarr(N_fl,Npt_max_samp) + default
      lat_mk4_A            = fltarr(N_fl,Npt_max_samp) + default
@@ -141,7 +145,7 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
   endif
   
   if keyword_set(kcor) then begin
-     Npt_v_kcor            = intarr(N_fl)
+     Npt_kcor              = intarr(N_fl)              + default
      Ne_kcor_A             = fltarr(N_fl,Npt_max_samp) + default
      rad_kcor_A            = fltarr(N_fl,Npt_max_samp) + default
      lat_kcor_A            = fltarr(N_fl,Npt_max_samp) + default
@@ -155,7 +159,7 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
      endif
   endif
   if keyword_set(ucomp) then begin
-     Npt_v_ucomp            = intarr(N_fl)
+     Npt_ucomp              = intarr(N_fl)              + default
      Ne_ucomp_A             = fltarr(N_fl,Npt_max_samp) + default
      rad_ucomp_A            = fltarr(N_fl,Npt_max_samp) + default
      lat_ucomp_A            = fltarr(N_fl,Npt_max_samp) + default
@@ -170,7 +174,7 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
   endif
   
   if keyword_set(lascoc2) then begin
-     Npt_v_c2            = intarr(N_fl)
+     Npt_c2              = intarr(N_fl)              + default
      Ne_c2_A             = fltarr(N_fl,Npt_max_samp) + default
      rad_c2_A            = fltarr(N_fl,Npt_max_samp) + default
      lat_c2_A            = fltarr(N_fl,Npt_max_samp) + default
@@ -213,7 +217,7 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
         indsamp = where(index_sampling_l eq 1)
         if indsamp[0] ne -1 then begin
            Nl_samp          = n_elements(indsamp)
-           Npt_v_aia(i_fl)  = Nl_samp 
+           Npt_aia             (i_fl)             = Nl_samp 
            Ne_aia_A            (i_fl,0:Nl_samp-1) = Ne_aia_l(indsamp)
            Tm_aia_A            (i_fl,0:Nl_samp-1) = Tm_aia_l(indsamp)
            WT_aia_A            (i_fl,0:Nl_samp-1) = WT_aia_l(indsamp)
@@ -486,15 +490,12 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
 ; Create a pointer structure to store field line extraction information  
   trace_data = { N_fl:                ptr_new(N_fl)                ,$
                  Npt_max_samp:        ptr_new(Npt_max_samp)        ,$
-                 Npt_v_samp:          ptr_new(Npt_v)               ,$
                  footpoint_rad:       ptr_new(footpoint_rad_A)     ,$
                  footpoint_lat:       ptr_new(footpoint_lat_A)     ,$
                  footpoint_lon:       ptr_new(footpoint_lon_A)     ,$
                  apex_rad:            ptr_new(apex_rad_A)          ,$
                  apex_lat:            ptr_new(apex_lat_A)          ,$
                  apex_lon:            ptr_new(apex_lon_A)           }
-  undefine,Npt_max_samp
-  undefine,Npt_v_samp
   undefine,footpoint_rad_A
   undefine,footpoint_lat_A
   undefine,footpoint_lon_A
@@ -548,6 +549,7 @@ endif
 ; Store into the structure traced tomographic resuls
   if keyword_set(aia) then begin
      trace_data = create_struct( trace_data ,$
+                  'Npt_aia' , ptr_new(           Npt_aia  ) ,$            
                    'Ne_aia' , ptr_new(            Ne_aia_A) ,$
                    'Tm_aia' , ptr_new(            Tm_aia_A) ,$
                    'WT_aia' , ptr_new(            WT_aia_A) ,$
@@ -555,6 +557,7 @@ endif
                   'rad_aia' , ptr_new(           rad_aia_A) ,$
                   'lat_aia' , ptr_new(           lat_aia_A) ,$
                   'lon_aia' , ptr_new(           lon_aia_A) )
+     undefine,Npt_aia
      undefine,Ne_aia_A
      undefine,Tm_aia_A
      undefine,WT_aia_A
@@ -662,9 +665,10 @@ endif
   endif
 
 ; Perform fits:
-  fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
-                  mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2,$
-                  fl_dir=fl_dir, trace_data = trace_data 
+; NOTA: Esta rutina hay que crearla a partir de fit_trace_data.pro  
+  fit_trace_data_samp, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
+                       mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2,$
+                       fl_dir=fl_dir, trace_data = trace_data 
   
  ; Save structure in fl_dir:
   save, trace_data, filename = fl_dir + structure_filename + '.sav'
