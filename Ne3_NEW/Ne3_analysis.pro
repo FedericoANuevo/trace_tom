@@ -25,13 +25,15 @@ pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
   field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI-PolFil/'
 ; field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_2x2deg_HMI-PolFil/'
 ;===============================================================================================
-  
+
+  PRINT,'RESTORING THE POINTER-STRUCTURE'  
 ; Load structure if so requested:
   dir = '/data1/DATA/trace_tom_files/'+PROJECT_NAME+'/field_lines_geometry'+field_line_geometry_suffix_dir
   restore, filename = dir + structure_filename
-
+  PRINT,'RESTORE COMPLETED'  
   N_fl = *trace_data.N_fl
 
+  PRINT,'CALCULATING FOOT-POINTS'  
 ; -------------------------------------------------
 ; Nota FAN: Propongo mover esto a merge_trace_struct. Charlar el
 ; martes con AVM.
@@ -49,7 +51,15 @@ pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
      Footpoint_Lon_A(ifl) = (*trace_data.lon)(ifl,irmin[ifl])
      Footpoint_Lat_A(ifl) = (*trace_data.lat)(ifl,irmin[ifl])
   endfor
- 
+  trace_data = create_struct( trace_data       ,$
+     'footpoint_rad', ptr_new(Footpoint_Rad_A),$
+     'footpoint_lat', ptr_new(Footpoint_Lat_A),$
+     'footpoint_lon', ptr_new(Footpoint_Lon_A) )
+  undefine,Footpoint_Rad_A
+  undefine,Footpoint_Lat_A
+  undefine,Footpoint_Lon_A
+; -------------------------------------------------  
+  PRINT,'CALCULATION OF  FOOT-POINTS COMPLETED'  
 ; Define plot filename suffix
   if not keyword_set(plot_filename_suffix) then plot_filename_suffix='footpoints-map'
 
