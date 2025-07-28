@@ -195,7 +195,7 @@ csz=1
                             opcl_str='open/closed'
 if keyword_set(open)   then opcl_str='open '
 if keyword_set(closed) then opcl_str='closed '
-plot,lon_A,lat_A,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=csz,$
+plot,*trace_data.lon,*trace_data.lat,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=csz,$
      title='Location of '+opcl_str+'footpoints',ytitle='Carrington Latitude [deg]',font=0
 if not keyword_set(open) and not keyword_set(closed) then oplot,*trace_data.Footpoint_Lon                , *trace_data.Footpoint_Lat               ,psym=4
 if     keyword_set(open)                             then oplot,(*trace_data.Footpoint_Lon)(ifl_open_A)  ,(*trace_data.Footpoint_Lat)(ifl_open_A)  ,psym=4
