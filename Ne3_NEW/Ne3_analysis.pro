@@ -265,7 +265,7 @@ if n_elements(indxpos_A) gt 1 then $
 oplot,(*trace_data.Footpoint_Lon)(indxpos_A),(*trace_data.Footpoint_Lat)(indxpos_A),psym=4,th=2,color=green
 indxneg_A = intersect(ifl_A,ifl_neg_A)
 if n_elements(indxneg_A) gt 1 then $
-oplot,Footpoint_Lon_A(indxneg_A),(*trace_data.Footpoint_Lat)(indxneg_A),psym=4,th=2,color=red
+oplot,(*trace_data.Footpoint_Lon)(indxneg_A),(*trace_data.Footpoint_Lat)(indxneg_A),psym=4,th=2,color=red
 
 
 ; LLEGUÉ HASTA ACÁ ...
