@@ -223,9 +223,9 @@ tag_posfit_ucomp_A(index) = +1
 
 ; Independently for each instrument, index lines that:
 ; 1) are in the box, 2) have a fit, 3) have Ne_fit>0 up to R_max, and 4) have a low chisq fit to Ne
-ifl_aia_A   = where(tag_box_A eq +1 AND tag_pos_aia_A   eq +1 AND fitflag_aia_A   eq +1 AND *trace_data.scN_fit_aia   le scN_crit)
-ifl_kcor_A  = where(tag_box_A eq +1 AND tag_pos_kcor_A  eq +1 AND fitflag_kcor_A  eq +1 AND *trace_data.scN_fit_kcor  le scN_crit)
-ifl_ucomp_A = where(tag_box_A eq +1 AND tag_pos_ucomp_A eq +1 AND fitflag_ucomp_A eq +1 AND *trace_data.scN_fit_ucomp le scN_crit)
+ifl_aia_A   = where(tag_box_A eq +1 AND tag_pos_aia_A   eq +1 AND *trace_data.fitflag_aia   eq +1 AND *trace_data.scN_fit_aia   le scN_crit)
+ifl_kcor_A  = where(tag_box_A eq +1 AND tag_pos_kcor_A  eq +1 AND *trace_data.fitflag_kcor  eq +1 AND *trace_data.scN_fit_kcor  le scN_crit)
+ifl_ucomp_A = where(tag_box_A eq +1 AND tag_pos_ucomp_A eq +1 AND *trace_data.fitflag_ucomp eq +1 AND *trace_data.scN_fit_ucomp le scN_crit)
 ; Also independently for each instrument,
 ; filter OUT lines for which NOT all their DPL Ne-fit parameters are positive
 if keyword_set(positparam) then begin
