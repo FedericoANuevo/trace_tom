@@ -9,8 +9,8 @@ pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
 
 ;===============================================================================================
 ; Select the project to analyze:
-; PROJECT_NAME = 'CR2254'
-  PROJECT_NAME = 'CR2261'
+  PROJECT_NAME = 'CR2254'
+; PROJECT_NAME = 'CR2261'
   
 ; Select structure to read:
 ; structure_filename='fdips_field_150x180x360_mrmqs220221t2004c2254_000.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
@@ -31,7 +31,25 @@ pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
   restore, filename = dir + structure_filename
 
   N_fl = *trace_data.N_fl
-  
+
+; -------------------------------------------------
+; Nota FAN: Propongo mover esto a merge_trace_struct. Charlar el
+; martes con AVM.
+; -------------------------------------------------  
+; Determine the Rad, Lat and Lon of the footppoint of each field line.
+; 1D Arrays: radial index corresponding to Rmin for each field line:
+  irmin=intarr(N_fl)
+  for i=0,N_fl-1 do irmin(i)=where(abs( (*trace_data.rad)(i,*) ) eq min(abs( (*trace_data.rad)(i,*) ) ) )
+; 1D Arrays: Footpoint Lon and Lat for each field line:
+  Footpoint_Rad_A = fltarr(N_fl)
+  Footpoint_Lon_A = fltarr(N_fl)
+  Footpoint_Lat_A = fltarr(N_fl)
+  for ifl = 0,N_fl-1 do begin
+     Footpoint_Rad_A(ifl) = (*trace_data.rad)(ifl,irmin[ifl])
+     Footpoint_Lon_A(ifl) = (*trace_data.lon)(ifl,irmin[ifl])
+     Footpoint_Lat_A(ifl) = (*trace_data.lat)(ifl,irmin[ifl])
+  endfor
+ 
 ; Define plot filename suffix
   if not keyword_set(plot_filename_suffix) then plot_filename_suffix='footpoints-map'
 
