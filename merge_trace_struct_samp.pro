@@ -208,11 +208,11 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
            index_foot = where( rad_l eq min(rad_l))
            index_apex = where( rad_l eq max(rad_l))
            footpoint_rad_A(i_fl) = rad_l(index_foot[0])
-           footpoint_lat_A(i_fl)=  lat_l(index_foot[0])
+           footpoint_lat_A(i_fl) = lat_l(index_foot[0])
            footpoint_lon_A(i_fl) = lon_l(index_foot[0])
-           apex_rad_A(i_fl) = rad_l(index_apex[0])
-           apex_lat_A(i_fl)=  lat_l(index_apex[0])
-           apex_lon_A(i_fl) = lon_l(index_apex[0])
+           apex_rad_A(i_fl)      = rad_l(index_apex[0])
+           apex_lat_A(i_fl)      = lat_l(index_apex[0])
+           apex_lon_A(i_fl)      = lon_l(index_apex[0])
         endif
         indsamp = where(index_sampling_l eq 1)
         if indsamp[0] ne -1 then begin
