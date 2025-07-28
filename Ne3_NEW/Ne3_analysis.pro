@@ -1,3 +1,4 @@
+; Ne3_analysis, r_max = 1.2
 pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
                   plot_filename_suffix=plot_filename_suffix,$
                   aia=aia, kcor=kcor, ucomp=ucomp,$
