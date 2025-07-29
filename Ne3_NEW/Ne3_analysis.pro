@@ -5,8 +5,10 @@ pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
                   plotaia=plotaia, plotkcor=plotkcor, plotucomp=plotucomp,$
                   open=open,closed=closed,connect=connect,$
                   positparam=positparam, ilstep=ilstep, constep=constep,$
-                  r_max=r_max, only_loops=only_loops
+                  r_max=r_max, only_loops=only_loops, loadstruct=loadstruct
 
+
+ common datastructure, trace_data
 
 ;===============================================================================================
 ; Select the project to analyze:
@@ -17,7 +19,7 @@ pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
 ; structure_filename='fdips_field_150x180x360_mrmqs220221t2004c2254_000.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
 ; structure_filename='fdips_field_150X180X360_mrmqs220831t1302c2261_000.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
 ; structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr.2254.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
-  structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2254.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
+  structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2254.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp_OPTMEM.sav'
 ; structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2261.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
   
 ; Select dir where the structure is located (labeled after the selection of starting points) 
@@ -29,38 +31,14 @@ pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
 
   PRINT,'RESTORING THE POINTER-STRUCTURE'  
 ; Load structure if so requested:
+if keyword_Set(loadstruct) then begin
   dir = '/data1/DATA/trace_tom_files/'+PROJECT_NAME+'/field_lines_geometry'+field_line_geometry_suffix_dir
   restore, filename = dir + structure_filename
-  PRINT,'RESTORE COMPLETED'  
+  PRINT,'RESTORE COMPLETED'
+endif
+
   N_fl = *trace_data.N_fl
 
-  PRINT,'CALCULATING FOOT-POINTS'  
-; -------------------------------------------------
-; Nota FAN: Propongo mover esto a merge_trace_struct. Charlar el
-; martes con AVM.
-; -------------------------------------------------  
-; Determine the Rad, Lat and Lon of the footppoint of each field line.
-; 1D Arrays: radial index corresponding to Rmin for each field line:
-  irmin=intarr(N_fl)
-  for i=0,N_fl-1 do irmin(i)=where(abs( (*trace_data.rad)(i,*) ) eq min(abs( (*trace_data.rad)(i,*) ) ) )
-; 1D Arrays: Footpoint Lon and Lat for each field line:
-  Footpoint_Rad_A = fltarr(N_fl)
-  Footpoint_Lon_A = fltarr(N_fl)
-  Footpoint_Lat_A = fltarr(N_fl)
-  for ifl = 0,N_fl-1 do begin
-     Footpoint_Rad_A(ifl) = (*trace_data.rad)(ifl,irmin[ifl])
-     Footpoint_Lon_A(ifl) = (*trace_data.lon)(ifl,irmin[ifl])
-     Footpoint_Lat_A(ifl) = (*trace_data.lat)(ifl,irmin[ifl])
-  endfor
-  trace_data = create_struct( trace_data       ,$
-     'footpoint_rad', ptr_new(Footpoint_Rad_A),$
-     'footpoint_lat', ptr_new(Footpoint_Lat_A),$
-     'footpoint_lon', ptr_new(Footpoint_Lon_A) )
-  undefine,Footpoint_Rad_A
-  undefine,Footpoint_Lat_A
-  undefine,Footpoint_Lon_A
-; -------------------------------------------------  
-  PRINT,'CALCULATION OF  FOOT-POINTS COMPLETED'  
 ; Define plot filename suffix
   if not keyword_set(plot_filename_suffix) then plot_filename_suffix='footpoints-map'
 
@@ -119,7 +97,7 @@ Nsamp = 2
 ; achieved by organizing these conditionals in increasing "bottleneckless".
 ;
 if NOT keyword_set(r_max) then begin
-   stop
+;   stop
    if keyword_set(kcor ) then begin
       r_crit = median(*trace_data.rad_fit_kcor )
       r_max  = max   (*trace_data.rad_fit_kcor )
@@ -155,7 +133,7 @@ for ifl=0,N_fl-1 do begin
    endelse
    if keyword_set(kcor) then begin
       ifitpos_kcor = where(reform((*trace_data.Ne_fit_kcor) (ifl,*)) gt 0. and *trace_data.rad_fit_kcor le R_max)
-      ifitrad_kcor = where(rad_fit_kcor_A le R_max) 
+      ifitrad_kcor = where(*trace_data.rad_fit_kcor le R_max) 
       if ifitpos_kcor(0) ne -1 then begin
          if n_elements(ifitpos_kcor) eq n_elements(ifitrad_kcor) then tag_pos_kcor_A(ifl) = +1.
 ;         if n_elements(where(rad_fit_kcor_A(ifitpos_kcor) lt r_crit))                                           ge Nsamp AND  $
