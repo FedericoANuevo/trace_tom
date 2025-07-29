@@ -39,8 +39,6 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
   readf,1,N_fl
 
 ; Maximum number of point along the fieldline
-; FEDE: Tal vez podemos optimizar el valor de esta
-; variable. Crucial para optimizar el uso de RAM.  
   Npt_max_samp = 150
   
 ; Default value in all arrays.
@@ -198,11 +196,11 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
         file_aia   = filename+'_aia.out'
         if i_fl eq 0 then structure_filename = structure_filename + '_aia'
         if NOT keyword_set(trace_Bs) then $
-        readcol,fl_dir+file_aia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_aia_l,Tm_aia_l,$
-                WT_aia_l, ldem_flag_aia_l, index_aia_l  ,FORMAT='D,D,D,D,D,D'
+           readcol,fl_dir+file_aia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_aia_l,Tm_aia_l,$
+                   WT_aia_l, ldem_flag_aia_l, index_aia_l  ,FORMAT='D,D,D,D,D,D'
         if     keyword_set(trace_Bs) then $
-        readcol,fl_dir+file_aia,x_l,y_l,z_l,s_l,Br_l,Bth_l,Bph_l,B_l,rad_l,lat_l,lon_l,Ne_aia_l,Tm_aia_l,$
-                WT_aia_l, ldem_flag_aia_l, index_aia_l  ,FORMAT='D,D,D,D,D,D,D,D,D,D,D'
+           readcol,fl_dir+file_aia,x_l,y_l,z_l,s_l,Br_l,Bth_l,Bph_l,B_l,rad_l,lat_l,lon_l,Ne_aia_l,Tm_aia_l,$
+                   WT_aia_l, ldem_flag_aia_l, index_aia_l  ,FORMAT='D,D,D,D,D,D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_aia_l, index_l=index_aia_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
            index_foot = where( rad_l eq min(rad_l))
@@ -210,143 +208,163 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
            footpoint_rad_A(i_fl) = rad_l(index_foot[0])
            footpoint_lat_A(i_fl) = lat_l(index_foot[0])
            footpoint_lon_A(i_fl) = lon_l(index_foot[0])
-           apex_rad_A(i_fl)      = rad_l(index_apex[0])
-           apex_lat_A(i_fl)      = lat_l(index_apex[0])
-           apex_lon_A(i_fl)      = lon_l(index_apex[0])
+           apex_rad_A     (i_fl) = rad_l(index_apex[0])
+           apex_lat_A     (i_fl) = lat_l(index_apex[0])
+           apex_lon_A     (i_fl) = lon_l(index_apex[0])
+           initialized = 'yes'
         endif
         indsamp = where(index_sampling_l eq 1)
         if indsamp[0] ne -1 then begin
-           Nl_samp          = n_elements(indsamp)
-           Npt_aia             (i_fl)             = Nl_samp 
-           Ne_aia_A            (i_fl,0:Nl_samp-1) = Ne_aia_l(indsamp)
-           Tm_aia_A            (i_fl,0:Nl_samp-1) = Tm_aia_l(indsamp)
-           WT_aia_A            (i_fl,0:Nl_samp-1) = WT_aia_l(indsamp)
-           ldem_flag_aia_A     (i_fl,0:Nl_samp-1) = ldem_flag_aia_l(indsamp)
-           rad_aia_A           (i_fl,0:Nl_samp-1) = rad_l(indsamp)
-           lat_aia_A           (i_fl,0:Nl_samp-1) = lat_l(indsamp)
-           lon_aia_A           (i_fl,0:Nl_samp-1) = lon_l(indsamp)
+           Nl_samp                           = n_elements(indsamp)
+           Npt_aia        (i_fl)             = Nl_samp 
+           Ne_aia_A       (i_fl,0:Nl_samp-1) = Ne_aia_l(indsamp)
+           Tm_aia_A       (i_fl,0:Nl_samp-1) = Tm_aia_l(indsamp)
+           WT_aia_A       (i_fl,0:Nl_samp-1) = WT_aia_l(indsamp)
+           ldem_flag_aia_A(i_fl,0:Nl_samp-1) = ldem_flag_aia_l(indsamp)
+           rad_aia_A      (i_fl,0:Nl_samp-1) = rad_l(indsamp)
+           lat_aia_A      (i_fl,0:Nl_samp-1) = lat_l(indsamp)
+           lon_aia_A      (i_fl,0:Nl_samp-1) = lon_l(indsamp)
            if keyword_set(trace_Bs) then begin
-               s_aia_A          (i_fl,0:Nl_samp-1) =   S_l (indsamp)
-              Br_aia_A          (i_fl,0:Nl_samp-1) =  Br_l (indsamp)
-             Bth_aia_A          (i_fl,0:Nl_samp-1) = Bth_l (indsamp)
-             Bph_aia_A          (i_fl,0:Nl_samp-1) = Bph_l (indsamp)
-               B_aia_A          (i_fl,0:Nl_samp-1) =   B_l (indsamp)
+              s_aia_A     (i_fl,0:Nl_samp-1) =   S_l(indsamp)
+              Br_aia_A    (i_fl,0:Nl_samp-1) =  Br_l(indsamp)
+              Bth_aia_A   (i_fl,0:Nl_samp-1) = Bth_l(indsamp)
+              Bph_aia_A   (i_fl,0:Nl_samp-1) = Bph_l(indsamp)
+              B_aia_A     (i_fl,0:Nl_samp-1) =   B_l(indsamp)
            endif
         endif
      endif
-; Nota del coder: Hay que repetir lo que se codeó con AIA para los
+; Nota de FAN: Hay que repetir lo que se codeó con AIA para los
 ; demás instrumentos ...
      
-   ; EUVI-A
+; EUVI-A
      if keyword_set(euvia)  then begin
         file_euvia = filename+'_euvia.out'
         if i_fl eq 0 then structure_filename = structure_filename + '_euvia'
         if NOT keyword_set(trace_Bs) then $
-        readcol,fl_dir+file_euvia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_euvia_l,Tm_euvia_l,$
-                WT_euvia_l, ldem_flag_euvia_l, index_euvia_l  ,FORMAT='D,D,D,D,D,D'
+           readcol,fl_dir+file_euvia,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_euvia_l,Tm_euvia_l,$
+                   WT_euvia_l, ldem_flag_euvia_l, index_euvia_l  ,FORMAT='D,D,D,D,D,D'
         if     keyword_set(trace_Bs) then $
-        readcol,fl_dir+file_euvia,x_l,y_l,z_l,s_l,Br_l,Bth_l,Bph_l,B_l,rad_l,lat_l,lon_l,Ne_euvia_l,Tm_euvia_l,$
-                WT_euvia_l, ldem_flag_euvia_l, index_euvia_l  ,FORMAT='D,D,D,D,D,D,D,D,D,D,D'
+           readcol,fl_dir+file_euvia,x_l,y_l,z_l,s_l,Br_l,Bth_l,Bph_l,B_l,rad_l,lat_l,lon_l,Ne_euvia_l,Tm_euvia_l,$
+                   WT_euvia_l, ldem_flag_euvia_l, index_euvia_l  ,FORMAT='D,D,D,D,D,D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_euvia_l, index_l=index_euvia_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
-           N_l         = n_elements(x_l)
-           Npt_v(i_fl) = N_l
+           index_foot = where( rad_l eq min(rad_l))
+           index_apex = where( rad_l eq max(rad_l))
+           footpoint_rad_A(i_fl) = rad_l(index_foot[0])
+           footpoint_lat_A(i_fl) = lat_l(index_foot[0])
+           footpoint_lon_A(i_fl) = lon_l(index_foot[0])
+           apex_rad_A     (i_fl) = rad_l(index_apex[0])
+           apex_lat_A     (i_fl) = lat_l(index_apex[0])
+           apex_lon_A     (i_fl) = lon_l(index_apex[0])
            initialized = 'yes'
-           x_A   (i_fl,0:N_l-1) = x_l
-           y_A   (i_fl,0:N_l-1) = y_l
-           z_A   (i_fl,0:N_l-1) = z_l
-           rad_A (i_fl,0:N_l-1) = rad_l
-           lat_A (i_fl,0:N_l-1) = lat_l
-           lon_A (i_fl,0:N_l-1) = lon_l
-           if keyword_set(trace_Bs) then begin
-             s_A (i_fl,0:N_l-1) =   s_l
-            Br_A (i_fl,0:N_l-1) =  Br_l
-           Bth_A (i_fl,0:N_l-1) = Bth_l
-           Bph_A (i_fl,0:N_l-1) = Bph_l
-             B_A (i_fl,0:N_l-1) =   B_l
-           endif
         endif
-        Ne_euvia_A            (i_fl,0:N_l-1) = Ne_euvia_l
-        Tm_euvia_A            (i_fl,0:N_l-1) = Tm_euvia_l
-        WT_euvia_A            (i_fl,0:N_l-1) = WT_euvia_l
-        ldem_flag_euvia_A     (i_fl,0:N_l-1) = ldem_flag_euvia_l
-        index_euvia_A         (i_fl,0:N_l-1) = index_euvia_l    
-        index_sampling_euvia_A(i_fl,0:N_l-1) = index_sampling_l
+        indsamp = where(index_sampling_l eq 1)
+        if indsamp[0] ne -1 then begin
+           Nl_samp          = n_elements(indsamp)
+           Npt_euvia         (i_fl)             = Nl_samp 
+           Ne_euvia_A        (i_fl,0:Nl_samp-1) = Ne_euvia_l(indsamp)
+           Tm_euvia_A        (i_fl,0:Nl_samp-1) = Tm_euvia_l(indsamp)
+           WT_euvia_A        (i_fl,0:Nl_samp-1) = WT_euvia_l(indsamp)
+           ldem_flag_euvia_A (i_fl,0:Nl_samp-1) = ldem_flag_euvia_l(indsamp)
+           rad_euvia_A       (i_fl,0:Nl_samp-1) = rad_l(indsamp)
+           lat_euvia_A       (i_fl,0:Nl_samp-1) = lat_l(indsamp)
+           lon_euvia_A       (i_fl,0:Nl_samp-1) = lon_l(indsamp)
+           if keyword_set(trace_Bs) then begin
+              s_euvia_A      (i_fl,0:Nl_samp-1) =   S_l(indsamp)
+              Br_euvia_A     (i_fl,0:Nl_samp-1) =  Br_l(indsamp)
+              Bth_euvia_A    (i_fl,0:Nl_samp-1) = Bth_l(indsamp)
+              Bph_euvia_A    (i_fl,0:Nl_samp-1) = Bph_l(indsamp)
+              B_euvia_A      (i_fl,0:Nl_samp-1) =   B_l(indsamp)
+           endif  
+        endif
      endif
-
-   ; EUVI-B
+     
+        
+; EUVI-B
      if keyword_set(euvib)  then begin
         file_euvib = filename+'_euvib.out'
         if i_fl eq 0 then structure_filename = structure_filename + '_euvib'
         if NOT keyword_set(trace_Bs) then $
-        readcol,fl_dir+file_euvib,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_euvib_l,Tm_euvib_l,$
-                WT_euvib_l, ldem_flag_euvib_l, index_euvib_l  ,FORMAT='D,D,D,D,D,D'
+           readcol,fl_dir+file_euvib,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_euvib_l,Tm_euvib_l,$
+                   WT_euvib_l, ldem_flag_euvib_l, index_euvib_l  ,FORMAT='D,D,D,D,D,D'
         if     keyword_set(trace_Bs) then $
-        readcol,fl_dir+file_euvib,x_l,y_l,z_l,s_l,Br_l,Bth_l,Bph_l,B_l,rad_l,lat_l,lon_l,Ne_euvib_l,Tm_euvib_l,$
-                WT_euvib_l, ldem_flag_euvib_l, index_euvib_l  ,FORMAT='D,D,D,D,D,D,D,D,D,D,D'
+           readcol,fl_dir+file_euvia,x_l,y_l,z_l,s_l,Br_l,Bth_l,Bph_l,B_l,rad_l,lat_l,lon_l,Ne_euvib_l,Tm_euvib_l,$
+                   WT_euvib_l, ldem_flag_euvib_l, index_euvib_l  ,FORMAT='D,D,D,D,D,D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_euvib_l, index_l=index_euvib_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
-           N_l         = n_elements(x_l)
-           Npt_v(i_fl) = N_l
+           index_foot = where( rad_l eq min(rad_l))
+           index_apex = where( rad_l eq max(rad_l))
+           footpoint_rad_A(i_fl) = rad_l(index_foot[0])
+           footpoint_lat_A(i_fl) = lat_l(index_foot[0])
+           footpoint_lon_A(i_fl) = lon_l(index_foot[0])
+           apex_rad_A     (i_fl) = rad_l(index_apex[0])
+           apex_lat_A     (i_fl) = lat_l(index_apex[0])
+           apex_lon_A     (i_fl) = lon_l(index_apex[0])
            initialized = 'yes'
-           x_A   (i_fl,0:N_l-1) = x_l
-           y_A   (i_fl,0:N_l-1) = y_l
-           z_A   (i_fl,0:N_l-1) = z_l
-           rad_A (i_fl,0:N_l-1) = rad_l
-           lat_A (i_fl,0:N_l-1) = lat_l
-           lon_A (i_fl,0:N_l-1) = lon_l
-           if keyword_set(trace_Bs) then begin
-             s_A (i_fl,0:N_l-1) =   s_l
-            Br_A (i_fl,0:N_l-1) =  Br_l
-           Bth_A (i_fl,0:N_l-1) = Bth_l
-           Bph_A (i_fl,0:N_l-1) = Bph_l
-             B_A (i_fl,0:N_l-1) =   B_l
-           endif
         endif
-        Ne_euvib_A            (i_fl,0:N_l-1) = Ne_euvib_l
-        Tm_euvib_A            (i_fl,0:N_l-1) = Tm_euvib_l
-        WT_euvib_A            (i_fl,0:N_l-1) = WT_euvib_l
-        ldem_flag_euvib_A     (i_fl,0:N_l-1) = ldem_flag_euvib_l
-        index_euvib_A         (i_fl,0:N_l-1) = index_euvib_l
-        index_sampling_euvib_A(i_fl,0:N_l-1) = index_sampling_l
+        indsamp = where(index_sampling_l eq 1)
+        if indsamp[0] ne -1 then begin
+           Nl_samp          = n_elements(indsamp)
+           Npt_euvib         (i_fl)             = Nl_samp 
+           Ne_euvib_A        (i_fl,0:Nl_samp-1) = Ne_euvib_l(indsamp)
+           Tm_euvib_A        (i_fl,0:Nl_samp-1) = Tm_euvib_l(indsamp)
+           WT_euvib_A        (i_fl,0:Nl_samp-1) = WT_euvib_l(indsamp)
+           ldem_flag_euvib_A (i_fl,0:Nl_samp-1) = ldem_flag_euvib_l(indsamp)
+           rad_euvib_A       (i_fl,0:Nl_samp-1) = rad_l(indsamp)
+           lat_euvib_A       (i_fl,0:Nl_samp-1) = lat_l(indsamp)
+           lon_euvib_A       (i_fl,0:Nl_samp-1) = lon_l(indsamp)
+           if keyword_set(trace_Bs) then begin
+              s_euvib_A      (i_fl,0:Nl_samp-1) =   S_l(indsamp)
+              Br_euvib_A     (i_fl,0:Nl_samp-1) =  Br_l(indsamp)
+              Bth_euvib_A    (i_fl,0:Nl_samp-1) = Bth_l(indsamp)
+              Bph_euvib_A    (i_fl,0:Nl_samp-1) = Bph_l(indsamp)
+              B_euvib_A      (i_fl,0:Nl_samp-1) =   B_l(indsamp)
+           endif  
+        endif
      endif
-   ; EIT
-     if keyword_set(eit)    then begin
+     
+; EIT
+     if keyword_set(eit)  then begin
         file_eit = filename+'_eit.out'
         if i_fl eq 0 then structure_filename = structure_filename + '_eit'
         if NOT keyword_set(trace_Bs) then $
-        readcol,fl_dir+file_eit,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_eit_l,Tm_eit_l,$
-                WT_eit_l, ldem_flag_eit_l, index_eit_l  ,FORMAT='D,D,D,D,D,D'
+           readcol,fl_dir+file_eit,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_eit_l,Tm_eit_l,$
+                   WT_eit_l, ldem_flag_eit_l, index_eit_l  ,FORMAT='D,D,D,D,D,D'
         if     keyword_set(trace_Bs) then $
-        readcol,fl_dir+file_eit,x_l,y_l,z_l,s_l,Br_l,Bth_l,Bph_l,B_l,rad_l,lat_l,lon_l,Ne_eit_l,Tm_eit_l,$
-                WT_eit_l, ldem_flag_eit_l, index_eit_l  ,FORMAT='D,D,D,D,D,D,D,D,D,D,D'
+           readcol,fl_dir+file_eit,x_l,y_l,z_l,s_l,Br_l,Bth_l,Bph_l,B_l,rad_l,lat_l,lon_l,Ne_eit_l,Tm_eit_l,$
+                   WT_eit_l, ldem_flag_eit_l, index_eit_l  ,FORMAT='D,D,D,D,D,D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_eit_l, index_l=index_eit_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
-           N_l         = n_elements(x_l)
-           Npt_v(i_fl) = N_l  
+           index_foot = where( rad_l eq min(rad_l))
+           index_apex = where( rad_l eq max(rad_l))
+           footpoint_rad_A(i_fl) = rad_l(index_foot[0])
+           footpoint_lat_A(i_fl) = lat_l(index_foot[0])
+           footpoint_lon_A(i_fl) = lon_l(index_foot[0])
+           apex_rad_A     (i_fl) = rad_l(index_apex[0])
+           apex_lat_A     (i_fl) = lat_l(index_apex[0])
+           apex_lon_A     (i_fl) = lon_l(index_apex[0])
            initialized = 'yes'
-           x_A   (i_fl,0:N_l-1) = x_l
-           y_A   (i_fl,0:N_l-1) = y_l
-           z_A   (i_fl,0:N_l-1) = z_l
-           rad_A (i_fl,0:N_l-1) = rad_l
-           lat_A (i_fl,0:N_l-1) = lat_l
-           lon_A (i_fl,0:N_l-1) = lon_l  
-           if keyword_set(trace_Bs) then begin
-             s_A (i_fl,0:N_l-1) =   s_l
-            Br_A (i_fl,0:N_l-1) =  Br_l
-           Bth_A (i_fl,0:N_l-1) = Bth_l
-           Bph_A (i_fl,0:N_l-1) = Bph_l
-             B_A (i_fl,0:N_l-1) =   B_l
-           endif
         endif
-        Ne_eit_A            (i_fl,0:N_l-1) = Ne_eit_l
-        Tm_eit_A            (i_fl,0:N_l-1) = Tm_eit_l
-        WT_eit_A            (i_fl,0:N_l-1) = WT_eit_l
-        ldem_flag_eit_A     (i_fl,0:N_l-1) = ldem_flag_eit_l
-        index_eit_A         (i_fl,0:N_l-1) = index_eit_l
-        index_sampling_eit_A(i_fl,0:N_l-1) = index_sampling_l
+        indsamp = where(index_sampling_l eq 1)
+        if indsamp[0] ne -1 then begin
+           Nl_samp          = n_elements(indsamp)
+           Npt_eit         (i_fl)             = Nl_samp 
+           Ne_eit_A        (i_fl,0:Nl_samp-1) = Ne_euvib_l(indsamp)
+           Tm_eit_A        (i_fl,0:Nl_samp-1) = Tm_euvib_l(indsamp)
+           WT_eit_A        (i_fl,0:Nl_samp-1) = WT_euvib_l(indsamp)
+           ldem_flag_eit_A (i_fl,0:Nl_samp-1) = ldem_flag_euvib_l(indsamp)
+           rad_eit_A       (i_fl,0:Nl_samp-1) = rad_l(indsamp)
+           lat_eit_A       (i_fl,0:Nl_samp-1) = lat_l(indsamp)
+           lon_eit_A       (i_fl,0:Nl_samp-1) = lon_l(indsamp)
+           if keyword_set(trace_Bs) then begin
+              s_eit_A      (i_fl,0:Nl_samp-1) =   S_l(indsamp)
+              Br_eit_A     (i_fl,0:Nl_samp-1) =  Br_l(indsamp)
+              Bth_eit_A    (i_fl,0:Nl_samp-1) = Bth_l(indsamp)
+              Bph_eit_A    (i_fl,0:Nl_samp-1) = Bph_l(indsamp)
+              B_eit_A      (i_fl,0:Nl_samp-1) =   B_l(indsamp)
+           endif  
+        endif
      endif
-
    ; Mk4
      if keyword_set(mk4)    then begin
         file_mk4   = filename+'_mk4.out'
@@ -359,26 +377,32 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
                    index_mk4_l  ,FORMAT='D,D,D,D,D,D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_mk4_l, index_l=index_mk4_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
-           N_l         = n_elements(x_l)
-           Npt_v(i_fl) = N_l  
+           index_foot = where( rad_l eq min(rad_l))
+           index_apex = where( rad_l eq max(rad_l))
+           footpoint_rad_A(i_fl) = rad_l(index_foot[0])
+           footpoint_lat_A(i_fl) = lat_l(index_foot[0])
+           footpoint_lon_A(i_fl) = lon_l(index_foot[0])
+           apex_rad_A     (i_fl) = rad_l(index_apex[0])
+           apex_lat_A     (i_fl) = lat_l(index_apex[0])
+           apex_lon_A     (i_fl) = lon_l(index_apex[0])
            initialized = 'yes'
-           x_A   (i_fl,0:N_l-1) = x_l
-           y_A   (i_fl,0:N_l-1) = y_l
-           z_A   (i_fl,0:N_l-1) = z_l
-           rad_A (i_fl,0:N_l-1) = rad_l
-           lat_A (i_fl,0:N_l-1) = lat_l
-           lon_A (i_fl,0:N_l-1) = lon_l
-           if keyword_set(trace_Bs) then begin
-             s_A (i_fl,0:N_l-1) =   s_l
-            Br_A (i_fl,0:N_l-1) =  Br_l
-           Bth_A (i_fl,0:N_l-1) = Bth_l
-           Bph_A (i_fl,0:N_l-1) = Bph_l
-             B_A (i_fl,0:N_l-1) =   B_l
-           endif
         endif
-        Ne_mk4_A   (i_fl,0:N_l-1) = Ne_mk4_l
-        index_mk4_A(i_fl,0:N_l-1) = index_mk4_l
-        index_sampling_mk4_A(i_fl,0:N_l-1) = index_sampling_l
+        indsamp = where(index_sampling_l eq 1)
+        if indsamp[0] ne -1 then begin
+           Nl_samp                    = n_elements(indsamp)
+           Npt_mk4 (i_fl)             = Nl_samp 
+           Ne_mk4_A(i_fl,0:Nl_samp-1) = Ne_mk4_l(indsamp)
+           rad_mk4_A       (i_fl,0:Nl_samp-1) = rad_l(indsamp)
+           lat_mk4_A       (i_fl,0:Nl_samp-1) = lat_l(indsamp)
+           lon_mk4_A       (i_fl,0:Nl_samp-1) = lon_l(indsamp)
+           if keyword_set(trace_Bs) then begin
+              s_mk4_A      (i_fl,0:Nl_samp-1) =   S_l(indsamp)
+              Br_mk4_A     (i_fl,0:Nl_samp-1) =  Br_l(indsamp)
+              Bth_mk4_A    (i_fl,0:Nl_samp-1) = Bth_l(indsamp)
+              Bph_mk4_A    (i_fl,0:Nl_samp-1) = Bph_l(indsamp)
+              B_mk4_A      (i_fl,0:Nl_samp-1) =   B_l(indsamp)
+           endif  
+        endif
      endif
 
    ; KCOR
@@ -579,7 +603,7 @@ endif
         undefine,Bph_aia_A
      endif
   endif
-; Nota del coder: Hay que repetir lo que se codeó con AIA para los
+; Nota de FAN: Hay que repetir lo que se codeó con AIA para los
 ; demás instrumentos ...
   
   if keyword_set(euvia) then begin

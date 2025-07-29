@@ -44,9 +44,11 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
   openr,1,fl_dir+fl_list
   readf,1,N_fl
 
-; Maximum number of point along the fieldline
-; FEDE: Tal vez podemos optimizar el valor de esta
-; variable. Crucial para optimizar el uso de RAM.  
+
+; Nota de FAN: Este valor es excesivo. Segun
+; mi análisis de los trazados de CR-2254 y  
+; Cr-2261 estarriamos bien con Npt_max = 2500.
+; Maximum number of point along the fieldline  
   Npt_max = 10100  
 ; Default value in all arrays.
   default = -678.

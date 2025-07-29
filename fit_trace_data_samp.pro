@@ -1,4 +1,4 @@
-;OB
+;
 ; PURPOSE: Performs analytical fits to tomographic products along each
 ; traced field line and stores results in the trace_data structure.
 ;
@@ -15,7 +15,9 @@ pro fit_trace_data_samp, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
     default = -678.
    ;Set the number of field-lines 
     N_fl    = *trace_data.N_fl
-    
+
+; Nota de FAN: Esta programado el  modulo para AIA. Ver si son
+; correctas las ediciones y seguir con los demas instrumentos
     if keyword_set(aia) then begin
        read_tomgrid_and_define_fitgrid,fl_dir=fl_dir,instr_string='aia'
        fitflag_aia_A = fltarr(N_fl        ) + default
@@ -37,7 +39,7 @@ pro fit_trace_data_samp, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
           Nsamp = (*trace_data.Npt_aia)(ifl)            
           if Nsamp ne default then begin
             ;Determine maximum heiht of the fl geometry (apex if closed). 
-             rad_fl_max = *trace_data.apex_rad[ìfl] 
+             rad_fl_max = (*trace_data.apex_rad)(ìfl) 
             ;Make 1-D array with the actual sampling heights.
              radsamp = reform((*trace_data.rad_aia)(ifl,0:Nsamp-1)) ; Rsun
             ;Determine critical fit heights and range
