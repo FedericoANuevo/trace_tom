@@ -26,15 +26,15 @@
 
 pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                     mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2,$
-                    fl_dir=fl_dir, trace_data = trace_data
-  
+                    fl_dir=fl_dir
+    common datastructure, trace_data  
     common tomgrid,nr,nt,np,rmin,rmax,Irmin,Irmax
     common fitgrid,radmin_fit,radmax_fit,drad_fit,Npt_fit
 
    ;Set a default value for all the elements of all the [NAME]_A arrays
     default = -678.
-   ;Set the number of field-lines 
-    N_fl    = *trace_data.N_fl
+   ;Define the number of field-lines 
+    N_fl = *trace_data.N_fl
     
     if keyword_set(aia) then begin
        read_tomgrid_and_define_fitgrid,fl_dir=fl_dir,instr_string='aia'
@@ -57,8 +57,8 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
           tmp = reform((*trace_data.index_sampling_aia) (ifl,*))
           ind_samp_aia = where(tmp eq 1)
           if ind_samp_aia[0] ne -1 then begin
-            ;Determine maximum heiht of the fl geometry (apex if closed). 
-             rad_fl_max = max((*trace_data.rad) (ifl,0:(*trace_data.Npt_v)(ifl)-1))
+            ;Define maximum heiht of the fl geometry (apex if closed). 
+             rad_fl_max = (*trace_data.Termpoint_Rad)(ifl)
             ;Make 1-D array with the actual sampling heights.
              radsamp = reform((*trace_data.rad) (ifl,ind_samp_aia)) ; Rsun
             ;Determine critical fit heights and range
@@ -183,8 +183,8 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
           tmp = reform((*trace_data.index_sampling_euvia)(ifl,*))
           ind_samp_euvia = where(tmp eq 1)
           if ind_samp_euvia[0] ne -1 then begin
-            ;Determine maximum heiht of the fl geometry (apex if closed).
-             rad_fl_max = max((*trace_data.rad)(ifl,0:(*trace_data.Npt_v)(ifl)-1))
+            ;Define maximum heiht of the fl geometry (apex if closed). 
+             rad_fl_max = (*trace_data.Termpoint_Rad)(ifl)
             ;Make 1-D array with the actual sampling heights.
              radsamp = reform((*trace_data.rad)(ifl,ind_samp_euvia)) ; Rsun
             ;Determine critical fit heights and range
@@ -306,8 +306,8 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
           tmp = reform((*trace_data.index_sampling_euvib)(ifl,*))
           ind_samp_euvib = where(tmp eq 1)
           if ind_samp_euvib[0] ne -1 then begin
-            ;Determine maximum heiht of the fl geometry (apex if closed).
-             rad_fl_max = max((*trace_data.rad)(ifl,0:(*trace_data.Npt_v)(ifl)-1))
+            ;Define maximum heiht of the fl geometry (apex if closed). 
+             rad_fl_max = (*trace_data.Termpoint_Rad)(ifl)
             ;Make 1-D array with the actual sampling heights.
              radsamp = reform((*trace_data.rad)(ifl,ind_samp_euvib)) ; Rsun
             ;Determine critical fit heights and range
@@ -386,7 +386,8 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
        
        if *trace_data.fit_F_Ne_euvib eq 'IHS' then begin
           trace_data = create_struct( trace_data                        ,$
-                                 'N0_fit_euvib',ptr_new(  N0_fit_euvib_A) )                                                                        
+                                 'N0_fit_euvib',ptr_new(  N0_fit_euvib_A) )
+          undefine,N0_fit_euvib_A
        endif
        if *trace_data.fit_F_Ne_euvib eq 'DPL' then begin
           trace_data = create_struct( trace_data                        ,$
@@ -424,8 +425,8 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
           tmp = reform((*trace_data.index_sampling_mk4)(ifl,*))
           ind_samp_mk4 = where(tmp eq 1)
           if ind_samp_mk4[0] ne -1 then begin
-            ;Determine maximum heiht of the fl geometry (apex if closed).
-             rad_fl_max = max((*trace_data.rad)(ifl,0:(*trace_data.Npt_v)(ifl)-1))
+            ;Define maximum heiht of the fl geometry (apex if closed). 
+             rad_fl_max = (*trace_data.Termpoint_Rad)(ifl)
             ;Make 1-D array with the actual sampling heights.
              radsamp = reform((*trace_data.rad)(ifl,ind_samp_mk4)) ; Rsun
             ;Determine critical fit heights and range
@@ -501,7 +502,7 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
        if *trace_data.fit_F_Ne_mk4 eq 'IHS' then begin
           trace_data = create_struct( trace_data                        ,$
                                     'N0_fit_mk4',ptr_new(  N0_fit_mk4_A) )
-          undefine, N0_fit_mk4_A
+          undefine,N0_fit_mk4_A
        endif
        if *trace_data.fit_F_Ne_mk4 eq 'SPL' then begin
           trace_data = create_struct( trace_data                        ,$
@@ -546,8 +547,8 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
           tmp = reform((*trace_data.index_sampling_kcor)(ifl,*))
           ind_samp_kcor = where(tmp eq 1)
           if ind_samp_kcor[0] ne -1 then begin
-            ;Determine maximum heiht of the fl geometry (apex if closed).
-             rad_fl_max = max((*trace_data.rad)(ifl,0:(*trace_data.Npt_v)(ifl)-1))
+            ;Define maximum heiht of the fl geometry (apex if closed). 
+             rad_fl_max = (*trace_data.Termpoint_Rad)(ifl)
             ;Make 1-D array with the actual sampling heights.
              radsamp = reform((*trace_data.rad)(ifl,ind_samp_kcor)) ; Rsun
             ;Determine critical fit heights and range
@@ -630,8 +631,8 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
           tmp = reform((*trace_data.index_sampling_ucomp)(ifl,*))
           ind_samp_ucomp = where(tmp eq 1)
           if ind_samp_ucomp[0] ne -1 then begin
-            ;Determine maximum heiht of the fl geometry (apex if closed).
-             rad_fl_max = max((*trace_data.rad)(ifl,0:(*trace_data.Npt_v)(ifl)-1))
+            ;Define maximum heiht of the fl geometry (apex if closed). 
+             rad_fl_max = (*trace_data.Termpoint_Rad)(ifl)
             ;Make 1-D array with the actual sampling heights.
              radsamp = reform((*trace_data.rad)(ifl,ind_samp_ucomp)) ; Rsun
             ;Determine critical fit heights and range
@@ -713,8 +714,8 @@ pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
           tmp = reform((*trace_data.index_sampling_c2)(ifl,*))
           ind_samp_c2 = where(tmp eq 1)
           if ind_samp_c2[0] ne -1 then begin
-            ;Determine maximum heiht of the fl geometry (apex if closed).
-             rad_fl_max = max((*trace_data.rad)(ifl,0:(*trace_data.Npt_v)(ifl)-1))
+            ;Define maximum heiht of the fl geometry (apex if closed). 
+             rad_fl_max = (*trace_data.Termpoint_Rad)(ifl)
             ;Make 1-D array with the actual sampling heights.
              radsamp = reform((*trace_data.rad)(ifl,ind_samp_c2)) ; Rsun
             ;Determine critical fit heights and range

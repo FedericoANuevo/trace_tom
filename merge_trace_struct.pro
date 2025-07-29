@@ -30,7 +30,10 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
                         aia=aia, euvia=euvia, euvib=euvib, eit=eit, $
                         mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2, $
                         struture_filename=structure_filename,$
-                        trace_Bs=trace_Bs
+                        trace_Bs=trace_Bs, $
+	                optnptmax=optnptmax, Npt_max=Npt_max
+
+ common datastructure, trace_data
 
   if not keyword_set(fl_dir) or not keyword_set(fl_list) then STOP
 
@@ -44,12 +47,13 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
   openr,1,fl_dir+fl_list
   readf,1,N_fl
 
-
-; Nota de FAN: Este valor es excesivo. Segun
-; mi análisis de los trazados de CR-2254 y  
-; Cr-2261 estarriamos bien con Npt_max = 2500.
 ; Maximum number of point along the fieldline  
-  Npt_max = 10100  
+if keyword_set(optnptmax) then begin
+   ; Insertemos una rutina que determine Npt_max óptimo.
+STOP
+endif else begin
+  if NOT keyword_set(Npt_max) then Npt_max = 2500
+endels
 ; Default value in all arrays.
   default = -678.
   
@@ -434,29 +438,44 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
   undefine,lat_A
   undefine,lon_A
 
-  goto,skip_footpoints
-; Determine the Rad, Lat and Lon of the footppoint of each field line.
-; 1D Arrays: radial index corresponding to Rmin for each field line:
+; Determine the Rad, Lat and Lon of the Foot[/Term]point of each field line.
+; 1D Arrays: radial index corresponding to Rmin and Rmax for each field line:
   irmin=intarr(N_fl)
-  for i=0,N_fl-1 do irmin(i)=where(abs( (*trace_data.rad)(i,*) ) eq min(abs( (*trace_data.rad)(i,*) ) ) )
-; 1D Arrays: Footpoint Lon and Lat for each field line:
+  irmax=intarr(N_fl)
+  for i=0,N_fl-1 do begin
+	; The function "abs" is used for "irmin" to deal with the values "-678".
+	irmin(i)=where(abs( (*trace_data.rad)(i,*) ) eq min(abs( (*trace_data.rad)(i,*) ) ) )
+     	irmax(i)=where(   ( (*trace_data.rad)(i,*) ) eq max(   ( (*trace_data.rad)(i,*) ) ) )
+  endfor
+; 1D Arrays: Foot[Term]point Lon and Lat for each field line:
   Footpoint_Rad_A = fltarr(N_fl)
   Footpoint_Lon_A = fltarr(N_fl)
   Footpoint_Lat_A = fltarr(N_fl)
+  Termpoint_Rad_A = fltarr(N_fl)
+  Termpoint_Lon_A = fltarr(N_fl)
+  Termpoint_Lat_A = fltarr(N_fl)
   for ifl = 0,N_fl-1 do begin
      Footpoint_Rad_A(ifl) = (*trace_data.rad)(ifl,irmin[ifl])
      Footpoint_Lon_A(ifl) = (*trace_data.lon)(ifl,irmin[ifl])
      Footpoint_Lat_A(ifl) = (*trace_data.lat)(ifl,irmin[ifl])
+     Termpoint_Rad_A(ifl) = (*trace_data.rad)(ifl,irmax[ifl])
+     Termpoint_Lon_A(ifl) = (*trace_data.lon)(ifl,irmax[ifl])
+     Termpoint_Lat_A(ifl) = (*trace_data.lat)(ifl,irmax[ifl])
   endfor
-  trace_data = create_struct( trace_data       ,$
-     'footpoint_rad', ptr_new(Footpoint_Rad_A),$
-     'footpoint_lat', ptr_new(Footpoint_Lat_A),$
-     'footpoint_lon', ptr_new(Footpoint_Lon_A) )
+  trace_data = create_struct( trace_data      ,$
+     'Footpoint_rad', ptr_new(Footpoint_Rad_A),$
+     'Footpoint_lon', ptr_new(Footpoint_Lon_A),$
+     'Footpoint_lat', ptr_new(Footpoint_Lat_A),$
+     'Termpoint_rad', ptr_new(Termpoint_Rad_A),$
+     'Termpoint_lon', ptr_new(Termpoint_Lon_A) )
+     'Termpoint_lat', ptr_new(Termpoint_Lat_A),$
   undefine,Footpoint_Rad_A
-  undefine,Footpoint_Lat_A
   undefine,Footpoint_Lon_A
-  skip_footpoints:
-  
+  undefine,Footpoint_Lat_A
+  undefine,Termpoint_Rad_A
+  undefine,Termpoint_Lon_A
+  undefine,Termpoint_Lat_A
+ 
   if keyword_set(trace_Bs) then begin
      trace_data = create_struct( trace_data,$
                  's'  ,   ptr_new(s_A)     ,$
@@ -615,7 +634,7 @@ endif
 ; Perform fits:
   fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                   mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2,$
-                  fl_dir=fl_dir, trace_data = trace_data 
+                  fl_dir=fl_dir
   
  ; Save structure in fl_dir:
   save, trace_data, filename = fl_dir + structure_filename + '.sav'
