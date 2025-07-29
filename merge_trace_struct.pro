@@ -53,7 +53,7 @@ if keyword_set(optnptmax) then begin
 STOP
 endif else begin
   if NOT keyword_set(Npt_max) then Npt_max = 2500
-endels
+endelse
 ; Default value in all arrays.
   default = -678.
   
@@ -416,7 +416,7 @@ endels
                               
   endfor                        ; End loop in fieldlines    
   close,1
-  STOP
+
 ; POINTER-STRUCTURE  
 ; Create a pointer structure to store field line extraction information  
   trace_data = { N_fl:    ptr_new(N_fl)    ,$
@@ -467,8 +467,8 @@ endels
      'Footpoint_lon', ptr_new(Footpoint_Lon_A),$
      'Footpoint_lat', ptr_new(Footpoint_Lat_A),$
      'Termpoint_rad', ptr_new(Termpoint_Rad_A),$
-     'Termpoint_lon', ptr_new(Termpoint_Lon_A) )
-     'Termpoint_lat', ptr_new(Termpoint_Lat_A),$
+     'Termpoint_lon', ptr_new(Termpoint_Lon_A),$
+     'Termpoint_lat', ptr_new(Termpoint_Lat_A) )
   undefine,Footpoint_Rad_A
   undefine,Footpoint_Lon_A
   undefine,Footpoint_Lat_A
@@ -637,10 +637,10 @@ endif
                   fl_dir=fl_dir
   
  ; Save structure in fl_dir:
-  save, trace_data, filename = fl_dir + structure_filename + '.sav'
+  save, trace_data, filename = fl_dir + structure_filename + '_OPTMEM.sav'
 
   print,'Output in:'
-  print,fl_dir + structure_filename + '.sav'
+  print,fl_dir + structure_filename + '_OPTMEM.sav'
   
   return
 end
