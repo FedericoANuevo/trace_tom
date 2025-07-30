@@ -1,4 +1,4 @@
-; Ne3_analysis, /aia, /kcor, /closed, /positparam, plot_filename_suffix='South-Streamer',LatLimits=[-90,-30],LonLimits=[80,200],/connect,r_max=1.195
+; Ne3_analysis, /aia, /kcor, /closed, /positparam, plot_filename_suffix='South-Streamer',LatLimits=[-90,-30],LonLimits=[80,200],/connect,r_max=1.195,/load
 pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
                   plot_filename_suffix=plot_filename_suffix,$
                   aia=aia, kcor=kcor, ucomp=ucomp,$
@@ -228,7 +228,7 @@ if keyword_set(connect) AND keyword_set(closed) then begin
    ifl=0
    closed_loop_count = -1
    while ifl le N_fl-2 do begin
-      if leg_label_A(ifl) ne 0 then begin
+      if (*trace_dat.leg_label)(ifl) ne 0 then begin
          closed_loop_count = closed_loop_count + 1
          if (tag_box_A(ifl) eq +1) AND (closed_loop_count mod constep eq 0) then $
             oplot,reform((*trace_data.Footpoint_Lon)(ifl:ifl+1)),reform((*trace_data.Footpoint_Lat)(ifl:ifl+1)),color=blue
