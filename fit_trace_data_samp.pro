@@ -39,7 +39,7 @@ pro fit_trace_data_samp, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
           Nsamp = (*trace_data.Npt_aia)(ifl)            
           if Nsamp ne default then begin
             ;Determine maximum heiht of the fl geometry (apex if closed). 
-             rad_fl_max = (*trace_data.apex_rad)(ìfl) 
+             rad_fl_max = (*trace_data.termpoint_rad)(ìfl) 
             ;Make 1-D array with the actual sampling heights.
              radsamp = reform((*trace_data.rad_aia)(ifl,0:Nsamp-1)) ; Rsun
             ;Determine critical fit heights and range

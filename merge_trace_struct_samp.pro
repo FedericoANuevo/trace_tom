@@ -50,9 +50,9 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
   Footpoint_Rad_A = fltarr(N_fl)
   Footpoint_Lon_A = fltarr(N_fl)
   Footpoint_Lat_A = fltarr(N_fl)
-  Apex_Rad_A      = fltarr(N_fl)
-  Apex_Lon_A      = fltarr(N_fl)
-  Apex_Lat_A      = fltarr(N_fl)
+  Termpoint_Rad_A = fltarr(N_fl)
+  Termpoint_Lon_A = fltarr(N_fl)
+  Termpoint_Lat_A = fltarr(N_fl)
 
 ; 2nd Tomography Products: 
   if keyword_set(aia) then begin
@@ -517,15 +517,15 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
                  footpoint_rad:       ptr_new(footpoint_rad_A)     ,$
                  footpoint_lat:       ptr_new(footpoint_lat_A)     ,$
                  footpoint_lon:       ptr_new(footpoint_lon_A)     ,$
-                 apex_rad:            ptr_new(apex_rad_A)          ,$
-                 apex_lat:            ptr_new(apex_lat_A)          ,$
-                 apex_lon:            ptr_new(apex_lon_A)           }
+                 termpoint_rad:       ptr_new(termpoint_rad_A)          ,$
+                 termpoint_lat:       ptr_new(termpoint_lat_A)          ,$
+                 termpoint_lon:       ptr_new(termpoint_lon_A)           }
   undefine,footpoint_rad_A
   undefine,footpoint_lat_A
   undefine,footpoint_lon_A
-  undefine,apex_rad_A
-  undefine,apex_lat_A
-  undefine,apex_lon_A
+  undefine,termpoint_rad_A
+  undefine,termpoint_lat_A
+  undefine,termpoint_lon_A
 
 
 if keyword_set(trace_Bs) then begin

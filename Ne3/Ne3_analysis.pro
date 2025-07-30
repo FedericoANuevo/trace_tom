@@ -100,7 +100,7 @@ pro Ne3_analysis, load=load, LonLimits=LonLimits, LatLimits=LatLimits, $
  if keyword_Set(only_loops) then begin
     ifl=0
     while ifl le N_fl-2 do begin
-       if leg_label_A(ifl) eq 0. then begin
+       if (*trace_data.leg_label)(ifl) eq 0. then begin
           ifl=ifl+1
        endif else begin
           if leg_label_A(ifl) ne leg_label_A(ifl+1) then STOP ; !this should never happen.

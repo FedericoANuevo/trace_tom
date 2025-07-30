@@ -29,13 +29,14 @@ pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
 ; field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_2x2deg_HMI-PolFil/'
 ;===============================================================================================
 
-  PRINT,'RESTORING THE POINTER-STRUCTURE'  
-; Load structure if so requested:
-if keyword_Set(loadstruct) then begin
   dir = '/data1/DATA/trace_tom_files/'+PROJECT_NAME+'/field_lines_geometry'+field_line_geometry_suffix_dir
-  restore, filename = dir + structure_filename
-  PRINT,'RESTORE COMPLETED'
-endif
+  
+; Load structure if so requested:
+  if keyword_Set(loadstruct) then begin
+     PRINT,'RESTORING THE POINTER-STRUCTURE'  
+     restore, filename = dir + structure_filename
+     PRINT,'RESTORE COMPLETED'
+  endif
 
   N_fl = *trace_data.N_fl
 
