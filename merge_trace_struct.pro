@@ -48,12 +48,22 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
   readf,1,N_fl
 
 ; Maximum number of point along the fieldline  
-if keyword_set(optnptmax) then begin
-   ; Insertemos una rutina que determine Npt_max óptimo.
-STOP
-endif else begin
-  if NOT keyword_set(Npt_max) then Npt_max = 2500
-endelse
+  if keyword_set(optnptmax) then begin
+     leg_Npt_A = lonarr(N_fl)
+     legNpt=0L
+     Nfl_tmp = 0L
+     openr,2,fl_dir+'legs-Npt.dat'
+     readf,2,Nfl_tmp
+     if Nfl_tmp NE N_fl then STOP
+     for i_fl=0L,Nfl_tmp-1 do begin
+        readf,2,legNpt
+        leg_Npt_A(i_fl)=legNpt
+     endfor
+     close,2
+     Npt_max = max(leg_Npt_A)
+  endif else begin
+     if NOT keyword_set(Npt_max) then Npt_max = 2500
+  endelse
 ; Default value in all arrays.
   default = -678.
   
@@ -416,7 +426,7 @@ endelse
                               
   endfor                        ; End loop in fieldlines    
   close,1
-
+  
 ; POINTER-STRUCTURE  
 ; Create a pointer structure to store field line extraction information  
   trace_data = { N_fl:    ptr_new(N_fl)    ,$
@@ -637,10 +647,10 @@ endif
                   fl_dir=fl_dir
   
  ; Save structure in fl_dir:
-  save, trace_data, filename = fl_dir + structure_filename + '_OPTMEM.sav'
+  save, trace_data, filename = fl_dir + structure_filename + '.sav'
 
   print,'Output in:'
-  print,fl_dir + structure_filename + '_OPTMEM.sav'
+  print,fl_dir + structure_filename + '.sav'
   
   return
 end
