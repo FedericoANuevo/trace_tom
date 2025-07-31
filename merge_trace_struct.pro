@@ -29,7 +29,7 @@
 pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
                         aia=aia, euvia=euvia, euvib=euvib, eit=eit, $
                         mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2, $
-                        struture_filename=structure_filename,$
+                        structure_filename=structure_filename,$
                         trace_Bs=trace_Bs, $
 	                optnptmax=optnptmax, Npt_max=Npt_max
 

@@ -7,9 +7,6 @@
 ; various tomographic products along individual field lines, including
 ; the fits as part of the structure.
 ;
-; NOTA: La idea es hacer un código similar a merge_trace_struct.pro
-; pero que guarde los resultados ya sampleados.
-
 ;
 ; INPUTS:
 ; fir_fl and fl_list: STRINGS. directory where field lines are
@@ -23,14 +20,16 @@
 pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
                              aia=aia, euvia=euvia, euvib=euvib, eit=eit, $
                              mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2, $
-                             struture_filename=structure_filename,$
+                             structure_filename=structure_filename,$
                              trace_Bs=trace_Bs
 
+  common datastructure, trace_data
+  
   if not keyword_set(fl_dir) or not keyword_set(fl_list) then STOP
 
 ; Set up filename for output structure:
   if not keyword_set(structure_filename) then structure_filename = fl_list
-  structure_filename = structure_filename + '-tracing-structure-merge-samp'
+  structure_filename = structure_filename + '-tracing-structure-merge'
 
 ; Read the list with the field-lines  
   N_fl     = 0L
@@ -204,13 +203,13 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
         sample_fl, Ne_l=Ne_aia_l, index_l=index_aia_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
            index_foot = where( rad_l eq min(rad_l))
-           index_apex = where( rad_l eq max(rad_l))
+           index_term = where( rad_l eq max(rad_l))
            footpoint_rad_A(i_fl) = rad_l(index_foot[0])
            footpoint_lat_A(i_fl) = lat_l(index_foot[0])
            footpoint_lon_A(i_fl) = lon_l(index_foot[0])
-           apex_rad_A     (i_fl) = rad_l(index_apex[0])
-           apex_lat_A     (i_fl) = lat_l(index_apex[0])
-           apex_lon_A     (i_fl) = lon_l(index_apex[0])
+           termpoint_rad_A(i_fl) = rad_l(index_term[0])
+           termpoint_lat_A(i_fl) = lat_l(index_term[0])
+           termpoint_lon_A(i_fl) = lon_l(index_term[0])
            initialized = 'yes'
         endif
         indsamp = where(index_sampling_l eq 1)
@@ -249,13 +248,13 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
         sample_fl, Ne_l=Ne_euvia_l, index_l=index_euvia_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
            index_foot = where( rad_l eq min(rad_l))
-           index_apex = where( rad_l eq max(rad_l))
+           index_term = where( rad_l eq max(rad_l))
            footpoint_rad_A(i_fl) = rad_l(index_foot[0])
            footpoint_lat_A(i_fl) = lat_l(index_foot[0])
            footpoint_lon_A(i_fl) = lon_l(index_foot[0])
-           apex_rad_A     (i_fl) = rad_l(index_apex[0])
-           apex_lat_A     (i_fl) = lat_l(index_apex[0])
-           apex_lon_A     (i_fl) = lon_l(index_apex[0])
+           termpoint_rad_A(i_fl) = rad_l(index_term[0])
+           termpoint_lat_A(i_fl) = lat_l(index_term[0])
+           termpoint_lon_A(i_fl) = lon_l(index_term[0])
            initialized = 'yes'
         endif
         indsamp = where(index_sampling_l eq 1)
@@ -293,13 +292,13 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
         sample_fl, Ne_l=Ne_euvib_l, index_l=index_euvib_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
            index_foot = where( rad_l eq min(rad_l))
-           index_apex = where( rad_l eq max(rad_l))
+           index_term = where( rad_l eq max(rad_l))
            footpoint_rad_A(i_fl) = rad_l(index_foot[0])
            footpoint_lat_A(i_fl) = lat_l(index_foot[0])
            footpoint_lon_A(i_fl) = lon_l(index_foot[0])
-           apex_rad_A     (i_fl) = rad_l(index_apex[0])
-           apex_lat_A     (i_fl) = lat_l(index_apex[0])
-           apex_lon_A     (i_fl) = lon_l(index_apex[0])
+           termpoint_rad_A(i_fl) = rad_l(index_term[0])
+           termpoint_lat_A(i_fl) = lat_l(index_term[0])
+           termpoint_lon_A(i_fl) = lon_l(index_term[0])
            initialized = 'yes'
         endif
         indsamp = where(index_sampling_l eq 1)
@@ -336,13 +335,13 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
         sample_fl, Ne_l=Ne_eit_l, index_l=index_eit_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
            index_foot = where( rad_l eq min(rad_l))
-           index_apex = where( rad_l eq max(rad_l))
+           index_term = where( rad_l eq max(rad_l))
            footpoint_rad_A(i_fl) = rad_l(index_foot[0])
            footpoint_lat_A(i_fl) = lat_l(index_foot[0])
            footpoint_lon_A(i_fl) = lon_l(index_foot[0])
-           apex_rad_A     (i_fl) = rad_l(index_apex[0])
-           apex_lat_A     (i_fl) = lat_l(index_apex[0])
-           apex_lon_A     (i_fl) = lon_l(index_apex[0])
+           termpoint_rad_A(i_fl) = rad_l(index_term[0])
+           termpoint_lat_A(i_fl) = lat_l(index_term[0])
+           termpoint_lon_A(i_fl) = lon_l(index_term[0])
            initialized = 'yes'
         endif
         indsamp = where(index_sampling_l eq 1)
@@ -378,13 +377,13 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
         sample_fl, Ne_l=Ne_mk4_l, index_l=index_mk4_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
            index_foot = where( rad_l eq min(rad_l))
-           index_apex = where( rad_l eq max(rad_l))
+           index_term = where( rad_l eq max(rad_l))
            footpoint_rad_A(i_fl) = rad_l(index_foot[0])
            footpoint_lat_A(i_fl) = lat_l(index_foot[0])
            footpoint_lon_A(i_fl) = lon_l(index_foot[0])
-           apex_rad_A     (i_fl) = rad_l(index_apex[0])
-           apex_lat_A     (i_fl) = lat_l(index_apex[0])
-           apex_lon_A     (i_fl) = lon_l(index_apex[0])
+           termpoint_rad_A(i_fl) = rad_l(index_term[0])
+           termpoint_lat_A(i_fl) = lat_l(index_term[0])
+           termpoint_lon_A(i_fl) = lon_l(index_term[0])
            initialized = 'yes'
         endif
         indsamp = where(index_sampling_l eq 1)
@@ -410,37 +409,42 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
         file_kcor   = filename+'_kcor.out'
         if i_fl eq 0 then structure_filename = structure_filename + '_kcor'
         if NOT keyword_set(trace_Bs) then $
-           readcol,fl_dir+file_kcor,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_kcor_l,$
+           readcol,fl_dir+file_mk4,x_l,y_l,z_l,rad_l,lat_l,lon_l,Ne_kcor_l,$
                    index_kcor_l  ,FORMAT='D,D,D,D,D,D'
         if     keyword_set(trace_Bs) then $
            readcol,fl_dir+file_kcor,x_l,y_l,z_l,s_l,Br_l,Bth_l,Bph_l,B_l,rad_l,lat_l,lon_l,Ne_kcor_l,$
                    index_kcor_l  ,FORMAT='D,D,D,D,D,D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_kcor_l, index_l=index_kcor_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
-           N_l         = n_elements(x_l)
-           Npt_v(i_fl) = N_l  
+           index_foot = where( rad_l eq min(rad_l))
+           index_term = where( rad_l eq max(rad_l))
+           footpoint_rad_A(i_fl) = rad_l(index_foot[0])
+           footpoint_lat_A(i_fl) = lat_l(index_foot[0])
+           footpoint_lon_A(i_fl) = lon_l(index_foot[0])
+           termpoint_rad_A(i_fl) = rad_l(index_term[0])
+           termpoint_lat_A(i_fl) = lat_l(index_term[0])
+           termpoint_lon_A(i_fl) = lon_l(index_term[0])
            initialized = 'yes'
-           x_A   (i_fl,0:N_l-1) = x_l
-           y_A   (i_fl,0:N_l-1) = y_l
-           z_A   (i_fl,0:N_l-1) = z_l
-           rad_A (i_fl,0:N_l-1) = rad_l
-           lat_A (i_fl,0:N_l-1) = lat_l
-           lon_A (i_fl,0:N_l-1) = lon_l  
-           if keyword_set(trace_Bs) then begin
-             s_A (i_fl,0:N_l-1) =   s_l
-            Br_A (i_fl,0:N_l-1) =  Br_l
-           Bth_A (i_fl,0:N_l-1) = Bth_l
-           Bph_A (i_fl,0:N_l-1) = Bph_l
-             B_A (i_fl,0:N_l-1) =   B_l
-           endif
         endif
-        Ne_kcor_A   (i_fl,0:N_l-1) = Ne_kcor_l
-        index_kcor_A(i_fl,0:N_l-1) = index_kcor_l        
-        index_sampling_kcor_A(i_fl,0:N_l-1) = index_sampling_l
+        indsamp = where(index_sampling_l eq 1)
+        if indsamp[0] ne -1 then begin
+           Nl_samp                    = n_elements(indsamp)
+           Npt_kcor (i_fl)             = Nl_samp 
+           Ne_kcor_A(i_fl,0:Nl_samp-1) = Ne_kcor_l(indsamp)
+           rad_kcor_A       (i_fl,0:Nl_samp-1) = rad_l(indsamp)
+           lat_kcor_A       (i_fl,0:Nl_samp-1) = lat_l(indsamp)
+           lon_kcor_A       (i_fl,0:Nl_samp-1) = lon_l(indsamp)
+           if keyword_set(trace_Bs) then begin
+              s_kcor_A      (i_fl,0:Nl_samp-1) =   S_l(indsamp)
+              Br_kcor_A     (i_fl,0:Nl_samp-1) =  Br_l(indsamp)
+              Bth_kcor_A    (i_fl,0:Nl_samp-1) = Bth_l(indsamp)
+              Bph_kcor_A    (i_fl,0:Nl_samp-1) = Bph_l(indsamp)
+              B_kcor_A      (i_fl,0:Nl_samp-1) =   B_l(indsamp)
+           endif  
+        endif
      endif
-
    ; UCOMP
-       if keyword_set(ucomp)    then begin
+     if keyword_set(ucomp)    then begin
         file_ucomp   = filename+'_ucomp.out'
         if i_fl eq 0 then structure_filename = structure_filename + '_ucomp'
         if NOT keyword_set(trace_Bs) then $
@@ -451,28 +455,33 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
                    index_ucomp_l  ,FORMAT='D,D,D,D,D,D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_ucomp_l, index_l=index_ucomp_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
-           N_l         = n_elements(x_l)
-           Npt_v(i_fl) = N_l  
+           index_foot = where( rad_l eq min(rad_l))
+           index_term = where( rad_l eq max(rad_l))
+           footpoint_rad_A(i_fl) = rad_l(index_foot[0])
+           footpoint_lat_A(i_fl) = lat_l(index_foot[0])
+           footpoint_lon_A(i_fl) = lon_l(index_foot[0])
+           termpoint_rad_A(i_fl) = rad_l(index_term[0])
+           termpoint_lat_A(i_fl) = lat_l(index_term[0])
+           termpoint_lon_A(i_fl) = lon_l(index_term[0])
            initialized = 'yes'
-           x_A   (i_fl,0:N_l-1) = x_l
-           y_A   (i_fl,0:N_l-1) = y_l
-           z_A   (i_fl,0:N_l-1) = z_l
-           rad_A (i_fl,0:N_l-1) = rad_l
-           lat_A (i_fl,0:N_l-1) = lat_l
-           lon_A (i_fl,0:N_l-1) = lon_l  
-           if keyword_set(trace_Bs) then begin
-             s_A (i_fl,0:N_l-1) =   s_l
-            Br_A (i_fl,0:N_l-1) =  Br_l
-           Bth_A (i_fl,0:N_l-1) = Bth_l
-           Bph_A (i_fl,0:N_l-1) = Bph_l
-             B_A (i_fl,0:N_l-1) =   B_l
-           endif
         endif
-        Ne_ucomp_A   (i_fl,0:N_l-1) = Ne_ucomp_l
-        index_ucomp_A(i_fl,0:N_l-1) = index_ucomp_l        
-        index_sampling_ucomp_A(i_fl,0:N_l-1) = index_sampling_l
+        indsamp = where(index_sampling_l eq 1)
+        if indsamp[0] ne -1 then begin
+           Nl_samp                    = n_elements(indsamp)
+           Npt_ucomp (i_fl)             = Nl_samp 
+           Ne_ucomp_A(i_fl,0:Nl_samp-1) = Ne_ucomp_l(indsamp)
+           rad_ucomp_A       (i_fl,0:Nl_samp-1) = rad_l(indsamp)
+           lat_ucomp_A       (i_fl,0:Nl_samp-1) = lat_l(indsamp)
+           lon_ucomp_A       (i_fl,0:Nl_samp-1) = lon_l(indsamp)
+           if keyword_set(trace_Bs) then begin
+              s_ucomp_A      (i_fl,0:Nl_samp-1) =   S_l(indsamp)
+              Br_ucomp_A     (i_fl,0:Nl_samp-1) =  Br_l(indsamp)
+              Bth_ucomp_A    (i_fl,0:Nl_samp-1) = Bth_l(indsamp)
+              Bph_ucomp_A    (i_fl,0:Nl_samp-1) = Bph_l(indsamp)
+              B_ucomp_A      (i_fl,0:Nl_samp-1) =   B_l(indsamp)
+           endif  
+        endif
      endif
-
    ; LASCO-C2
      if keyword_set(lascoc2) then begin
         file_c2    = filename+'_lascoc2.out'
@@ -485,31 +494,36 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
                    index_c2_l  ,FORMAT='D,D,D,D,D,D,D,D,D,D,D'
         sample_fl, Ne_l=Ne_c2_l, index_l=index_c2_l, index_sampling_l=index_sampling_l
         if initialized eq 'no' then begin
-           N_l         = n_elements(x_l)
-           Npt_v(i_fl) = N_l  
+            index_foot = where( rad_l eq min(rad_l))
+           index_term = where( rad_l eq max(rad_l))
+           footpoint_rad_A(i_fl) = rad_l(index_foot[0])
+           footpoint_lat_A(i_fl) = lat_l(index_foot[0])
+           footpoint_lon_A(i_fl) = lon_l(index_foot[0])
+           termpoint_rad_A(i_fl) = rad_l(index_term[0])
+           termpoint_lat_A(i_fl) = lat_l(index_term[0])
+           termpoint_lon_A(i_fl) = lon_l(index_term[0])
            initialized = 'yes'
-           x_A   (i_fl,0:N_l-1) = x_l
-           y_A   (i_fl,0:N_l-1) = y_l
-           z_A   (i_fl,0:N_l-1) = z_l
-           rad_A (i_fl,0:N_l-1) = rad_l
-           lat_A (i_fl,0:N_l-1) = lat_l
-           lon_A (i_fl,0:N_l-1) = lon_l  
+        endif
+        indsamp = where(index_sampling_l eq 1)
+        if indsamp[0] ne -1 then begin
+           Nl_samp                  = n_elements(indsamp)
+           Npt_c2    (i_fl)         = Nl_samp        
+           Ne_c2_A   (i_fl,0:Nl_samp-1) = Ne_c2_l
+           rad_c2_A  (i_fl,0:Nl_samp-1) = rad_l(indsamp)
+           lat_c2_A  (i_fl,0:Nl_samp-1) = lat_l(indsamp)
+           lon_c2_A  (i_fl,0:Nl_samp-1) = lon_l(indsamp)
            if keyword_set(trace_Bs) then begin
-             s_A (i_fl,0:N_l-1) =   s_l
-            Br_A (i_fl,0:N_l-1) =  Br_l
-           Bth_A (i_fl,0:N_l-1) = Bth_l
-           Bph_A (i_fl,0:N_l-1) = Bph_l
-             B_A (i_fl,0:N_l-1) =   B_l
+              s_c2_A      (i_fl,0:Nl_samp-1) =   S_l(indsamp)
+              Br_c2_A     (i_fl,0:Nl_samp-1) =  Br_l(indsamp)
+              Bth_c2_A    (i_fl,0:Nl_samp-1) = Bth_l(indsamp)
+              Bph_c2_A    (i_fl,0:Nl_samp-1) = Bph_l(indsamp)
+              B_c2_A      (i_fl,0:Nl_samp-1) =   B_l(indsamp)
            endif
         endif
-        Ne_c2_A   (i_fl,0:N_l-1) = Ne_c2_l
-        index_c2_A(i_fl,0:N_l-1) = index_c2_l    
-        index_sampling_c2_A(i_fl,0:N_l-1) = index_sampling_l
-     endif
-                              
+     endif                 
   endfor                        ; End loop in fieldlines    
   close,1
-  STOP
+
 ; POINTER-STRUCTURE  
 ; Create a pointer structure to store field line extraction information  
   trace_data = { N_fl:                ptr_new(N_fl)                ,$
@@ -517,9 +531,9 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
                  footpoint_rad:       ptr_new(footpoint_rad_A)     ,$
                  footpoint_lat:       ptr_new(footpoint_lat_A)     ,$
                  footpoint_lon:       ptr_new(footpoint_lon_A)     ,$
-                 termpoint_rad:       ptr_new(termpoint_rad_A)          ,$
-                 termpoint_lat:       ptr_new(termpoint_lat_A)          ,$
-                 termpoint_lon:       ptr_new(termpoint_lon_A)           }
+                 termpoint_rad:       ptr_new(termpoint_rad_A)     ,$
+                 termpoint_lat:       ptr_new(termpoint_lat_A)     ,$
+                 termpoint_lon:       ptr_new(termpoint_lon_A)      }
   undefine,footpoint_rad_A
   undefine,footpoint_lat_A
   undefine,footpoint_lon_A
@@ -603,102 +617,237 @@ endif
         undefine,Bph_aia_A
      endif
   endif
-; Nota de FAN: Hay que repetir lo que se codeó con AIA para los
-; demás instrumentos ...
-  
+
+; EUVI-A 
   if keyword_set(euvia) then begin
      trace_data = create_struct( trace_data ,$
-                 'Ne_euvia' , ptr_new(            Ne_euvia_A) ,$
-                 'Tm_euvia' , ptr_new(            Tm_euvia_A) ,$
-                 'WT_euvia' , ptr_new(            WT_euvia_A) ,$
-          'ldem_flag_euvia' , ptr_new(     ldem_flag_euvia_A) ,$
-              'index_euvia' , ptr_new(         index_euvia_A) ,$
-     'index_sampling_euvia' , ptr_new(index_sampling_euvia_A)  )
+                  'Npt_euvia' , ptr_new(           Npt_euvia  ) ,$            
+                   'Ne_euvia' , ptr_new(            Ne_euvia_A) ,$
+                   'Tm_euvia' , ptr_new(            Tm_euvia_A) ,$
+                   'WT_euvia' , ptr_new(            WT_euvia_A) ,$
+            'ldem_flag_euvia' , ptr_new(     ldem_flag_euvia_A) ,$
+                  'rad_euvia' , ptr_new(           rad_euvia_A) ,$
+                  'lat_euvia' , ptr_new(           lat_euvia_A) ,$
+                  'lon_euvia' , ptr_new(           lon_euvia_A) )
+     undefine,Npt_euvia
      undefine,Ne_euvia_A
      undefine,Tm_euvia_A
      undefine,WT_euvia_A
      undefine,ldem_flag_euvia_A
-     undefine,index_euvia_A
-     undefine,index_sampling_euvia_A
+     undefine,rad_euvia_A
+     undefine,lat_euvia_A
+     undefine,lon_euvia_A
+     if keyword_set(trace_Bs) then begin
+        trace_data = create_struct( trace_data ,$
+                                    's_euvia', ptr_new(s_euvia_A), $
+                                    'B_euvia', ptr_new(B_euvia_A), $
+                                    'Br_euvia', ptr_new(Br_euvia_A), $
+                                    'Bth_euvia', ptr_new(Bth_euvia_A), $
+                                    'Bph_euvia', ptr_new(Bph_euvia_A) )
+        undefine,s_euvia_A
+        undefine,B_euvia_A
+        undefine,Br_euvia_A
+        undefine,Bth_euvia_A
+        undefine,Bph_euvia_A
+     endif
   endif
+
+; EUVI-B
   if keyword_set(euvib) then begin
      trace_data = create_struct( trace_data ,$
-                 'Ne_euvib' , ptr_new(            Ne_euvib_A) ,$
-                 'Tm_euvib' , ptr_new(            Tm_euvib_A) ,$
-                 'WT_euvib' , ptr_new(            WT_euvib_A) ,$
-          'ldem_flag_euvib' , ptr_new(     ldem_flag_euvib_A) ,$
-              'index_euvib' , ptr_new(         index_euvib_A) ,$
-     'index_sampling_euvib' , ptr_new(index_sampling_euvib_A)  )
+                  'Npt_euvib' , ptr_new(           Npt_euvib  ) ,$            
+                   'Ne_euvib' , ptr_new(            Ne_euvib_A) ,$
+                   'Tm_euvib' , ptr_new(            Tm_euvib_A) ,$
+                   'WT_euvib' , ptr_new(            WT_euvib_A) ,$
+            'ldem_flag_euvib' , ptr_new(     ldem_flag_euvib_A) ,$
+                  'rad_euvib' , ptr_new(           rad_euvib_A) ,$
+                  'lat_euvib' , ptr_new(           lat_euvib_A) ,$
+                  'lon_euvib' , ptr_new(           lon_euvib_A) )
+     undefine,Npt_euvib
      undefine,Ne_euvib_A
      undefine,Tm_euvib_A
      undefine,WT_euvib_A
      undefine,ldem_flag_euvib_A
-     undefine,index_euvib_A
-     undefine,index_sampling_euvib_A
+     undefine,rad_euvib_A
+     undefine,lat_euvib_A
+     undefine,lon_euvib_A
+     if keyword_set(trace_Bs) then begin
+        trace_data = create_struct( trace_data ,$
+                                    's_euvib', ptr_new(s_euvib_A), $
+                                    'B_euvib', ptr_new(B_euvib_A), $
+                                    'Br_euvib', ptr_new(Br_euvib_A), $
+                                    'Bth_euvib', ptr_new(Bth_euvib_A), $
+                                    'Bph_euvib', ptr_new(Bph_euvib_A) )
+        undefine,s_euvib_A
+        undefine,B_euvib_A
+        undefine,Br_euvib_A
+        undefine,Bth_euvib_A
+        undefine,Bph_euvib_A
+     endif
   endif
-  if keyword_set(eit) then begin
+ ; EIT 
+ if keyword_set(eit) then begin
      trace_data = create_struct( trace_data ,$
+                  'Npt_eit' , ptr_new(           Npt_eit  ) ,$            
                    'Ne_eit' , ptr_new(            Ne_eit_A) ,$
                    'Tm_eit' , ptr_new(            Tm_eit_A) ,$
                    'WT_eit' , ptr_new(            WT_eit_A) ,$
             'ldem_flag_eit' , ptr_new(     ldem_flag_eit_A) ,$
-                'index_eit' , ptr_new(         index_eit_A) ,$
-       'index_sampling_eit' , ptr_new(index_sampling_eit_A)  )
+                  'rad_eit' , ptr_new(           rad_eit_A) ,$
+                  'lat_eit' , ptr_new(           lat_eit_A) ,$
+                  'lon_eit' , ptr_new(           lon_eit_A) )
+     undefine,Npt_eit
      undefine,Ne_eit_A
      undefine,Tm_eit_A
      undefine,WT_eit_A
      undefine,ldem_flag_eit_A
-     undefine,index_eit_A
-     undefine,index_sampling_eit_A
+     undefine,rad_eit_A
+     undefine,lat_eit_A
+     undefine,lon_eit_A
+     if keyword_set(trace_Bs) then begin
+        trace_data = create_struct( trace_data ,$
+                                    's_eit', ptr_new(s_eit_A), $
+                                    'B_eit', ptr_new(B_eit_A), $
+                                    'Br_eit', ptr_new(Br_eit_A), $
+                                    'Bth_eit', ptr_new(Bth_eit_A), $
+                                    'Bph_eit', ptr_new(Bph_eit_A) )
+        undefine,s_eit_A
+        undefine,B_eit_A
+        undefine,Br_eit_A
+        undefine,Bth_eit_A
+        undefine,Bph_eit_A
+     endif
   endif
-  if keyword_set(mk4) then begin
+
+
+;MK4
+ if keyword_set(mk4) then begin
      trace_data = create_struct( trace_data ,$
+                  'Npt_mk4' , ptr_new(           Npt_mk4  ) ,$            
                    'Ne_mk4' , ptr_new(            Ne_mk4_A) ,$
-                'index_mk4' , ptr_new(         index_mk4_A) ,$
-       'index_sampling_mk4' , ptr_new(index_sampling_mk4_A)  )
+                  'rad_mk4' , ptr_new(           rad_mk4_A) ,$
+                  'lat_mk4' , ptr_new(           lat_mk4_A) ,$
+                  'lon_mk4' , ptr_new(           lon_mk4_A) )
+     undefine,Npt_mk4
      undefine,Ne_mk4_A
-     undefine,index_mk4_A
-     undefine,index_sampling_mk4_A
+     undefine,rad_mk4_A
+     undefine,lat_mk4_A
+     undefine,lon_mk4_A
+     if keyword_set(trace_Bs) then begin
+        trace_data = create_struct( trace_data ,$
+                                    's_mk4', ptr_new(s_mk4_A), $
+                                    'B_mk4', ptr_new(B_mk4_A), $
+                                    'Br_mk4', ptr_new(Br_mk4_A), $
+                                    'Bth_mk4', ptr_new(Bth_mk4_A), $
+                                    'Bph_mk4', ptr_new(Bph_mk4_A) )
+        undefine,s_mk4_A
+        undefine,B_mk4_A
+        undefine,Br_mk4_A
+        undefine,Bth_mk4_A
+        undefine,Bph_mk4_A
+     endif
   endif
+
+; ...
+
+ 
+;KCOR
   if keyword_set(kcor) then begin
      trace_data = create_struct( trace_data ,$
-                 'Ne_kcor' , ptr_new(            Ne_kcor_A) ,$
-              'index_kcor' , ptr_new(         index_kcor_A) ,$
-     'index_sampling_kcor' , ptr_new(index_sampling_kcor_A)  )
+                  'Npt_kcor' , ptr_new(           Npt_kcor  ) ,$            
+                   'Ne_kcor' , ptr_new(            Ne_kcor_A) ,$
+                  'rad_kcor' , ptr_new(           rad_kcor_A) ,$
+                  'lat_kcor' , ptr_new(           lat_kcor_A) ,$
+                  'lon_kcor' , ptr_new(           lon_kcor_A) )
+     undefine,Npt_kcor
      undefine,Ne_kcor_A
-     undefine,index_kcor_A
-     undefine,index_sampling_kcor_A
+     undefine,rad_kcor_A
+     undefine,lat_kcor_A
+     undefine,lon_kcor_A
+     if keyword_set(trace_Bs) then begin
+        trace_data = create_struct( trace_data ,$
+                                    's_kcor', ptr_new(s_kcor_A), $
+                                    'B_kcor', ptr_new(B_kcor_A), $
+                                    'Br_kcor', ptr_new(Br_kcor_A), $
+                                    'Bth_kcor', ptr_new(Bth_kcor_A), $
+                                    'Bph_kcor', ptr_new(Bph_kcor_A) )
+        undefine,s_kcor_A
+        undefine,B_kcor_A
+        undefine,Br_kcor_A
+        undefine,Bth_kcor_A
+        undefine,Bph_kcor_A
+     endif
   endif
+
+
+
+; UCOMP
   if keyword_set(ucomp) then begin
      trace_data = create_struct( trace_data ,$
-                 'Ne_ucomp' , ptr_new(            Ne_ucomp_A) ,$
-              'index_ucomp' , ptr_new(         index_ucomp_A) ,$
-     'index_sampling_ucomp' , ptr_new(index_sampling_ucomp_A)  )
+                  'Npt_ucomp' , ptr_new(           Npt_ucomp  ) ,$            
+                   'Ne_ucomp' , ptr_new(            Ne_ucomp_A) ,$
+                  'rad_ucomp' , ptr_new(           rad_ucomp_A) ,$
+                  'lat_ucomp' , ptr_new(           lat_ucomp_A) ,$
+                  'lon_ucomp' , ptr_new(           lon_ucomp_A) )
+     undefine,Npt_ucomp
      undefine,Ne_ucomp_A
-     undefine,index_ucomp_A
-     undefine,index_sampling_ucomp_A
+     undefine,rad_ucomp_A
+     undefine,lat_ucomp_A
+     undefine,lon_ucomp_A
+     if keyword_set(trace_Bs) then begin
+        trace_data = create_struct( trace_data ,$
+                                    's_ucomp', ptr_new(s_ucomp_A), $
+                                    'B_ucomp', ptr_new(B_ucomp_A), $
+                                    'Br_ucomp', ptr_new(Br_ucomp_A), $
+                                    'Bth_ucomp', ptr_new(Bth_ucomp_A), $
+                                    'Bph_ucomp', ptr_new(Bph_ucomp_A) )
+        undefine,s_ucomp_A
+        undefine,B_ucomp_A
+        undefine,Br_ucomp_A
+        undefine,Bth_ucomp_A
+        undefine,Bph_ucomp_A
+     endif
   endif
+; ...
+
   if keyword_set(lascoc2) then begin
      trace_data = create_struct( trace_data ,$
-                   'Ne_c2' , ptr_new(            Ne_c2_A) ,$
-                'index_c2' , ptr_new(         index_c2_A) ,$
-       'index_sampling_c2' , ptr_new(index_sampling_c2_A)  )
+                                 'Npt_c2' , ptr_new(           Npt_c2  ) ,$            
+                                 'Ne_c2' , ptr_new(            Ne_c2_A) ,$
+                                 'rad_c2' , ptr_new(           rad_c2_A) ,$
+                                 'lat_c2' , ptr_new(           lat_c2_A) ,$
+                                 'lon_c2' , ptr_new(           lon_c2_A) )
+     undefine,Npt_c2
      undefine,Ne_c2_A
-     undefine,index_c2_A
-     undefine,index_sampling_c2_A
+     undefine,rad_c2_A
+     undefine,lat_c2_A
+     undefine,lon_c2_A
+     if keyword_set(trace_Bs) then begin
+        trace_data = create_struct( trace_data ,$
+                                    's_c2', ptr_new(s_c2_A), $
+                                    'B_c2', ptr_new(B_c2_A), $
+                                    'Br_c2', ptr_new(Br_c2_A), $
+                                    'Bth_c2', ptr_new(Bth_c2_A), $
+                                    'Bph_c2', ptr_new(Bph_c2_A) )
+        undefine,s_c2_A
+        undefine,B_c2_A
+        undefine,Br_c2_A
+        undefine,Bth_c2_A
+        undefine,Bph_c2_A
+     endif
+
   endif
 
 ; Perform fits:
-; NOTA: Esta rutina hay que crearla a partir de fit_trace_data.pro  
   fit_trace_data_samp, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                        mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2,$
-                       fl_dir=fl_dir, trace_data = trace_data 
+                       fl_dir=fl_dir
   
  ; Save structure in fl_dir:
-  save, trace_data, filename = fl_dir + structure_filename + '.sav'
+  save, trace_data, filename = fl_dir + structure_filename + '_sampled.sav'
 
   print,'Output in:'
-  print,fl_dir + structure_filename + '.sav'
+  print,fl_dir + structure_filename + '_sampled.sav'
   
   return
 end

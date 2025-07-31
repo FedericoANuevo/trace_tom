@@ -6,10 +6,11 @@
 
 pro fit_trace_data_samp, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                          mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2,$
-                         fl_dir=fl_dir, trace_data = trace_data
-  
-    common tomgrid,nr,nt,np,rmin,rmax,Irmin,Irmax
-    common fitgrid,radmin_fit,radmax_fit,drad_fit,Npt_fit
+                         fl_dir=fl_dir
+   
+  common datastructure, trace_data
+  common tomgrid,nr,nt,np,rmin,rmax,Irmin,Irmax
+  common fitgrid,radmin_fit,radmax_fit,drad_fit,Npt_fit
 
    ;Set a default value for all the elements of all the [NAME]_A arrays
     default = -678.
@@ -39,7 +40,7 @@ pro fit_trace_data_samp, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
           Nsamp = (*trace_data.Npt_aia)(ifl)            
           if Nsamp ne default then begin
             ;Determine maximum heiht of the fl geometry (apex if closed). 
-             rad_fl_max = (*trace_data.termpoint_rad)(ìfl) 
+             rad_fl_max = (*trace_data.termpoint_rad)(ifl) 
             ;Make 1-D array with the actual sampling heights.
              radsamp = reform((*trace_data.rad_aia)(ifl,0:Nsamp-1)) ; Rsun
             ;Determine critical fit heights and range
@@ -161,21 +162,20 @@ pro fit_trace_data_samp, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
        rad_fit_euvia_A = radmin_fit + drad_fit/2. + drad_fit * findgen(Npt_fit)
        for ifl=0L,N_fl-1 do begin      
           dNedr_fit_euvia_A = fltarr(Npt_fit) + default
-          tmp = reform((*trace_data.index_sampling_euvia)(ifl,*))
-          ind_samp_euvia = where(tmp eq 1)
-          if ind_samp_euvia[0] ne -1 then begin
+          Nsamp = (*trace_data.Npt_euvia)(ifl)            
+          if Nsamp ne default then begin
             ;Determine maximum heiht of the fl geometry (apex if closed).
-             rad_fl_max = max((*trace_data.rad)(ifl,0:(*trace_data.Npt_v)(ifl)-1))
+             rad_fl_max = (*trace_data.termpoint_rad)(ifl) 
             ;Make 1-D array with the actual sampling heights.
-             radsamp = reform((*trace_data.rad)(ifl,ind_samp_euvia)) ; Rsun
+             radsamp = reform((*trace_data.rad_aia)(ifl,0:Nsamp-1)) ; Rsun
             ;Determine critical fit heights and range
              determine_fit_critical_parameters, radsamp=radsamp, rad_fit=rad_fit_euvia_A, $
                                                 radfit_min=radfit_min, radfit_max=radfit_max, range_fit=range_fit
             ;Test if there is proper coverage of actual sample data for a decent least squares fit.
              test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, rad_fl_max=rad_fl_max, covgflag=covgflag
              if covgflag eq 'yes' then begin
-                Nesamp = reform((*trace_data.Ne_euvia)(ifl,ind_samp_euvia))
-                Tmsamp = reform((*trace_data.Tm_euvia)(ifl,ind_samp_euvia))
+                Nesamp = reform((*trace_data.Ne_euvia)(ifl,0:Nsamp-1))
+                Tmsamp = reform((*trace_data.Tm_euvia)(ifl,0:Nsamp-1))
                 goto,skip_euvia_isohthermal_hydrostatic
                 fit_F_Ne_euvia  = 'IHS'
                 linear_fit, 1./radsamp   , alog(Nesamp), AN, r2N, /linfit_idl
@@ -284,21 +284,20 @@ pro fit_trace_data_samp, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
        rad_fit_euvib_A = radmin_fit + drad_fit/2. + drad_fit * findgen(Npt_fit)
        for ifl=0L,N_fl-1 do begin      
           dNedr_fit_euvib_A = fltarr(Npt_fit) + default
-          tmp = reform((*trace_data.index_sampling_euvib)(ifl,*))
-          ind_samp_euvib = where(tmp eq 1)
-          if ind_samp_euvib[0] ne -1 then begin
+          Nsamp = (*trace_data.Npt_aia)(ifl)            
+          if Nsamp ne default then begin
             ;Determine maximum heiht of the fl geometry (apex if closed).
-             rad_fl_max = max((*trace_data.rad)(ifl,0:(*trace_data.Npt_v)(ifl)-1))
+             rad_fl_max = (*trace_data.termpoint_rad)(ìfl) 
             ;Make 1-D array with the actual sampling heights.
-             radsamp = reform((*trace_data.rad)(ifl,ind_samp_euvib)) ; Rsun
+             radsamp = reform((*trace_data.rad_euvib)(ifl,0:Nsamp-1)) ; Rsun
             ;Determine critical fit heights and range
              determine_fit_critical_parameters, radsamp=radsamp, rad_fit=rad_fit_euvib_A, $
                                                 radfit_min=radfit_min, radfit_max=radfit_max, range_fit=range_fit
             ;Test if there is proper coverage of actual sample data for a decent least squares fit.
              test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, rad_fl_max=rad_fl_max, covgflag=covgflag
              if covgflag eq 'yes' then begin
-                Nesamp = reform((*trace_data.Ne_euvib)(ifl,ind_samp_euvib))
-                Tmsamp = reform((*trace_data.Tm_euvib)(ifl,ind_samp_euvib))
+                Nesamp = reform((*trace_data.Ne_euvib)(ifl,0:Nsamp-1))
+                Tmsamp = reform((*trace_data.Tm_euvib)(ifl,0:Nsamp-1))
                 goto,skip_euvib_isohthermal_hydrostatic
                 fit_F_Ne_euvib  = 'IHS'
                 linear_fit, 1./radsamp   , alog(Nesamp), AN, r2N, /linfit_idl
@@ -402,20 +401,19 @@ pro fit_trace_data_samp, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
        rad_fit_mk4_A = radmin_fit + drad_fit/2. + drad_fit * findgen(Npt_fit)
        for ifl=0L,N_fl-1 do begin      
           dNedr_fit_mk4_A = fltarr(Npt_fit) + default
-          tmp = reform((*trace_data.index_sampling_mk4)(ifl,*))
-          ind_samp_mk4 = where(tmp eq 1)
-          if ind_samp_mk4[0] ne -1 then begin
+          Nsamp = (*trace_data.Npt_mk4)(ifl)            
+          if Nsamp ne default then begin
             ;Determine maximum heiht of the fl geometry (apex if closed).
-             rad_fl_max = max((*trace_data.rad)(ifl,0:(*trace_data.Npt_v)(ifl)-1))
+             rad_fl_max = (*trace_data.termpoint_rad)(ifl) 
             ;Make 1-D array with the actual sampling heights.
-             radsamp = reform((*trace_data.rad)(ifl,ind_samp_mk4)) ; Rsun
+             radsamp = reform((*trace_data.rad_mk4)(ifl,0:Nsamp-1)) ; Rsun  
             ;Determine critical fit heights and range
              determine_fit_critical_parameters, radsamp=radsamp, rad_fit=rad_fit_mk4_A, $
                                                 radfit_min=radfit_min, radfit_max=radfit_max, range_fit=range_fit
             ;Test if there is proper coverage of actual sample data for a decent least squares fit.
              test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, rad_fl_max=rad_fl_max, covgflag=covgflag
              if covgflag eq 'yes' then begin
-                Nesamp = reform((*trace_data.Ne_mk4)(ifl,ind_samp_mk4))
+                Nesamp = reform((*trace_data.Ne_mk4)(ifl,0:Nsamp-1))
                 goto,skip_mk4_isohthermal_hydrostatic
                 fit_F_Ne_mk4  = 'IHS'
                 linear_fit, 1./radsamp   ,alog(Nesamp), AN, r2N, /linfit_idl
@@ -524,20 +522,19 @@ pro fit_trace_data_samp, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
        rad_fit_kcor_A = radmin_fit + drad_fit/2. + drad_fit * findgen(Npt_fit)
        for ifl=0L,N_fl-1 do begin      
           dNedr_fit_kcor_A = fltarr(Npt_fit) + default
-          tmp = reform((*trace_data.index_sampling_kcor)(ifl,*))
-          ind_samp_kcor = where(tmp eq 1)
-          if ind_samp_kcor[0] ne -1 then begin
+          Nsamp = (*trace_data.Npt_kcor)(ifl)            
+          if Nsamp ne default then begin
             ;Determine maximum heiht of the fl geometry (apex if closed).
-             rad_fl_max = max((*trace_data.rad)(ifl,0:(*trace_data.Npt_v)(ifl)-1))
+             rad_fl_max = (*trace_data.termpoint_rad)(ifl) 
             ;Make 1-D array with the actual sampling heights.
-             radsamp = reform((*trace_data.rad)(ifl,ind_samp_kcor)) ; Rsun
+             radsamp = reform((*trace_data.rad_kcor)(ifl,0:Nsamp-1)) ; Rsun   
             ;Determine critical fit heights and range
              determine_fit_critical_parameters, radsamp=radsamp, rad_fit=rad_fit_kcor_A, $
                                                 radfit_min=radfit_min, radfit_max=radfit_max, range_fit=range_fit
             ;Test if there is proper coverage of actual sample data for a decent least squares fit.
              test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, rad_fl_max=rad_fl_max, covgflag=covgflag
              if covgflag eq 'yes' then begin
-                Nesamp = reform((*trace_data.Ne_kcor)(ifl,ind_samp_kcor))
+                Nesamp = reform((*trace_data.Ne_kcor)(ifl,0:Nsamp-1))
                 fit_F_Ne_kcor  = 'DPL'
                 double_power_fit, radsamp, Nesamp, A, chisqr ;, /weighted
                 if (where(~finite(A)))(0) ne -1 then goto,skip_fit_kcor
@@ -608,20 +605,19 @@ pro fit_trace_data_samp, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
        rad_fit_ucomp_A = radmin_fit + drad_fit/2. + drad_fit * findgen(Npt_fit)
        for ifl=0L,N_fl-1 do begin      
           dNedr_fit_ucomp_A = fltarr(Npt_fit) + default
-          tmp = reform((*trace_data.index_sampling_ucomp)(ifl,*))
-          ind_samp_ucomp = where(tmp eq 1)
-          if ind_samp_ucomp[0] ne -1 then begin
+          Nsamp = (*trace_data.Npt_ucomp)(ifl)            
+          if Nsamp ne default then begin
             ;Determine maximum heiht of the fl geometry (apex if closed).
-             rad_fl_max = max((*trace_data.rad)(ifl,0:(*trace_data.Npt_v)(ifl)-1))
+             rad_fl_max = (*trace_data.termpoint_rad)(ifl) 
             ;Make 1-D array with the actual sampling heights.
-             radsamp = reform((*trace_data.rad)(ifl,ind_samp_ucomp)) ; Rsun
+             radsamp = reform((*trace_data.rad_ucomp)(ifl,0:Nsamp-1)) ; Rsun   
             ;Determine critical fit heights and range
              determine_fit_critical_parameters, radsamp=radsamp, rad_fit=rad_fit_ucomp_A, $
                                                 radfit_min=radfit_min, radfit_max=radfit_max, range_fit=range_fit
             ;Test if there is proper coverage of actual sample data for a decent least squares fit.
              test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, rad_fl_max=rad_fl_max, covgflag=covgflag
              if covgflag eq 'yes' then begin
-                Nesamp = reform((*trace_data.Ne_ucomp)(ifl,ind_samp_ucomp))
+                Nesamp = reform((*trace_data.Ne_ucomp)(ifl,0:Nsamp-1))
                 fit_F_Ne_ucomp  = 'DPL'
                 double_power_fit, radsamp, Nesamp, A, chisqr ;, /weighted
                 if (where(~finite(A)))(0) ne -1 then goto,skip_fit_ucomp
@@ -691,20 +687,20 @@ pro fit_trace_data_samp, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
        rad_fit_c2_A = radmin_fit + drad_fit/2. + drad_fit * findgen(Npt_fit)
        for ifl=0L,N_fl-1 do begin      
           dNedr_fit_c2_A = fltarr(Npt_fit) + default
-          tmp = reform((*trace_data.index_sampling_c2)(ifl,*))
-          ind_samp_c2 = where(tmp eq 1)
-          if ind_samp_c2[0] ne -1 then begin
+          Nsamp = (*trace_data.Npt_c2)(ifl)            
+          if Nsamp ne default then begin
             ;Determine maximum heiht of the fl geometry (apex if closed).
-             rad_fl_max = max((*trace_data.rad)(ifl,0:(*trace_data.Npt_v)(ifl)-1))
+             rad_fl_max = (*trace_data.termpoint_rad)(ifl) 
             ;Make 1-D array with the actual sampling heights.
-             radsamp = reform((*trace_data.rad)(ifl,ind_samp_c2)) ; Rsun
+             radsamp = reform((*trace_data.rad_c2)(ifl,0:Nsamp-1)) ; Rsun   
+         
             ;Determine critical fit heights and range
              determine_fit_critical_parameters, radsamp=radsamp, rad_fit=rad_fit_c2_A, $
                                                 radfit_min=radfit_min, radfit_max=radfit_max, range_fit=range_fit
             ;Test if there is proper coverage of actual sample data for a decent least squares fit.
              test_coverage, radsamp=radsamp, radfit_min=radfit_min, radfit_max=radfit_max, rad_fl_max=rad_fl_max, covgflag=covgflag
              if covgflag eq 'yes' then begin
-                Nesamp = reform((*trace_data.Ne_c2)(ifl,ind_samp_c2))
+                Nesamp = reform((*trace_data.Ne_c2)(ifl,0:Nsamp-1))
                 goto,skip_c2_single_power_law
                 fit_F_Ne_c2 = 'SPL'
                 linear_fit, alog(radsamp), alog(Nesamp), AN, r2N, /linfit_idl
