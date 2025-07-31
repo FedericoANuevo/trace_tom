@@ -64,6 +64,8 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
   endif else begin
      if NOT keyword_set(Npt_max) then Npt_max = 2500
   endelse
+  PRINT,'Npt_max: ',Npt_max
+  STOP
 ; Default value in all arrays.
   default = -678.
   

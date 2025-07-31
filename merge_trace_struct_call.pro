@@ -16,8 +16,8 @@ pro merge_trace_struct_call, nfs1=nfs1, nfs2=nfs2, trace_Bs=trace_Bs, optnptmax 
   PROJECT_NAME = 'CR2261'
 
 ; Define field_line_geometry_suffix_dir
-; field_line_geometry_suffix_dir = '_aunifgrid_multirad_50x50deg_HMI-PolFil/'
-  field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_20x20deg_HMI-PolFil/'
+; field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI-PolFil/'
+  field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_2x2deg_HMI-PolFil/'
 
 ; Provide FL_LIST, the file which informs the number of field lines and the
 ; filenames of the ASCII files containing the geometry of each line.
