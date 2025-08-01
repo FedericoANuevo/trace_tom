@@ -1,7 +1,7 @@
 ;
 ; PURPOSE: This code merges the tracing of tomographic products based
 ; on data from different instruments along given AWSoM/FDIPS-PFSS fieldlines, and
-; store all the information in a pointer structure.
+; store all the information in a pointer structure. 
 ;
 ; It also performs, if requested (/fits) analytical fits to the
 ; various tomographic products along individual field lines, including
