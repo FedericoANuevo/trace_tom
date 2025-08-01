@@ -1,4 +1,4 @@
-; Ne3_analysis, /aia, /kcor, /closed, /positparam, plot_filename_suffix='South-Streamer',LatLimits=[-90,-30],LonLimits=[80,200],/connect,r_max=1.195,/load
+; Ne3_analysis, /aia, /kcor, /closed, /positparam, plot_filename_suffix='South-Streamer2',LatLimits=[-90,-30],LonLimits=[80,200],/connect,r_max=1.195,/load
 ; Ne3_analysis,/aia, /kcor, /ucomp, /open, plot_filename_suffix='Test',/positparam,/load
 pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
                   plot_filename_suffix=plot_filename_suffix,$
@@ -20,7 +20,7 @@ pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
 ; structure_filename='fdips_field_150x180x360_mrmqs220221t2004c2254_000.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
 ; structure_filename='fdips_field_150X180X360_mrmqs220831t1302c2261_000.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
 ; structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr.2254.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
-  structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2254_prep.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
+  structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2254_prep.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp_sampled.sav'
 ; structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2261_prep.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
   
 ; Select dir where the structure is located (labeled after the selection of starting points) 
