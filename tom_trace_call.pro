@@ -24,8 +24,8 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
 ; PROJECT_NAME = 'CR2261'
 
 ; Define field_line_geometry_suffix_dir
-  field_line_geometry_suffix_dir='_aunifgrid_multirad_3x3deg_HMI-PolFil/'
-; field_line_geometry_suffix_dir='_aunifgrid_2.50Rs_1x1deg_HMI-PolFil/'
+; field_line_geometry_suffix_dir='_aunifgrid_multirad_3x3deg_HMI-PolFil/'
+  field_line_geometry_suffix_dir='_aunifgrid_2.50Rs_1x1deg_HMI-PolFil/'
   
 ; Provide FL_LIST, the file which informs the number of field lines and the
 ; filenames of the ASCII files containing the geometry of each line.
