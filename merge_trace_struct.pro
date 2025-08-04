@@ -47,7 +47,7 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
   openr,1,fl_dir+fl_list
   readf,1,N_fl
 
-; Maximum number of point along the fieldline  
+; Restore number of points Npt along each fieldline  
   if keyword_set(optnptmax) then begin
      leg_Npt_A = lonarr(N_fl)
      legNpt=0L
@@ -60,6 +60,8 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
         leg_Npt_A(i_fl)=legNpt
      endfor
      close,2
+; Store the maximum value Npt_max, to be used for all arrays to
+; optimize the memory use.
      Npt_max = max(leg_Npt_A)
   endif else begin
      if NOT keyword_set(Npt_max) then Npt_max = 2500

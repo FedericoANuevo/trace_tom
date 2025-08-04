@@ -37,14 +37,19 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
   openr,1,fl_dir+fl_list
   readf,1,N_fl
 
-; Maximum number of point along the fieldline
-  Npt_max_aia     = 40
-  Npt_max_euvia   = 40
-  Npt_max_euvib   = 40
-  Npt_max_eit     = 40
-  Npt_max_mk4     = 80
-  Npt_max_kcor    = 80
-  Npt_max_ucomp   = 40
+; Maximum number of points along each fieldline,
+; set based on experience. These values may need
+; to be changed. Also, expand if new instruments
+; are added.
+; NOTE: for an instrument that varies its FoV a lot, lik Metis, we
+; will need a formula such as: Npt_max = 1.5 * Nrad.
+  Npt_max_aia     =  40
+  Npt_max_euvia   =  40
+  Npt_max_euvib   =  40
+  Npt_max_eit     =  40
+  Npt_max_mk4     =  80
+  Npt_max_kcor    =  80
+  Npt_max_ucomp   =  40
   Npt_max_c2      = 150
   
 ; Default value in all arrays.
@@ -52,7 +57,6 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
   
 ; Define needed arrays:
 ; 1st Line Geometry and Bfield:
-
   Footpoint_Rad_A = fltarr(N_fl)
   Footpoint_Lon_A = fltarr(N_fl)
   Footpoint_Lat_A = fltarr(N_fl)
@@ -80,7 +84,7 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
   endif
   
   if keyword_set(euvia) then begin
-     Npt_euvia              = intarr(N_fl)              + default
+     Npt_euvia              = intarr(N_fl)               + default
      Ne_euvia_A             = fltarr(N_fl,Npt_max_euvia) + default
      Tm_euvia_A             = fltarr(N_fl,Npt_max_euvia) + default
      WT_euvia_A             = fltarr(N_fl,Npt_max_euvia) + default
@@ -98,7 +102,7 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
    endif
   
   if keyword_set(euvib) then begin
-     Npt_euvib              = intarr(N_fl)              + default
+     Npt_euvib              = intarr(N_fl)               + default
      Ne_euvib_A             = fltarr(N_fl,Npt_max_euvib) + default
      Tm_euvib_A             = fltarr(N_fl,Npt_max_euvib) + default
      WT_euvib_A             = fltarr(N_fl,Npt_max_euvib) + default
@@ -116,7 +120,7 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
    endif
 
   if keyword_set(eit) then begin
-     Npt_eit              = intarr(N_fl)              + default
+     Npt_eit              = intarr(N_fl)             + default
      Ne_eit_A             = fltarr(N_fl,Npt_max_eit) + default
      Tm_eit_A             = fltarr(N_fl,Npt_max_eit) + default
      WT_eit_A             = fltarr(N_fl,Npt_max_eit) + default
@@ -134,7 +138,7 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
    endif
   
   if keyword_set(mk4) then begin
-     Npt_mk4              = intarr(N_fl)              + default
+     Npt_mk4              = intarr(N_fl)             + default
      Ne_mk4_A             = fltarr(N_fl,Npt_max_mk4) + default
      rad_mk4_A            = fltarr(N_fl,Npt_max_mk4) + default
      lat_mk4_A            = fltarr(N_fl,Npt_max_mk4) + default
@@ -162,8 +166,9 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
         B_kcor_A           = fltarr(N_fl,Npt_max_kcor) + default
      endif
   endif
+  
   if keyword_set(ucomp) then begin
-     Npt_ucomp              = intarr(N_fl)              + default
+     Npt_ucomp              = intarr(N_fl)               + default
      Ne_ucomp_A             = fltarr(N_fl,Npt_max_ucomp) + default
      rad_ucomp_A            = fltarr(N_fl,Npt_max_ucomp) + default
      lat_ucomp_A            = fltarr(N_fl,Npt_max_ucomp) + default
@@ -239,9 +244,7 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
            endif
         endif
      endif
-; Nota de FAN: Hay que repetir lo que se codeó con AIA para los
-; demás instrumentos ...
-     
+
 ; EUVI-A
      if keyword_set(euvia)  then begin
         file_euvia = filename+'_euvia.out'
@@ -284,7 +287,6 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
            endif  
         endif
      endif
-     
         
 ; EUVI-B
      if keyword_set(euvib)  then begin
@@ -371,6 +373,7 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
            endif  
         endif
      endif
+     
    ; Mk4
      if keyword_set(mk4)    then begin
         file_mk4   = filename+'_mk4.out'
@@ -450,6 +453,7 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
            endif  
         endif
      endif
+     
    ; UCOMP
      if keyword_set(ucomp)    then begin
         file_ucomp   = filename+'_ucomp.out'
@@ -489,6 +493,7 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
            endif  
         endif
      endif
+     
    ; LASCO-C2
      if keyword_set(lascoc2) then begin
         file_c2    = filename+'_lascoc2.out'
@@ -534,7 +539,6 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
 ; POINTER-STRUCTURE  
 ; Create a pointer structure to store field line extraction information  
   trace_data = { N_fl:                ptr_new(N_fl)                ,$
-;                Npt_max_samp:        ptr_new(Npt_max_samp)        ,$
                  footpoint_rad:       ptr_new(footpoint_rad_A)     ,$
                  footpoint_lat:       ptr_new(footpoint_lat_A)     ,$
                  footpoint_lon:       ptr_new(footpoint_lon_A)     ,$
@@ -547,7 +551,6 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
   undefine,termpoint_rad_A
   undefine,termpoint_lat_A
   undefine,termpoint_lon_A
-
 
 if keyword_set(trace_Bs) then begin
 ; Read-in the leg-label of all fieldlines.
@@ -730,7 +733,6 @@ endif
      endif
   endif
 
-
 ;MK4
  if keyword_set(mk4) then begin
     trace_data = create_struct( trace_data ,$
@@ -759,9 +761,6 @@ endif
         undefine,Bph_mk4_A
      endif
   endif
-
-; ...
-
  
 ;KCOR
   if keyword_set(kcor) then begin
@@ -792,8 +791,6 @@ endif
      endif
   endif
 
-
-
 ; UCOMP
   if keyword_set(ucomp) then begin
      trace_data = create_struct( trace_data ,$
@@ -822,8 +819,8 @@ endif
         undefine,Bph_ucomp_A
      endif
   endif
-; ...
 
+; LASCO-C2
   if keyword_set(lascoc2) then begin
      trace_data = create_struct( trace_data ,$
                              'Npt_max_c2' , ptr_new(       Npt_max_c2  ) ,$                        
