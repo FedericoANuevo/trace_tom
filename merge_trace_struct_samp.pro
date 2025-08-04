@@ -38,7 +38,14 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
   readf,1,N_fl
 
 ; Maximum number of point along the fieldline
-  Npt_max_samp = 150
+  Npt_max_aia     = 40
+  Npt_max_euvia   = 40
+  Npt_max_euvib   = 40
+  Npt_max_eit     = 40
+  Npt_max_mk4     = 80
+  Npt_max_kcor    = 80
+  Npt_max_ucomp   = 40
+  Npt_max_c2      = 150
   
 ; Default value in all arrays.
   default = -678.
@@ -55,133 +62,133 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
 
 ; 2nd Tomography Products: 
   if keyword_set(aia) then begin
-     Npt_aia              = intarr(N_fl)              + default
-     Ne_aia_A             = fltarr(N_fl,Npt_max_samp) + default
-     Tm_aia_A             = fltarr(N_fl,Npt_max_samp) + default
-     WT_aia_A             = fltarr(N_fl,Npt_max_samp) + default
-     ldem_flag_aia_A      = fltarr(N_fl,Npt_max_samp) + default
-     rad_aia_A            = fltarr(N_fl,Npt_max_samp) + default
-     lat_aia_A            = fltarr(N_fl,Npt_max_samp) + default
-     lon_aia_A            = fltarr(N_fl,Npt_max_samp) + default
+     Npt_aia              = intarr(N_fl)             + default
+     Ne_aia_A             = fltarr(N_fl,Npt_max_aia) + default
+     Tm_aia_A             = fltarr(N_fl,Npt_max_aia) + default
+     WT_aia_A             = fltarr(N_fl,Npt_max_aia) + default
+     ldem_flag_aia_A      = fltarr(N_fl,Npt_max_aia) + default
+     rad_aia_A            = fltarr(N_fl,Npt_max_aia) + default
+     lat_aia_A            = fltarr(N_fl,Npt_max_aia) + default
+     lon_aia_A            = fltarr(N_fl,Npt_max_aia) + default
      if keyword_set(trace_Bs) then begin
-        s_aia_A            = fltarr(N_fl,Npt_max_samp) + default
-        Br_aia_A           = fltarr(N_fl,Npt_max_samp) + default
-        Bth_aia_A          = fltarr(N_fl,Npt_max_samp) + default
-        Bph_aia_A          = fltarr(N_fl,Npt_max_samp) + default
-        B_aia_A            = fltarr(N_fl,Npt_max_samp) + default
+        s_aia_A            = fltarr(N_fl,Npt_max_aia) + default
+        Br_aia_A           = fltarr(N_fl,Npt_max_aia) + default
+        Bth_aia_A          = fltarr(N_fl,Npt_max_aia) + default
+        Bph_aia_A          = fltarr(N_fl,Npt_max_aia) + default
+        B_aia_A            = fltarr(N_fl,Npt_max_aia) + default
      endif
   endif
   
   if keyword_set(euvia) then begin
      Npt_euvia              = intarr(N_fl)              + default
-     Ne_euvia_A             = fltarr(N_fl,Npt_max_samp) + default
-     Tm_euvia_A             = fltarr(N_fl,Npt_max_samp) + default
-     WT_euvia_A             = fltarr(N_fl,Npt_max_samp) + default
-     ldem_flag_euvia_A      = fltarr(N_fl,Npt_max_samp) + default
-      rad_euvia_A           = fltarr(N_fl,Npt_max_samp) + default
-      lat_euvia_A           = fltarr(N_fl,Npt_max_samp) + default
-      lon_euvia_A           = fltarr(N_fl,Npt_max_samp) + default
+     Ne_euvia_A             = fltarr(N_fl,Npt_max_euvia) + default
+     Tm_euvia_A             = fltarr(N_fl,Npt_max_euvia) + default
+     WT_euvia_A             = fltarr(N_fl,Npt_max_euvia) + default
+     ldem_flag_euvia_A      = fltarr(N_fl,Npt_max_euvia) + default
+      rad_euvia_A           = fltarr(N_fl,Npt_max_euvia) + default
+      lat_euvia_A           = fltarr(N_fl,Npt_max_euvia) + default
+      lon_euvia_A           = fltarr(N_fl,Npt_max_euvia) + default
       if keyword_set(trace_Bs) then begin
-         s_euvia_A           = fltarr(N_fl,Npt_max_samp) + default
-         Br_euvia_A          = fltarr(N_fl,Npt_max_samp) + default
-         Bth_euvia_A         = fltarr(N_fl,Npt_max_samp) + default
-         Bph_euvia_A         = fltarr(N_fl,Npt_max_samp) + default
-         B_euvia_A           = fltarr(N_fl,Npt_max_samp) + default
+         s_euvia_A           = fltarr(N_fl,Npt_max_euvia) + default
+         Br_euvia_A          = fltarr(N_fl,Npt_max_euvia) + default
+         Bth_euvia_A         = fltarr(N_fl,Npt_max_euvia) + default
+         Bph_euvia_A         = fltarr(N_fl,Npt_max_euvia) + default
+         B_euvia_A           = fltarr(N_fl,Npt_max_euvia) + default
       endif
    endif
   
   if keyword_set(euvib) then begin
      Npt_euvib              = intarr(N_fl)              + default
-     Ne_euvib_A             = fltarr(N_fl,Npt_max_samp) + default
-     Tm_euvib_A             = fltarr(N_fl,Npt_max_samp) + default
-     WT_euvib_A             = fltarr(N_fl,Npt_max_samp) + default
-     ldem_flag_euvib_A      = fltarr(N_fl,Npt_max_samp) + default
-      rad_euvib_A           = fltarr(N_fl,Npt_max_samp) + default
-      lat_euvib_A           = fltarr(N_fl,Npt_max_samp) + default
-      lon_euvib_A           = fltarr(N_fl,Npt_max_samp) + default
+     Ne_euvib_A             = fltarr(N_fl,Npt_max_euvib) + default
+     Tm_euvib_A             = fltarr(N_fl,Npt_max_euvib) + default
+     WT_euvib_A             = fltarr(N_fl,Npt_max_euvib) + default
+     ldem_flag_euvib_A      = fltarr(N_fl,Npt_max_euvib) + default
+      rad_euvib_A           = fltarr(N_fl,Npt_max_euvib) + default
+      lat_euvib_A           = fltarr(N_fl,Npt_max_euvib) + default
+      lon_euvib_A           = fltarr(N_fl,Npt_max_euvib) + default
       if keyword_set(trace_Bs) then begin
-         s_euvib_A           = fltarr(N_fl,Npt_max_samp) + default
-         Br_euvib_A          = fltarr(N_fl,Npt_max_samp) + default
-         Bth_euvib_A         = fltarr(N_fl,Npt_max_samp) + default
-         Bph_euvib_A         = fltarr(N_fl,Npt_max_samp) + default
-         B_euvib_A           = fltarr(N_fl,Npt_max_samp) + default
+         s_euvib_A           = fltarr(N_fl,Npt_max_euvib) + default
+         Br_euvib_A          = fltarr(N_fl,Npt_max_euvib) + default
+         Bth_euvib_A         = fltarr(N_fl,Npt_max_euvib) + default
+         Bph_euvib_A         = fltarr(N_fl,Npt_max_euvib) + default
+         B_euvib_A           = fltarr(N_fl,Npt_max_euvib) + default
       endif
    endif
 
   if keyword_set(eit) then begin
      Npt_eit              = intarr(N_fl)              + default
-     Ne_eit_A             = fltarr(N_fl,Npt_max_samp) + default
-     Tm_eit_A             = fltarr(N_fl,Npt_max_samp) + default
-     WT_eit_A             = fltarr(N_fl,Npt_max_samp) + default
-     ldem_flag_eit_A      = fltarr(N_fl,Npt_max_samp) + default
-      rad_eit_A           = fltarr(N_fl,Npt_max_samp) + default
-      lat_eit_A           = fltarr(N_fl,Npt_max_samp) + default
-      lon_eit_A           = fltarr(N_fl,Npt_max_samp) + default
+     Ne_eit_A             = fltarr(N_fl,Npt_max_eit) + default
+     Tm_eit_A             = fltarr(N_fl,Npt_max_eit) + default
+     WT_eit_A             = fltarr(N_fl,Npt_max_eit) + default
+     ldem_flag_eit_A      = fltarr(N_fl,Npt_max_eit) + default
+      rad_eit_A           = fltarr(N_fl,Npt_max_eit) + default
+      lat_eit_A           = fltarr(N_fl,Npt_max_eit) + default
+      lon_eit_A           = fltarr(N_fl,Npt_max_eit) + default
       if keyword_set(trace_Bs) then begin
-        s_eit_A           = fltarr(N_fl,Npt_max_samp) + default
-        Br_eit_A          = fltarr(N_fl,Npt_max_samp) + default
-        Bth_eit_A         = fltarr(N_fl,Npt_max_samp) + default
-        Bph_eit_A         = fltarr(N_fl,Npt_max_samp) + default
-        B_eit_A           = fltarr(N_fl,Npt_max_samp) + default
+        s_eit_A           = fltarr(N_fl,Npt_max_eit) + default
+        Br_eit_A          = fltarr(N_fl,Npt_max_eit) + default
+        Bth_eit_A         = fltarr(N_fl,Npt_max_eit) + default
+        Bph_eit_A         = fltarr(N_fl,Npt_max_eit) + default
+        B_eit_A           = fltarr(N_fl,Npt_max_eit) + default
      endif
    endif
   
   if keyword_set(mk4) then begin
      Npt_mk4              = intarr(N_fl)              + default
-     Ne_mk4_A             = fltarr(N_fl,Npt_max_samp) + default
-     rad_mk4_A            = fltarr(N_fl,Npt_max_samp) + default
-     lat_mk4_A            = fltarr(N_fl,Npt_max_samp) + default
-     lon_mk4_A            = fltarr(N_fl,Npt_max_samp) + default
+     Ne_mk4_A             = fltarr(N_fl,Npt_max_mk4) + default
+     rad_mk4_A            = fltarr(N_fl,Npt_max_mk4) + default
+     lat_mk4_A            = fltarr(N_fl,Npt_max_mk4) + default
+     lon_mk4_A            = fltarr(N_fl,Npt_max_mk4) + default
      if keyword_set(trace_Bs) then begin
-        s_mk4_A           = fltarr(N_fl,Npt_max_samp) + default
-        Br_mk4_A          = fltarr(N_fl,Npt_max_samp) + default
-        Bth_mk4_A         = fltarr(N_fl,Npt_max_samp) + default
-        Bph_mk4_A         = fltarr(N_fl,Npt_max_samp) + default
-        B_mk4_A           = fltarr(N_fl,Npt_max_samp) + default
+        s_mk4_A           = fltarr(N_fl,Npt_max_mk4) + default
+        Br_mk4_A          = fltarr(N_fl,Npt_max_mk4) + default
+        Bth_mk4_A         = fltarr(N_fl,Npt_max_mk4) + default
+        Bph_mk4_A         = fltarr(N_fl,Npt_max_mk4) + default
+        B_mk4_A           = fltarr(N_fl,Npt_max_mk4) + default
      endif
   endif
   
   if keyword_set(kcor) then begin
      Npt_kcor              = intarr(N_fl)              + default
-     Ne_kcor_A             = fltarr(N_fl,Npt_max_samp) + default
-     rad_kcor_A            = fltarr(N_fl,Npt_max_samp) + default
-     lat_kcor_A            = fltarr(N_fl,Npt_max_samp) + default
-     lon_kcor_A            = fltarr(N_fl,Npt_max_samp) + default
+     Ne_kcor_A             = fltarr(N_fl,Npt_max_kcor) + default
+     rad_kcor_A            = fltarr(N_fl,Npt_max_kcor) + default
+     lat_kcor_A            = fltarr(N_fl,Npt_max_kcor) + default
+     lon_kcor_A            = fltarr(N_fl,Npt_max_kcor) + default
      if keyword_set(trace_Bs) then begin
-        s_kcor_A           = fltarr(N_fl,Npt_max_samp) + default
-        Br_kcor_A          = fltarr(N_fl,Npt_max_samp) + default
-        Bth_kcor_A         = fltarr(N_fl,Npt_max_samp) + default
-        Bph_kcor_A         = fltarr(N_fl,Npt_max_samp) + default
-        B_kcor_A           = fltarr(N_fl,Npt_max_samp) + default
+        s_kcor_A           = fltarr(N_fl,Npt_max_kcor) + default
+        Br_kcor_A          = fltarr(N_fl,Npt_max_kcor) + default
+        Bth_kcor_A         = fltarr(N_fl,Npt_max_kcor) + default
+        Bph_kcor_A         = fltarr(N_fl,Npt_max_kcor) + default
+        B_kcor_A           = fltarr(N_fl,Npt_max_kcor) + default
      endif
   endif
   if keyword_set(ucomp) then begin
      Npt_ucomp              = intarr(N_fl)              + default
-     Ne_ucomp_A             = fltarr(N_fl,Npt_max_samp) + default
-     rad_ucomp_A            = fltarr(N_fl,Npt_max_samp) + default
-     lat_ucomp_A            = fltarr(N_fl,Npt_max_samp) + default
-     lon_ucomp_A            = fltarr(N_fl,Npt_max_samp) + default
+     Ne_ucomp_A             = fltarr(N_fl,Npt_max_ucomp) + default
+     rad_ucomp_A            = fltarr(N_fl,Npt_max_ucomp) + default
+     lat_ucomp_A            = fltarr(N_fl,Npt_max_ucomp) + default
+     lon_ucomp_A            = fltarr(N_fl,Npt_max_ucomp) + default
      if keyword_set(trace_Bs) then begin
-        s_ucomp_A           = fltarr(N_fl,Npt_max_samp) + default
-        Br_ucomp_A          = fltarr(N_fl,Npt_max_samp) + default
-        Bth_ucomp_A         = fltarr(N_fl,Npt_max_samp) + default
-        Bph_ucomp_A         = fltarr(N_fl,Npt_max_samp) + default
-        B_ucomp_A           = fltarr(N_fl,Npt_max_samp) + default
+        s_ucomp_A           = fltarr(N_fl,Npt_max_ucomp) + default
+        Br_ucomp_A          = fltarr(N_fl,Npt_max_ucomp) + default
+        Bth_ucomp_A         = fltarr(N_fl,Npt_max_ucomp) + default
+        Bph_ucomp_A         = fltarr(N_fl,Npt_max_ucomp) + default
+        B_ucomp_A           = fltarr(N_fl,Npt_max_ucomp) + default
      endif
   endif
   
   if keyword_set(lascoc2) then begin
-     Npt_c2              = intarr(N_fl)              + default
-     Ne_c2_A             = fltarr(N_fl,Npt_max_samp) + default
-     rad_c2_A            = fltarr(N_fl,Npt_max_samp) + default
-     lat_c2_A            = fltarr(N_fl,Npt_max_samp) + default
-     lon_c2_A            = fltarr(N_fl,Npt_max_samp) + default
+     Npt_c2              = intarr(N_fl)            + default
+     Ne_c2_A             = fltarr(N_fl,Npt_max_c2) + default
+     rad_c2_A            = fltarr(N_fl,Npt_max_c2) + default
+     lat_c2_A            = fltarr(N_fl,Npt_max_c2) + default
+     lon_c2_A            = fltarr(N_fl,Npt_max_c2) + default
      if keyword_set(trace_Bs) then begin
-        s_c2_A           = fltarr(N_fl,Npt_max_samp) + default
-        Br_c2_A          = fltarr(N_fl,Npt_max_samp) + default
-        Bth_c2_A         = fltarr(N_fl,Npt_max_samp) + default
-        Bph_c2_A         = fltarr(N_fl,Npt_max_samp) + default
-        B_c2_A           = fltarr(N_fl,Npt_max_samp) + default
+        s_c2_A           = fltarr(N_fl,Npt_max_c2) + default
+        Br_c2_A          = fltarr(N_fl,Npt_max_c2) + default
+        Bth_c2_A         = fltarr(N_fl,Npt_max_c2) + default
+        Bph_c2_A         = fltarr(N_fl,Npt_max_c2) + default
+        B_c2_A           = fltarr(N_fl,Npt_max_c2) + default
      endif
   
   endif
@@ -527,7 +534,7 @@ pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
 ; POINTER-STRUCTURE  
 ; Create a pointer structure to store field line extraction information  
   trace_data = { N_fl:                ptr_new(N_fl)                ,$
-                 Npt_max_samp:        ptr_new(Npt_max_samp)        ,$
+;                Npt_max_samp:        ptr_new(Npt_max_samp)        ,$
                  footpoint_rad:       ptr_new(footpoint_rad_A)     ,$
                  footpoint_lat:       ptr_new(footpoint_lat_A)     ,$
                  footpoint_lon:       ptr_new(footpoint_lon_A)     ,$
@@ -587,6 +594,7 @@ endif
 ; Store into the structure traced tomographic resuls
   if keyword_set(aia) then begin
      trace_data = create_struct( trace_data ,$
+              'Npt_max_aia'  ,ptr_new(       Npt_max_aia  ) ,$                        
                   'Npt_aia' , ptr_new(           Npt_aia  ) ,$            
                    'Ne_aia' , ptr_new(            Ne_aia_A) ,$
                    'Tm_aia' , ptr_new(            Tm_aia_A) ,$
@@ -621,6 +629,7 @@ endif
 ; EUVI-A 
   if keyword_set(euvia) then begin
      trace_data = create_struct( trace_data ,$
+              'Npt_max_euvia'  ,ptr_new(       Npt_max_euvia  ) ,$                        
                   'Npt_euvia' , ptr_new(           Npt_euvia  ) ,$            
                    'Ne_euvia' , ptr_new(            Ne_euvia_A) ,$
                    'Tm_euvia' , ptr_new(            Tm_euvia_A) ,$
@@ -655,6 +664,7 @@ endif
 ; EUVI-B
   if keyword_set(euvib) then begin
      trace_data = create_struct( trace_data ,$
+              'Npt_max_euvib'  ,ptr_new(       Npt_max_euvib  ) ,$                        
                   'Npt_euvib' , ptr_new(           Npt_euvib  ) ,$            
                    'Ne_euvib' , ptr_new(            Ne_euvib_A) ,$
                    'Tm_euvib' , ptr_new(            Tm_euvib_A) ,$
@@ -687,7 +697,8 @@ endif
   endif
  ; EIT 
  if keyword_set(eit) then begin
-     trace_data = create_struct( trace_data ,$
+    trace_data = create_struct( trace_data ,$
+              'Npt_max_eit'  ,ptr_new(       Npt_max_eit  ) ,$                        
                   'Npt_eit' , ptr_new(           Npt_eit  ) ,$            
                    'Ne_eit' , ptr_new(            Ne_eit_A) ,$
                    'Tm_eit' , ptr_new(            Tm_eit_A) ,$
@@ -722,7 +733,8 @@ endif
 
 ;MK4
  if keyword_set(mk4) then begin
-     trace_data = create_struct( trace_data ,$
+    trace_data = create_struct( trace_data ,$
+              'Npt_max_mk4'  ,ptr_new(       Npt_max_mk4  ) ,$                        
                   'Npt_mk4' , ptr_new(           Npt_mk4  ) ,$            
                    'Ne_mk4' , ptr_new(            Ne_mk4_A) ,$
                   'rad_mk4' , ptr_new(           rad_mk4_A) ,$
@@ -754,6 +766,7 @@ endif
 ;KCOR
   if keyword_set(kcor) then begin
      trace_data = create_struct( trace_data ,$
+              'Npt_max_kcor'  ,ptr_new(       Npt_max_kcor  ) ,$                        
                   'Npt_kcor' , ptr_new(           Npt_kcor  ) ,$            
                    'Ne_kcor' , ptr_new(            Ne_kcor_A) ,$
                   'rad_kcor' , ptr_new(           rad_kcor_A) ,$
@@ -784,6 +797,7 @@ endif
 ; UCOMP
   if keyword_set(ucomp) then begin
      trace_data = create_struct( trace_data ,$
+              'Npt_max_ucomp' , ptr_new(       Npt_max_ucomp  ) ,$                        
                   'Npt_ucomp' , ptr_new(           Npt_ucomp  ) ,$            
                    'Ne_ucomp' , ptr_new(            Ne_ucomp_A) ,$
                   'rad_ucomp' , ptr_new(           rad_ucomp_A) ,$
@@ -812,11 +826,12 @@ endif
 
   if keyword_set(lascoc2) then begin
      trace_data = create_struct( trace_data ,$
+                             'Npt_max_c2' , ptr_new(       Npt_max_c2  ) ,$                        
                                  'Npt_c2' , ptr_new(           Npt_c2  ) ,$            
-                                 'Ne_c2' , ptr_new(            Ne_c2_A) ,$
-                                 'rad_c2' , ptr_new(           rad_c2_A) ,$
-                                 'lat_c2' , ptr_new(           lat_c2_A) ,$
-                                 'lon_c2' , ptr_new(           lon_c2_A) )
+                                  'Ne_c2' , ptr_new(            Ne_c2_A) ,$
+                                  'rad_c2', ptr_new(           rad_c2_A) ,$
+                                  'lat_c2', ptr_new(           lat_c2_A) ,$
+                                  'lon_c2', ptr_new(           lon_c2_A) )
      undefine,Npt_c2
      undefine,Ne_c2_A
      undefine,rad_c2_A

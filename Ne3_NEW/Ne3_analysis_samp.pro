@@ -17,17 +17,12 @@ pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
   PROJECT_NAME = 'CR2261'
   
 ; Select structure to read:
-; structure_filename='fdips_field_150x180x360_mrmqs220221t2004c2254_000.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
-; structure_filename='fdips_field_150X180X360_mrmqs220831t1302c2261_000.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
-; structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr.2254.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp.sav'
 ; structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2254_prep.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp_sampled.sav'
   structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2261_prep.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp_sampled.sav'
   
 ; Select dir where the structure is located (labeled after the selection of starting points) 
-; field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI/'
-; field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_2x2deg_HMI/'
-; field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI-PolFil/'
-  field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_2x2deg_HMI-PolFil/'
+  field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI-PolFil/'
+; field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_2x2deg_HMI-PolFil/'
 ;===============================================================================================
 
   dir = '/data1/DATA/trace_tom_files/'+PROJECT_NAME+'/field_lines_geometry'+field_line_geometry_suffix_dir
@@ -167,7 +162,8 @@ green =  16
 
 ; Lat/Lon plots of FootPoints
 ;fig_dir = './'
-fig_dir = '~/Downloads/PLOTS/'
+fig_dir = '~/Downloads/'
+fig_dir = dir 
 ps1,fig_dir+structure_filename+'_'+plot_filename_suffix+'.eps'
 np=1000
 !p.multi=[0,1,2]
@@ -175,7 +171,7 @@ loadct,0
 !p.color=0
 !p.background=255
 csz=1
-                            opcl_str='open/closed'
+                            opcl_str='open/closed '
 if keyword_set(open)   then opcl_str='open '
 if keyword_set(closed) then opcl_str='closed '
 plot,*trace_data.Footpoint_lon,*trace_data.Footpoint_lat,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=csz,$
