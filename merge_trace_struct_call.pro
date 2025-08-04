@@ -6,9 +6,9 @@
 ;
 ; HISTORY: V1.0 AMV & FAN, CLaSP, October 2023.
 ; 
-; merge_trace_struct_samp_call, /trace_Bs
+; merge_trace_struct_call, /trace_Bs
 
-pro merge_trace_struct_samp_call, nfs1=nfs1, nfs2=nfs2, trace_Bs=trace_Bs, optnptmax = optnptmax
+pro merge_trace_struct_call, nfs1=nfs1, nfs2=nfs2, trace_Bs=trace_Bs
 
 ;===============================================================================================
 ; Define PROJECT_NAME, a string suffix to construct the full PATHS to the required files.
