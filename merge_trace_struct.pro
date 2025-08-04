@@ -17,11 +17,11 @@
 ;
 ; HISTORY: V1.0 FAN, IAFE, July 2025.
 
-pro merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, $
-                             aia=aia, euvia=euvia, euvib=euvib, eit=eit, $
-                             mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2, $
-                             structure_filename=structure_filename,$
-                             trace_Bs=trace_Bs
+pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
+                        aia=aia, euvia=euvia, euvib=euvib, eit=eit, $
+                        mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2, $
+                        structure_filename=structure_filename,$
+                        trace_Bs=trace_Bs
 
   common datastructure, trace_data
   
@@ -851,9 +851,9 @@ endif
   endif
 
 ; Perform fits:
-  fit_trace_data_samp, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
-                       mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2,$
-                       fl_dir=fl_dir
+  fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
+                  mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2,$
+                  fl_dir=fl_dir
   
  ; Save structure in fl_dir:
   save, trace_data, filename = fl_dir + structure_filename + '_sampled.sav'

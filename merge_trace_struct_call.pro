@@ -37,7 +37,7 @@ pro merge_trace_struct_samp_call, nfs1=nfs1, nfs2=nfs2, trace_Bs=trace_Bs, optnp
   fl_dir = base_dir+'DATA/trace_tom_files/'+PROJECT_NAME+'/field_lines_geometry'+field_line_geometry_suffix_dir
 ;------------------------------------------------------------------------------------
 
-   merge_trace_struct_samp, fl_dir=fl_dir, fl_list=fl_list, trace_Bs=trace_Bs, /aia, /kcor, /ucomp, structure_filename=structure_filename
+   merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, trace_Bs=trace_Bs, /aia, /kcor, /ucomp, structure_filename=structure_filename
    
   return
 end

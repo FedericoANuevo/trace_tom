@@ -4,9 +4,9 @@
 ;
 ; HISTORY: V1.0, FAN, July 25, IAFE.
 
-pro fit_trace_data_samp, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
-                         mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2,$
-                         fl_dir=fl_dir
+pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
+                    mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2,$
+                    fl_dir=fl_dir
    
   common datastructure, trace_data
   common tomgrid,nr,nt,np,rmin,rmax,Irmin,Irmax
