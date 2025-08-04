@@ -17,8 +17,7 @@ pro fit_trace_data_samp, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
    ;Set the number of field-lines 
     N_fl    = *trace_data.N_fl
 
-; Nota de FAN: Esta programado el  modulo para AIA. Ver si son
-; correctas las ediciones y seguir con los demas instrumentos
+    ; AIA:
     if keyword_set(aia) then begin
        read_tomgrid_and_define_fitgrid,fl_dir=fl_dir,instr_string='aia'
        fitflag_aia_A = fltarr(N_fl        ) + default
@@ -144,6 +143,7 @@ pro fit_trace_data_samp, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                                    'fitgrid_aia'    ,ptr_new([ radmin_fit , radmax_fit , drad_fit , Npt_fit ]) )
     endif ; AIA
 
+    ; EUVIA:
     if keyword_set(euvia) then begin
        read_tomgrid_and_define_fitgrid,fl_dir=fl_dir,instr_string='euvia'
        fitflag_euvia_A = fltarr(N_fl        ) + default
