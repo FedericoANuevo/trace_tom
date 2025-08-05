@@ -1,5 +1,7 @@
 ; Calling sequence examples:
-; Ne3_analysis,/aia, /kcor, /open, plot_filename_suffix='Open',/positparam,/load, r_max=1.195
+; Ne3_analysis,/aia, /kcor, /open, plot_filename_suffix='Open_Test1',/positparam,/load, r_max=1.195,latlimits=[-50.,50.]
+; Ne3_analysis,/aia, /kcor, /open, plot_filename_suffix='Open_Test2',/positparam,       r_max=1.195,latlimits=[ 50.,90.]
+; Ne3_analysis,/aia, /kcor, /open, plot_filename_suffix='Open_2x2',/positparam,/load, r_max=1.195
 
 pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
                   plot_filename_suffix=plot_filename_suffix,$
@@ -23,7 +25,8 @@ pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
   
 ; Select dir where the structure is located (labeled after the selection of starting points) 
 ; field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI-PolFil/'
-  field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_2x2deg_HMI-PolFil/'
+; field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_2x2deg_HMI-PolFil/'
+  field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_1x1deg_HMI-PolFil/'
 ;===============================================================================================
 
   dir = '/data1/DATA/trace_tom_files/'+PROJECT_NAME+'/field_lines_geometry'+field_line_geometry_suffix_dir
@@ -116,7 +119,7 @@ endif
 ;tag_fullrange_kcor_A   = fltarr(N_fl) - 678.
  tag_pos_ucomp_A        = fltarr(N_fl) - 678.
 ;tag_fullrange_ucomp_A  = fltarr(N_fl) - 678.
-for ifl=0,N_fl-1 do begin
+for ifl=0L,N_fl-1 do begin
    if keyword_set(aia) then begin
       ifitpos_aia = where(reform((*trace_data.Ne_fit_aia)  (ifl,*)) gt 0. and *trace_data.rad_fit_aia le R_max)
       ifitrad_aia = where(*trace_data.rad_fit_aia le R_max) 
