@@ -41,8 +41,8 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
 ; set based on experience. These values may need
 ; to be changed. Also, expand if new instruments
 ; are added.
-; NOTE: for an instrument that varies its FoV a lot, lik Metis, we
-; will need a formula such as: Npt_max = 1.5 * Nrad.
+; NOTE: for an instrument that varies its FoV a lot, like Metis, we
+; will need a formula such as: Npt_max = 1.5 * (Irmax-Irmin)/dr.
   Npt_max_aia     =  40
   Npt_max_euvia   =  40
   Npt_max_euvib   =  40
