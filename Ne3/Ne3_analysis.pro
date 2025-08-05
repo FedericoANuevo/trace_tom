@@ -13,16 +13,16 @@ pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
 
 ;===============================================================================================
 ; Select the project to analyze:
-; PROJECT_NAME = 'CR2254'
-  PROJECT_NAME = 'CR2261'
+  PROJECT_NAME = 'CR2254'
+; PROJECT_NAME = 'CR2261'
   
 ; Select structure to read:
-; structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2254_prep.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp_sampled.sav'
-  structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2261_prep.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp_sampled.sav'
+  structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2254_prep.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp_sampled.sav'
+; structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2261_prep.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp_sampled.sav'
   
 ; Select dir where the structure is located (labeled after the selection of starting points) 
-  field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI-PolFil/'
-; field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_2x2deg_HMI-PolFil/'
+; field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI-PolFil/'
+  field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_2x2deg_HMI-PolFil/'
 ;===============================================================================================
 
   dir = '/data1/DATA/trace_tom_files/'+PROJECT_NAME+'/field_lines_geometry'+field_line_geometry_suffix_dir
@@ -162,7 +162,7 @@ green =  16
 
 ; Lat/Lon plots of FootPoints
 ;fig_dir = './'
-fig_dir = '~/Downloads/'
+;fig_dir = '~/Downloads/'
 fig_dir = dir 
 ps1,fig_dir+structure_filename+'_'+plot_filename_suffix+'.eps'
 np=1000
