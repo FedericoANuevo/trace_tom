@@ -218,7 +218,7 @@ if keyword_set(positparam) then begin
 endif
 
 ; Make an index array with the common elements of all ifl_INSTRUMENT_A
-                            ifl_A = indgen(N_fl) ; start index with ALL lines
+                            ifl_A = indgen(N_fl,/LONG) ; start index with ALL lines
 if keyword_set(aia)    then ifl_A = intersect(ifl_A,ifl_aia_A  )
 if keyword_set(kcor)   then ifl_A = intersect(ifl_A,ifl_kcor_A )
 if keyword_set(ucomp)  then ifl_A = intersect(ifl_A,ifl_ucomp_A)
