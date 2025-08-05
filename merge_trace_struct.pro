@@ -1,4 +1,4 @@
-;
+;;
 ; PURPOSE: This code merges the tracing of tomographic products based
 ; on data from different instruments along given AWSoM/FDIPS-PFSS fieldlines, and
 ; store all the information in a pointer structure. 
@@ -15,8 +15,22 @@
 ; FLAGS: one per allowed instrument, use those for which you want to
 ; merge results, provided in any order.
 ;
-; HISTORY: V1.0 FAN, IAFE, July 2025.
-
+; HISTORY: V1.0 AMV & FAN, CLaSP, October 2023.
+;          V1.1 AMV, IAFE, November 2023. Added Sampling, expanded to
+;          all instruments and performed overall polishing.
+;          V2.0 AMV, IAFE, January 2024. Added fit to tomographic resuls.
+;          V2.1 AMV, CLASP, May 2024. pointers for each instrument are
+;          defined only if its data is used.
+;          V2.2 FAN, CLASP, May 2024. Added WT and LDEM_FLAG to the
+;          traced result.
+;          V2.4 AMV, CLaSP, May 2024, expanded to include closed FL,
+;          added line-label to structure
+;          V3.0 FAN, IAFE, July 2025, Memory load optimization:
+;                          - Npt_max custom set for each instrument
+;                          - sampling of results at the median
+;                            location of the field line within each
+;                            tomographic cell.
+;;
 pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
                         aia=aia, euvia=euvia, euvib=euvib, eit=eit, $
                         mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2, $
