@@ -2,7 +2,29 @@
 ; PURPOSE: Performs analytical fits to tomographic products along each
 ; traced field line and stores results in the trace_data structure.
 ;
-; HISTORY: V1.0, FAN, July 25, IAFE.
+; HISTORY: V1.0, AMV, January 2024, IAFE.
+;          V1.1, AMV & FAN, January 2024, IAFE. Added Theil-Sen and R² metric.
+;          V1.2, AMV, January 2024, IAFE. Added Double-Power-Law for Mk4.
+;                                         Added fits' parameters to output structure.
+;                                         Added 2-PoweLaw fit for C2.
+;          V1.3, AMV, January 2024, IAFE. Added DPL fit for EUV.
+;                                         Added fitted function name
+;                                         and automated parameter
+;                                         storing in output structure.
+;          V1.4, AMV, January 2024, IAFE. Added <lambda_N> for all
+;                                         functional fits.
+;          V1.4.1, FAN, April 2024, IAFE. Added goto,skip_fit_aia
+;          and if indsamp[0] ne -1 then ...
+;          v1.4.1, FAN, May 2024, ClaSP. Change GOTO by IF
+;          v1.4.1, FAN, May 2024, ClaSP. Change scN_fit and scT_fit as
+;          a function of chisqr
+;          v1.4.2, FAN, May 2024, ClaSP. euvia keyword added.
+;          v2.0, AMV & FAN, May 2025, CLaSP, expanded to include closed fl.
+;                           involving many edits, new arrays, new subroutines.
+;          v3.0 FAN, IAFE, July 2025, Memory load optimization:
+;                          - undefine arrays after loading them into
+;                            the structure.
+;;
 
 pro fit_trace_data, aia=aia, euvia=euvia, euvib=euvib, eit=eit,$
                     mk4=mk4, kcor=kcor, ucomp=ucomp, lascoc2=lascoc2,$
