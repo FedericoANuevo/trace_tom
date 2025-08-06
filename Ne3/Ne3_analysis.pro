@@ -2,6 +2,7 @@
 ; Ne3_analysis,/aia, /kcor, /open, plot_filename_suffix='Open_Test1',/positparam,/load, r_max=1.195,latlimits=[-50.,50.]
 ; Ne3_analysis,/aia, /kcor, /open, plot_filename_suffix='Open_Test2',/positparam,       r_max=1.195,latlimits=[ 50.,90.]
 ; Ne3_analysis,/aia, /kcor, /open, plot_filename_suffix='Open_2x2',/positparam,/load, r_max=1.195
+; Ne3_analysis,/aia, /kcor, /ucomp, /closed, plot_filename_suffix='Closed_5x5',/positparam, /load
 
 pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
                   plot_filename_suffix=plot_filename_suffix,$
@@ -23,10 +24,12 @@ pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
 ; structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2254_prep.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp_sampled.sav'
   structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2261_prep.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp_sampled.sav'
   
-; Select dir where the structure is located (labeled after the selection of starting points) 
+; Select dir where the structure is located (labeled after the selection of starting points)
 ; field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI-PolFil/'
+; field_line_geometry_suffix_dir = '_aunifgrid_multirad_3x3deg_HMI-PolFil/'
+  field_line_geometry_suffix_dir = '_aunifgrid_multirad_1x1deg_HMI-PolFil/'
 ; field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_2x2deg_HMI-PolFil/'
-  field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_1x1deg_HMI-PolFil/'
+; field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_1x1deg_HMI-PolFil/'
 ;===============================================================================================
 
   dir = '/data1/DATA/trace_tom_files/'+PROJECT_NAME+'/field_lines_geometry'+field_line_geometry_suffix_dir
@@ -34,7 +37,7 @@ pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
 ; Load structure if so requested:
   if keyword_Set(loadstruct) then begin
      PRINT,'RESTORING THE POINTER-STRUCTURE'  
-     restore, filename = dir + structure_filename
+     restore, dir + structure_filename
      PRINT,'RESTORE COMPLETED'
   endif
 
