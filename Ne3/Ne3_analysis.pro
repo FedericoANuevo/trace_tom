@@ -2,7 +2,7 @@
 ; Ne3_analysis,/aia, /kcor, /open, plot_filename_suffix='Open_Test1',/positparam,/load, r_max=1.195,latlimits=[-50.,50.]
 ; Ne3_analysis,/aia, /kcor, /open, plot_filename_suffix='Open_Test2',/positparam,       r_max=1.195,latlimits=[ 50.,90.]
 ; Ne3_analysis,/aia, /kcor, /open, plot_filename_suffix='Open_2x2',/positparam,/load, r_max=1.195
-; Ne3_analysis,/aia, /kcor, /ucomp, /closed, plot_filename_suffix='Closed_5x5',/positparam, /load
+; Ne3_analysis,/aia, /kcor, /ucomp, /closed, plot_filename_suffix='Closed',/positparam, /load
 
 pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
                   plot_filename_suffix=plot_filename_suffix,$
@@ -27,7 +27,8 @@ pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
 ; Select dir where the structure is located (labeled after the selection of starting points)
 ; field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI-PolFil/'
 ; field_line_geometry_suffix_dir = '_aunifgrid_multirad_3x3deg_HMI-PolFil/'
-  field_line_geometry_suffix_dir = '_aunifgrid_multirad_1x1deg_HMI-PolFil/'
+  field_line_geometry_suffix_dir = '_aunifgrid_multirad-6h_3x3deg_HMI-PolFil/'
+; field_line_geometry_suffix_dir = '_aunifgrid_multirad_1x1deg_HMI-PolFil/'
 ; field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_2x2deg_HMI-PolFil/'
 ; field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_1x1deg_HMI-PolFil/'
 ;===============================================================================================
