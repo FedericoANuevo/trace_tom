@@ -6,16 +6,22 @@
 ; Ne3_analysis,/aia, /kcor, /ucomp, /closed, plot_filename_suffix='EQ-STR',/positparam, /load,latlimits=[-50.,50.]
 ; Ne3_analysis,/aia, /kcor, /open, plot_filename_suffix='NCH',/positparam,/load, r_max=1.195,latlimits=[ 50.,90.]
 ; Ne3_analysis,/aia, /kcor, /open, plot_filename_suffix='SCH',/positparam,       r_max=1.195,latlimits=[-90.,-50]
+; To test with RAAA66 results:
+; Ne3_analysis,/aia, /kcor, /ucomp, plot_filename_suffix='O+C_-60+60',/positparam, /load,latlimits=[-60.,60.],/histo
 pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
                   plot_filename_suffix=plot_filename_suffix,$
                   aia=aia, kcor=kcor, ucomp=ucomp,$
                   plotaia=plotaia, plotkcor=plotkcor, plotucomp=plotucomp,$
                   open=open,closed=closed,connect=connect,$
                   positparam=positparam, ilstep=ilstep, constep=constep,$
-                  r_max=r_max, only_loops=only_loops, loadstruct=loadstruct
+                  r_max=r_max, only_loops=only_loops, loadstruct=loadstruct,$
+                  histo = histo
 
 
  common datastructure, trace_data
+
+  
+ 
 
 ;===============================================================================================
 ; Select the project to analyze:
@@ -30,9 +36,9 @@ pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
 ; field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI-PolFil/'
 ; field_line_geometry_suffix_dir = '_aunifgrid_multirad_3x3deg_HMI-PolFil/'
 ; field_line_geometry_suffix_dir = '_aunifgrid_multirad-6h_3x3deg_HMI-PolFil/'
-; field_line_geometry_suffix_dir = '_aunifgrid_multirad_1x1deg_HMI-PolFil/'
+  field_line_geometry_suffix_dir = '_aunifgrid_multirad_1x1deg_HMI-PolFil/'
 ; field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_2x2deg_HMI-PolFil/'
-  field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_1x1deg_HMI-PolFil/'
+; field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_1x1deg_HMI-PolFil/'
 ;===============================================================================================
 
   dir = '/data1/DATA/trace_tom_files/'+PROJECT_NAME+'/field_lines_geometry'+field_line_geometry_suffix_dir
@@ -40,7 +46,7 @@ pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
 ; Load structure if so requested:
   if keyword_Set(loadstruct) then begin
      PRINT,'RESTORING THE POINTER-STRUCTURE'  
-     restore, dir + structure_filename
+     restore, FILENAME = dir + structure_filename
      PRINT,'RESTORE COMPLETED'
   endif
 
@@ -257,8 +263,6 @@ if n_elements(indxneg_A) gt 1 then $
 oplot,(*trace_data.Footpoint_Lon)(indxneg_A),(*trace_data.Footpoint_Lat)(indxneg_A),psym=4,th=2,color=red
 
 
-; LLEGUÉ HASTA ACÁ ...
-
 ; Compute the average Ne(r) of each instrument for lines indexed ifl_A
 if keyword_set(aia) then begin
    Ne_fit_aia_Avg   = total((*trace_data.Ne_fit_aia)(ifl_A,*)   , 1 ) / float(n_elements(ifl_A)) 
@@ -340,8 +344,36 @@ if keyword_set(kcor)  then oplot,*trace_data.rad_fit_kcor ,Ne_fit_kcor_Avg /unit
 if keyword_set(ucomp) then oplot,*trace_data.rad_fit_ucomp,Ne_fit_ucomp_Avg/unit,color=color,th=8,linestyle=3
 loadct,0
 !p.multi=0
-ps2
 
+if keyword_set(histo) then begin
+   
+   Nifl = n_elements(ifl_A)
+   if keyword_set(aia) and keyword_set(ucomp) then ratio_ucomp_aia   = fltarr(Nifl) 
+   if keyword_set(aia) and keyword_set(kcor)  then ratio_aia_kcor    = fltarr(Nifl)
+   if keyword_set(kcor)and keyword_set(ucomp) then ratio_ucomp_kcor  = fltarr(Nifl)
+
+   if keyword_set(aia) and keyword_set(ucomp) then i_rmax = where(*trace_data.rad_fit_aia  eq r_max)
+   if keyword_set(aia) and keyword_set(kcor)  then i_rmax = where(*trace_data.rad_fit_aia  eq r_max)
+   if keyword_set(kcor)and keyword_set(ucomp) then i_rmax = where(*trace_data.rad_fit_kcor eq r_max)
+   
+   for ifl=0,Nifl-1  do begin
+      il = (ifl_A(ifl))(0)
+      if keyword_set(aia) and keyword_set(ucomp) then $
+         ratio_ucomp_aia(ifl) = mean( (*trace_data.Ne_fit_ucomp)(il,0:i_rmax)/ (*trace_data.Ne_fit_aia)(il,0:i_rmax))
+      if keyword_set(aia) and keyword_set(kcor)  then $
+         ratio_aia_kcor(ifl)  = mean( (*trace_data.Ne_fit_aia)  (il,0:i_rmax)/ (*trace_data.Ne_fit_kcor)(il,0:i_rmax))
+      if keyword_set(kcor)and keyword_set(ucomp)then $
+         ratio_ucomp_kcor(ifl)= mean( (*trace_data.Ne_fit_ucomp)(il,0:i_rmax)/  (*trace_data.Ne_fit_kcor)(il,0:i_rmax))
+   ENDFOR
+   if keyword_set(aia) and keyword_set(ucomp) then $
+      xhisto2,ratio_ucomp_aia,comp_suffix='ucomp_aia',sufijo=plot_filename_suffix,tit=plot_filename_suffix,histo_x_tit='<Ne!u(UCoMP)!n/Ne!u(AIA)!n>',Nvals =50, dir_fig ='./'
+   if keyword_set(kcor) and keyword_set(ucomp) then $
+      xhisto2,ratio_ucomp_kcor,comp_suffix='ucomp_kcor',sufijo=plot_filename_suffix,tit=plot_filename_suffix,histo_x_tit='<Ne!u(UCoMP)!n/Ne!u(KCOR)!n>',Nvals =50, dir_fig ='./'
+   if keyword_set(kcor) and keyword_set(aia) then $
+      xhisto2,ratio_aia_kcor,comp_suffix='aia_kcor',sufijo=plot_filename_suffix,tit=plot_filename_suffix,histo_x_tit='<Ne!u(AIA)!n/Ne!u(KCOR)!n>',Nvals =50, dir_fig ='./'
+endif
+
+PS2
 stop
 return
 end
@@ -360,3 +392,67 @@ return
 end
 
 
+pro xhisto2,vector,comp_suffix=comp_suffix,sufijo=sufijo,tit=tit,histo_x_tit=histo_x_tit,Nvals=Nvals,cleanstat=cleanstat,dir_fig=dir_fig,mini=mini,maxi=maxi
+
+  if not keyword_set(dir_fig) then dir_fig = '/data1/tomography/SolarTom_idl/Figures/'
+
+
+  if not keyword_set(mini) then mini = 0.1 
+  if not keyword_set(maxi) then maxi = 2.0
+
+  vector = vector > mini < maxi
+  
+;  mini      = min(vector)
+;  maxi      = max(vector)
+  delta     = (maxi-mini)/Nvals
+
+  histo_vector = histogram(vector,binsize=delta,locations=xval)
+  histo_vector = float(histo_vector) / float(n_elements(vector))
+
+  index = where( vector gt mini + delta and vector lt maxi)
+  v_cut = vector(index)
+
+  ; i1= where( vector ge mini and vector le mini + delta)
+  ; i2= where( vector ge maxi and vector le maxi + delta)
+  ; stop
+  
+  if not keyword_set(cleanstat) then begin
+     avg        =   mean(vector)
+     med        = median(vector)
+     stdv       =  stdev(vector)
+     stdev_frac =  stdev(vector)/abs(avg)
+  endif
+  
+  if keyword_set(cleanstat) then begin
+     avg        =   mean(v_cut)
+     med        = median(v_cut)
+     stdv       =  stdev(v_cut)
+     stdev_frac =  stdev(v_cut)/abs(avg) 
+  endif
+
+  print,'uncut - cut'
+  print,'mean',mean(vector), mean(v_cut)
+  print,'median',median(vector),median(v_cut)
+  print,'st. dev.',stdev(vector),stdev(v_cut)
+
+  
+; redondeo de med y stdv a dos cifras decimales
+  f    = 100.
+  med  = round(float(med)*f)/f
+  stdv = round(float(stdv)*f)/f
+
+  if med ge 1. then  med_str =strmid(string(med),6,4)
+  if med lt 1. then  med_str =strmid(string(med),5,4)
+  stdv_str=strmid(string(stdv),5,4)
+    
+  cant       = long(n_elements(vector))
+  name_fig   = 'comparison_'+comp_suffix+'_'+sufijo
+  name_fig   =  (STRJOIN(STRSPLIT(name_fig, /EXTRACT,'.'), '_'))
+  ps1,dir_fig+name_fig+'.eps'
+
+  plot,xval,histo_vector ,font=0,xtitle=histo_x_tit,title=tit,linestyle=8,psym=10,thick=4,charsize=2.2,xrange=[mini-0.1,maxi+0.1],xstyle=1
+  xyouts,0.7*[1,1,1,1],0.98-[0.18,0.25,0.32,0.38],['m='+med_str,'','!9s!3='+stdv_str,''],/normal,charthick=1,Font=0,charsize=2.2
+  !p.multi = 0
+     
+  return
+end
