@@ -282,10 +282,10 @@ endif
 ; Color-highlight all footpoints indicated by ifl_A accordind to their polarity
 indxpos_A = intersect(ifl_A,ifl_pos_A)
 if n_elements(indxpos_A) gt 1 then $
-oplot,(*trace_data.Footpoint_Lon)(indxpos_A),(*trace_data.Footpoint_Lat)(indxpos_A),psym=4,th=2,color=green
+oplot,(*trace_data.Footpoint_Lon)(indxpos_A),(*trace_data.Footpoint_Lat)(indxpos_A),psym=8,th=2,color=red
 indxneg_A = intersect(ifl_A,ifl_neg_A)
 if n_elements(indxneg_A) gt 1 then $
-oplot,(*trace_data.Footpoint_Lon)(indxneg_A),(*trace_data.Footpoint_Lat)(indxneg_A),psym=4,th=2,color=red
+oplot,(*trace_data.Footpoint_Lon)(indxneg_A),(*trace_data.Footpoint_Lat)(indxneg_A),psym=8,th=2,color=blue
 
 
 ; Compute the average Ne(r) of each instrument for lines indexed ifl_A
