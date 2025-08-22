@@ -18,21 +18,7 @@ pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
                   histo = histo, tit = tit
 
 
-  common datastructure, trace_data
-
-; set graph stuff                                                                                                                                                         
-device, retain     = 2
-device, true_color = 24
-device, decomposed = 0
-
-
-  
-;Create custom made symbol (psym=8) for scatter plots
-  N=25
-  A = FINDGEN(N) * (!PI*2/float(N-1))
-  f=2.
-  USERSYM, COS(A)/f, SIN(A)/f,/FILL
-
+ common datastructure, trace_data
 
   
  
@@ -190,25 +176,19 @@ blue  = 100
 red   = 200
 green =  16
 
-
-window,xs=800,ys=500
-
 ; Lat/Lon plots of FootPoints
  fig_dir = './'
 ;fig_dir = '~/Downloads/'
 ;fig_dir = dir 
-;ps1,fig_dir+structure_filename+'_'+plot_filename_suffix+'.eps'
+ps1,fig_dir+structure_filename+'_'+plot_filename_suffix+'.eps'
 np=1000
 !p.multi=[0,1,2]
 loadct,0
 !p.color=0
 !p.background=255
-csz=2.0
-cth=2.5
-xth=2.
-yth=2.
+csz=1
 
-opcl_str='open/closed '
+                            opcl_str='open/closed '
 if keyword_set(open)   then opcl_str='open '
 if keyword_set(closed) then opcl_str='closed '
 
@@ -216,10 +196,10 @@ if not keyword_set (tit) then title = 'Location of '+opcl_str+'footpoints'
 if     keyword_set (tit) then title = tit+' footpoints'
 
 plot,*trace_data.Footpoint_lon,*trace_data.Footpoint_lat,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=csz,$
-     title=title,ytitle='Carrington Latitude [deg]',xthick=xth,ythick=yth,CHARTHICK=cth,XTITLE='Carrington Longitude [deg]',font=1
-if not keyword_set(open) and not keyword_set(closed) then oplot,*trace_data.Footpoint_Lon                , *trace_data.Footpoint_Lat               ,psym=8
-if     keyword_set(open)                             then oplot,(*trace_data.Footpoint_Lon)(ifl_open_A)  ,(*trace_data.Footpoint_Lat)(ifl_open_A)  ,psym=8
-if                               keyword_set(closed) then oplot,(*trace_data.Footpoint_Lon)(ifl_closed_A),(*trace_data.Footpoint_Lat)(ifl_closed_A),psym=8
+     title=title,ytitle='Carrington Latitude [deg]',font=0
+if not keyword_set(open) and not keyword_set(closed) then oplot,*trace_data.Footpoint_Lon                , *trace_data.Footpoint_Lat               ,psym=4
+if     keyword_set(open)                             then oplot,(*trace_data.Footpoint_Lon)(ifl_open_A)  ,(*trace_data.Footpoint_Lat)(ifl_open_A)  ,psym=4
+if                               keyword_set(closed) then oplot,(*trace_data.Footpoint_Lon)(ifl_closed_A),(*trace_data.Footpoint_Lat)(ifl_closed_A),psym=4
 
 loadct,12
 
@@ -338,11 +318,11 @@ if keyword_set(aia) and keyword_set(kcor) and     keyword_set(ucomp) then $
 if keyword_set(aia) and	keyword_set(kcor) and not keyword_set(ucomp) then $
    title = '<N!De!N(r)>   Solid: AIA; Dashed: KCOR'
 
-plot,*trace_data.rad_fit_kcor,(*trace_data.Ne_fit_kcor)(0,*)/unit,charsize=csz,font=1,$
+plot,*trace_data.rad_fit_kcor,(*trace_data.Ne_fit_kcor)(0,*)/unit,charsize=csz,font=0,$
      title  = title,$
      ytitle = 'Ne(r) [x 10!U'+unit_power_str+'!N cm!U-3!N]',yr=yrange,ystyle=1,$
      xtitle = 'r [Rsun]'                                   ,xr=xrange,xstyle=1,$
-     /nodata,xthick=xth,ythick=yth,CHARTHICK=cth
+     /nodata
 
 if keyword_set(plotaia) or keyword_set(plotkcor) or keyword_set(plotucomp) then begin
 loadct,39
@@ -370,12 +350,12 @@ endif
 
 loadct,0
 color=0
-if keyword_set(aia)   then oplot,*trace_data.rad_fit_aia  ,Ne_fit_aia_Avg  /unit,color=color,th=3
-if keyword_set(kcor)  then oplot,*trace_data.rad_fit_kcor ,Ne_fit_kcor_Avg /unit,color=color,th=3,linestyle=2
-if keyword_set(ucomp) then oplot,*trace_data.rad_fit_ucomp,Ne_fit_ucomp_Avg/unit,color=color,th=3,linestyle=3
+if keyword_set(aia)   then oplot,*trace_data.rad_fit_aia  ,Ne_fit_aia_Avg  /unit,color=color,th=8
+if keyword_set(kcor)  then oplot,*trace_data.rad_fit_kcor ,Ne_fit_kcor_Avg /unit,color=color,th=8,linestyle=2
+if keyword_set(ucomp) then oplot,*trace_data.rad_fit_ucomp,Ne_fit_ucomp_Avg/unit,color=color,th=8,linestyle=3
 loadct,0
 !p.multi=0
-record_jpg,fig_dir,structure_filename+'_'+plot_filename_suffix+'.jpg'
+
 if keyword_set(histo) then begin
    
    Nifl = n_elements(ifl_A)
@@ -485,19 +465,5 @@ pro xhisto2,vector,comp_suffix=comp_suffix,sufijo=sufijo,tit=tit,histo_x_tit=his
   xyouts,0.7*[1,1,1,1],0.98-[0.18,0.25,0.32,0.38],['m='+med_str,'','!9s!3='+stdv_str,''],/normal,charthick=1,Font=0,charsize=2.2
   !p.multi = 0
      
-  return
-end
-
-
-pro record_jpg,dir,filename
-
-; set graph stuff                                                                                                                                                                             
-;  device, retain     = 2
-;  device, true_color = 24
-;  device, decomposed = 0
-
-  image24 = TVRD(True=1)
-  image2d = Color_Quan(image24, 1, r, g, b)
-  write_jpeg,dir+filename,image24,quality=100,true=1
   return
 end
