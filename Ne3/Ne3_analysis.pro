@@ -15,7 +15,7 @@ pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
                   open=open,closed=closed,connect=connect,$
                   positparam=positparam, ilstep=ilstep, constep=constep,$
                   r_max=r_max, only_loops=only_loops, loadstruct=loadstruct,$
-                  histo = histo
+                  histo = histo, tit = tit
 
 
  common datastructure, trace_data
@@ -25,12 +25,12 @@ pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
 
 ;===============================================================================================
 ; Select the project to analyze:
-; PROJECT_NAME = 'CR2254'
-  PROJECT_NAME = 'CR2261'
+  PROJECT_NAME = 'CR2254'
+; PROJECT_NAME = 'CR2261'
   
 ; Select structure to read:
-; structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2254_prep.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp_sampled.sav'
-  structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2261_prep.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp_sampled.sav'
+  structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2254_prep.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp_sampled.sav'
+; structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2261_prep.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp_sampled.sav'
   
 ; Select dir where the structure is located (labeled after the selection of starting points)
 ; field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI-PolFil/'
@@ -187,11 +187,16 @@ loadct,0
 !p.color=0
 !p.background=255
 csz=1
+
                             opcl_str='open/closed '
 if keyword_set(open)   then opcl_str='open '
 if keyword_set(closed) then opcl_str='closed '
+
+if not keyword_set (tit) then title = 'Location of '+opcl_str+'footpoints'
+if     keyword_set (tit) then title = tit+' footpoints'
+
 plot,*trace_data.Footpoint_lon,*trace_data.Footpoint_lat,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=csz,$
-     title='Location of '+opcl_str+'footpoints',ytitle='Carrington Latitude [deg]',font=0
+     title=title,ytitle='Carrington Latitude [deg]',font=0
 if not keyword_set(open) and not keyword_set(closed) then oplot,*trace_data.Footpoint_Lon                , *trace_data.Footpoint_Lat               ,psym=4
 if     keyword_set(open)                             then oplot,(*trace_data.Footpoint_Lon)(ifl_open_A)  ,(*trace_data.Footpoint_Lat)(ifl_open_A)  ,psym=4
 if                               keyword_set(closed) then oplot,(*trace_data.Footpoint_Lon)(ifl_closed_A),(*trace_data.Footpoint_Lat)(ifl_closed_A),psym=4
@@ -307,8 +312,14 @@ if keyword_set(ucomp) then begin
    if yrflag ne -1. then yrange = [min([miny,yrange(0)]),max([maxy,max(yrange(1))])]
    yrflag = +1
 endif
+
+if keyword_set(aia) and keyword_set(kcor) and     keyword_set(ucomp) then $
+   title = '<N!De!N(r)>   Solid: AIA; Dashed: KCOR; Dot-Dashed: UCoMP'
+if keyword_set(aia) and	keyword_set(kcor) and not keyword_set(ucomp) then $
+   title = '<N!De!N(r)>   Solid: AIA; Dashed: KCOR'
+
 plot,*trace_data.rad_fit_kcor,(*trace_data.Ne_fit_kcor)(0,*)/unit,charsize=csz,font=0,$
-     title  = '<N!De!N(r)>   Solid: AIA; Dashed: KCOR; Dot-Dashed: UCoMP',$
+     title  = title,$
      ytitle = 'Ne(r) [x 10!U'+unit_power_str+'!N cm!U-3!N]',yr=yrange,ystyle=1,$
      xtitle = 'r [Rsun]'                                   ,xr=xrange,xstyle=1,$
      /nodata
@@ -349,7 +360,7 @@ if keyword_set(histo) then begin
    
    Nifl = n_elements(ifl_A)
    if keyword_set(aia) and keyword_set(ucomp) then ratio_ucomp_aia   = fltarr(Nifl) 
-   if keyword_set(aia) and keyword_set(kcor)  then ratio_aia_kcor    = fltarr(Nifl)
+   if keyword_set(aia) and keyword_set(kcor)  then ratio_kcor_aia    = fltarr(Nifl)
    if keyword_set(kcor)and keyword_set(ucomp) then ratio_ucomp_kcor  = fltarr(Nifl)
 
    if keyword_set(aia) and keyword_set(ucomp) then i_rmax = where(*trace_data.rad_fit_aia  eq r_max)
@@ -361,16 +372,16 @@ if keyword_set(histo) then begin
       if keyword_set(aia) and keyword_set(ucomp) then $
          ratio_ucomp_aia(ifl) = mean( (*trace_data.Ne_fit_ucomp)(il,0:i_rmax)/ (*trace_data.Ne_fit_aia)(il,0:i_rmax))
       if keyword_set(aia) and keyword_set(kcor)  then $
-         ratio_aia_kcor(ifl)  = mean( (*trace_data.Ne_fit_aia)  (il,0:i_rmax)/ (*trace_data.Ne_fit_kcor)(il,0:i_rmax))
+         ratio_kcor_aia(ifl)  = mean( (*trace_data.Ne_fit_kcor)  (il,0:i_rmax)/ (*trace_data.Ne_fit_aia)(il,0:i_rmax))
       if keyword_set(kcor)and keyword_set(ucomp)then $
          ratio_ucomp_kcor(ifl)= mean( (*trace_data.Ne_fit_ucomp)(il,0:i_rmax)/  (*trace_data.Ne_fit_kcor)(il,0:i_rmax))
    ENDFOR
    if keyword_set(aia) and keyword_set(ucomp) then $
-      xhisto2,ratio_ucomp_aia,comp_suffix='ucomp_aia',sufijo=plot_filename_suffix,tit=plot_filename_suffix,histo_x_tit='<Ne!u(UCoMP)!n/Ne!u(AIA)!n>',Nvals =50, dir_fig ='./'
+      xhisto2,ratio_ucomp_aia,comp_suffix='ucomp_aia',sufijo=plot_filename_suffix,tit=tit ,histo_x_tit='<Ne!u(UCoMP)!n/Ne!u(AIA)!n>',Nvals =50, dir_fig ='./'
    if keyword_set(kcor) and keyword_set(ucomp) then $
-      xhisto2,ratio_ucomp_kcor,comp_suffix='ucomp_kcor',sufijo=plot_filename_suffix,tit=plot_filename_suffix,histo_x_tit='<Ne!u(UCoMP)!n/Ne!u(KCOR)!n>',Nvals =50, dir_fig ='./'
+      xhisto2,ratio_ucomp_kcor,comp_suffix='ucomp_kcor',sufijo=plot_filename_suffix,tit=tit,histo_x_tit='<Ne!u(UCoMP)!n/Ne!u(KCOR)!n>',Nvals =50, dir_fig ='./'
    if keyword_set(kcor) and keyword_set(aia) then $
-      xhisto2,ratio_aia_kcor,comp_suffix='aia_kcor',sufijo=plot_filename_suffix,tit=plot_filename_suffix,histo_x_tit='<Ne!u(AIA)!n/Ne!u(KCOR)!n>',Nvals =50, dir_fig ='./'
+      xhisto2,ratio_kcor_aia,comp_suffix='aia_kcor',sufijo=plot_filename_suffix,tit=tit,histo_x_tit='<Ne!u(KCOR)!n/Ne!u(AIA)!n>',Nvals =50, dir_fig ='./'
 endif
 
 PS2
