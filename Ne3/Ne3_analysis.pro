@@ -30,7 +30,7 @@ device, decomposed = 0
 ;Create custom made symbol (psym=8) for scatter plots
   N=25
   A = FINDGEN(N) * (!PI*2/float(N-1))
-  f=2.
+  f=2.*0.25
   USERSYM, COS(A)/f, SIN(A)/f,/FILL
 
 
@@ -50,9 +50,9 @@ device, decomposed = 0
 ; field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI-PolFil/'
 ; field_line_geometry_suffix_dir = '_aunifgrid_multirad_3x3deg_HMI-PolFil/'
 ; field_line_geometry_suffix_dir = '_aunifgrid_multirad-6h_3x3deg_HMI-PolFil/'
-  field_line_geometry_suffix_dir = '_aunifgrid_multirad_1x1deg_HMI-PolFil/'
+; field_line_geometry_suffix_dir = '_aunifgrid_multirad_1x1deg_HMI-PolFil/'
 ; field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_2x2deg_HMI-PolFil/'
-; field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_1x1deg_HMI-PolFil/'
+  field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_1x1deg_HMI-PolFil/'
 ;===============================================================================================
 
   dir = '/data1/DATA/trace_tom_files/'+PROJECT_NAME+'/field_lines_geometry'+field_line_geometry_suffix_dir
@@ -191,7 +191,7 @@ red   = 200
 green =  16
 
 
-window,xs=800,ys=500
+window,xs=1500,ys=1200
 
 ; Lat/Lon plots of FootPoints
  fig_dir = './'
@@ -203,8 +203,8 @@ np=1000
 loadct,0
 !p.color=0
 !p.background=255
-csz=2.0
-cth=2.5
+csz=4.0
+cth=4.0
 xth=2.
 yth=2.
 
@@ -370,9 +370,9 @@ endif
 
 loadct,0
 color=0
-if keyword_set(aia)   then oplot,*trace_data.rad_fit_aia  ,Ne_fit_aia_Avg  /unit,color=color,th=3
-if keyword_set(kcor)  then oplot,*trace_data.rad_fit_kcor ,Ne_fit_kcor_Avg /unit,color=color,th=3,linestyle=2
-if keyword_set(ucomp) then oplot,*trace_data.rad_fit_ucomp,Ne_fit_ucomp_Avg/unit,color=color,th=3,linestyle=3
+if keyword_set(aia)   then oplot,*trace_data.rad_fit_aia  ,Ne_fit_aia_Avg  /unit,color=color,th=5
+if keyword_set(kcor)  then oplot,*trace_data.rad_fit_kcor ,Ne_fit_kcor_Avg /unit,color=color,th=5,linestyle=2
+if keyword_set(ucomp) then oplot,*trace_data.rad_fit_ucomp,Ne_fit_ucomp_Avg/unit,color=color,th=5,linestyle=3
 loadct,0
 !p.multi=0
 record_jpg,fig_dir,structure_filename+'_'+plot_filename_suffix+'.jpg'
@@ -402,9 +402,10 @@ if keyword_set(histo) then begin
       xhisto2,ratio_ucomp_kcor,comp_suffix='ucomp_kcor',sufijo=plot_filename_suffix,tit=tit,histo_x_tit='<Ne!u(UCoMP)!n/Ne!u(KCOR)!n>',Nvals =50, dir_fig ='./'
    if keyword_set(kcor) and keyword_set(aia) then $
       xhisto2,ratio_kcor_aia,comp_suffix='aia_kcor',sufijo=plot_filename_suffix,tit=tit,histo_x_tit='<Ne!u(KCOR)!n/Ne!u(AIA)!n>',Nvals =50, dir_fig ='./'
+PS2
 endif
 
-PS2
+
 stop
 return
 end

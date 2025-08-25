@@ -21,7 +21,11 @@ pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
  common datastructure, trace_data
 
   
- 
+;Create custom made symbol (psym=8) for scatter plots
+  N=25
+  A = FINDGEN(N) * (!PI*2/float(N-1))
+  f=2.
+  USERSYM, COS(A)/f, SIN(A)/f,/FILL 
 
 ;===============================================================================================
 ; Select the project to analyze:
@@ -36,9 +40,9 @@ pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
 ; field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI-PolFil/'
 ; field_line_geometry_suffix_dir = '_aunifgrid_multirad_3x3deg_HMI-PolFil/'
 ; field_line_geometry_suffix_dir = '_aunifgrid_multirad-6h_3x3deg_HMI-PolFil/'
-  field_line_geometry_suffix_dir = '_aunifgrid_multirad_1x1deg_HMI-PolFil/'
+; field_line_geometry_suffix_dir = '_aunifgrid_multirad_1x1deg_HMI-PolFil/'
 ; field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_2x2deg_HMI-PolFil/'
-; field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_1x1deg_HMI-PolFil/'
+  field_line_geometry_suffix_dir = '_aunifgrid_2.50Rs_1x1deg_HMI-PolFil/'
 ;===============================================================================================
 
   dir = '/data1/DATA/trace_tom_files/'+PROJECT_NAME+'/field_lines_geometry'+field_line_geometry_suffix_dir
@@ -196,10 +200,10 @@ if not keyword_set (tit) then title = 'Location of '+opcl_str+'footpoints'
 if     keyword_set (tit) then title = tit+' footpoints'
 
 plot,*trace_data.Footpoint_lon,*trace_data.Footpoint_lat,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=csz,$
-     title=title,ytitle='Carrington Latitude [deg]',font=0
-if not keyword_set(open) and not keyword_set(closed) then oplot,*trace_data.Footpoint_Lon                , *trace_data.Footpoint_Lat               ,psym=4
-if     keyword_set(open)                             then oplot,(*trace_data.Footpoint_Lon)(ifl_open_A)  ,(*trace_data.Footpoint_Lat)(ifl_open_A)  ,psym=4
-if                               keyword_set(closed) then oplot,(*trace_data.Footpoint_Lon)(ifl_closed_A),(*trace_data.Footpoint_Lat)(ifl_closed_A),psym=4
+     title=title,ytitle='Carrington Latitude [deg]',xtitle='Carrington Longitude [deg]',font=0
+if not keyword_set(open) and not keyword_set(closed) then oplot,*trace_data.Footpoint_Lon                , *trace_data.Footpoint_Lat               ,psym=8
+if     keyword_set(open)                             then oplot,(*trace_data.Footpoint_Lon)(ifl_open_A)  ,(*trace_data.Footpoint_Lat)(ifl_open_A)  ,psym=8
+if                               keyword_set(closed) then oplot,(*trace_data.Footpoint_Lon)(ifl_closed_A),(*trace_data.Footpoint_Lat)(ifl_closed_A),psym=8
 
 loadct,12
 
@@ -262,10 +266,10 @@ endif
 ; Color-highlight all footpoints indicated by ifl_A accordind to their polarity
 indxpos_A = intersect(ifl_A,ifl_pos_A)
 if n_elements(indxpos_A) gt 1 then $
-oplot,(*trace_data.Footpoint_Lon)(indxpos_A),(*trace_data.Footpoint_Lat)(indxpos_A),psym=4,th=2,color=green
+oplot,(*trace_data.Footpoint_Lon)(indxpos_A),(*trace_data.Footpoint_Lat)(indxpos_A),psym=8,th=2,color=red
 indxneg_A = intersect(ifl_A,ifl_neg_A)
 if n_elements(indxneg_A) gt 1 then $
-oplot,(*trace_data.Footpoint_Lon)(indxneg_A),(*trace_data.Footpoint_Lat)(indxneg_A),psym=4,th=2,color=red
+oplot,(*trace_data.Footpoint_Lon)(indxneg_A),(*trace_data.Footpoint_Lat)(indxneg_A),psym=8,th=2,color=blue
 
 
 ; Compute the average Ne(r) of each instrument for lines indexed ifl_A
