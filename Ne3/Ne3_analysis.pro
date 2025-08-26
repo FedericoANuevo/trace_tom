@@ -401,7 +401,7 @@ if keyword_set(histo) then begin
    if keyword_set(kcor) and keyword_set(ucomp) then $
       xhisto2,ratio_ucomp_kcor,comp_suffix='ucomp_kcor',sufijo=plot_filename_suffix,tit=tit,histo_x_tit='<Ne!u(UCoMP)!n/Ne!u(KCOR)!n>',Nvals =50, dir_fig ='./'
    if keyword_set(kcor) and keyword_set(aia) then $
-      xhisto2,ratio_kcor_aia,comp_suffix='aia_kcor',sufijo=plot_filename_suffix,tit=tit,histo_x_tit='<Ne!u(KCOR)!n/Ne!u(AIA)!n>',Nvals =50, dir_fig ='./'
+      xhisto2,ratio_kcor_aia,comp_suffix='kcor_aia',sufijo=plot_filename_suffix,tit=tit,histo_x_tit='<Ne!u(KCOR)!n/Ne!u(AIA)!n>',Nvals =50, dir_fig ='./'
 PS2
 endif
 

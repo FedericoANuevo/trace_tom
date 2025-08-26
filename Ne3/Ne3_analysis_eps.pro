@@ -29,12 +29,12 @@ pro Ne3_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
 
 ;===============================================================================================
 ; Select the project to analyze:
-  PROJECT_NAME = 'CR2254'
-; PROJECT_NAME = 'CR2261'
+; PROJECT_NAME = 'CR2254'
+  PROJECT_NAME = 'CR2261'
   
 ; Select structure to read:
-  structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2254_prep.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp_sampled.sav'
-; structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2261_prep.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp_sampled.sav'
+; structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2254_prep.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp_sampled.sav'
+  structure_filename='fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2261_prep.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_kcor_ucomp_sampled.sav'
   
 ; Select dir where the structure is located (labeled after the selection of starting points)
 ; field_line_geometry_suffix_dir = '_aunifgrid_multirad_5x5deg_HMI-PolFil/'
@@ -385,7 +385,7 @@ if keyword_set(histo) then begin
    if keyword_set(kcor) and keyword_set(ucomp) then $
       xhisto2,ratio_ucomp_kcor,comp_suffix='ucomp_kcor',sufijo=plot_filename_suffix,tit=tit,histo_x_tit='<Ne!u(UCoMP)!n/Ne!u(KCOR)!n>',Nvals =50, dir_fig ='./'
    if keyword_set(kcor) and keyword_set(aia) then $
-      xhisto2,ratio_kcor_aia,comp_suffix='aia_kcor',sufijo=plot_filename_suffix,tit=tit,histo_x_tit='<Ne!u(KCOR)!n/Ne!u(AIA)!n>',Nvals =50, dir_fig ='./'
+      xhisto2,ratio_kcor_aia,comp_suffix='kcor_aia',sufijo=plot_filename_suffix,tit=tit,histo_x_tit='<Ne!u(KCOR)!n/Ne!u(AIA)!n>',Nvals =50, dir_fig ='./'
 endif
 
 PS2
