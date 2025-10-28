@@ -7,6 +7,7 @@
 ; tom_trace_call, /demt , /trace_Bs
 ; tom_trace_call, /ucomp, /trace_Bs
 ; tom_trace_call, /kcor , /trace_Bs
+; tom_trace_call, /lasco, /trace_Bs
 ;
 ; HISTORY: V1.0 FAN & AMV, CLaSP, October 2023.
 ;          V1.1 AMV, CLaSP, May-2025, centralized and clearer dir structure.
@@ -21,17 +22,19 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
 ;===============================================================================================
 ; Define PROJECT_NAME, a string suffix to construct the full PATHS to the required files.
 ; PROJECT_NAME = 'CR2254'
-  PROJECT_NAME = 'CR2261'
-
+; PROJECT_NAME = 'CR2261'
+  PROJECT_NAME = 'April24'
 ; Define field_line_geometry_suffix_dir
 ; field_line_geometry_suffix_dir='_aunifgrid_multirad-6h_3x3deg_HMI-PolFil/'
-  field_line_geometry_suffix_dir='_aunifgrid_2.50Rs_0.5x0.5deg_HMI-PolFil/'
+; field_line_geometry_suffix_dir='_aunifgrid_2.50Rs_0.5x0.5deg_HMI-PolFil/'
+  field_line_geometry_suffix_dir='_equatorial-ring/'
   
 ; Provide FL_LIST, the file which informs the number of field lines and the
 ; filenames of the ASCII files containing the geometry of each line.
 ;
 ; fl_list = 'fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2254_prep.ubdat_fline-filenames_list.txt'
-  fl_list = 'fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2261_prep.ubdat_fline-filenames_list.txt'
+; fl_list = 'fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2261_prep.ubdat_fline-filenames_list.txt'
+  fl_list = 'Bfield_AWSoM_April24.ubdat_fline-filenames_list.txt'
 ;===============================================================================================
 
 ; --------------------This block should not require edits.---------------------------
@@ -55,19 +58,19 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
     ;tom_file = 'LDEM.CR2099_aia_Hollow_3Bands_gauss1_lin_Norm-median_singlStart' & instr = 'aia'
     ;tom_file = 'CR2099_AIA_compound1.dat'    & instr = 'aia'
     ;tom_file = 'CR2099_AIA_compound2.dat'    & instr = 'aia'
-    ;tom_file = 'LDEM.April-2024_aia_Hollow_3Bands_gauss1_lin_Norm-median_singlStart' & instr = 'aia'
+     tom_file = 'LDEM.April-2024_aia_Hollow_3Bands_gauss1_lin_Norm-median_singlStart'
      if PROJECT_NAME eq 'CR2254' then $
         tom_file = 'LDEM.feb-mar_2022_segment2_aia_Hollow_3Bands_ucomp_comparison_gauss1_lin_Norm-median_singlStart'
      if PROJECT_NAME eq 'CR2261' then $
         tom_file = 'LDEM.chip07_aia_Hollow_3Bands_ucomp_comparison_exp2_gauss1_lin_Norm-median_singlStart'
      instr    = 'aia'
-     nr       = 21   ;30
-     nt       = 60   ;90
+     nr       = 30   ;21   
+     nt       = 90   ;60  
      np       = 2*nt
-     rmin     = 1.09 ;1.0
-     rmax     = 1.30 ;1.3
-     Irmin    = 1.09 ;1.02
-     Irmax    = 1.25 ;1.25
+     rmin     = 1.0  ;1.09 
+     rmax     = 1.3  ;1.30 
+     Irmin    = 1.02 ;1.09 
+     Irmax    = 1.25 ;1.25 
      tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_list=fl_list,$
                nr=nr,nt=nt,np=np,rmin=rmin,rmax=rmax,Irmin=Irmin,Irmax=Irmax,trace_Bs=trace_Bs
   endif
@@ -75,7 +78,7 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
   if keyword_set(lasco) then begin
     ;tom_file = 'x_LascoC2pB_CR2099_shifted_std-grid_Rmin2.5_Rmax8.5_IRmin2.5_IRmax6.0_60x60x120_BF4_L6.e-6'
     ;tom_file = 'x_LascoC2pB_CR2082_Rmin2.5_Rmax8.5_IRmin2.5_IRmax6.0_60x60x120_BF4_L8.2e-6'
-    ;tom_file = 'x_LascoC2pB_April-2024_Rmin2.5_Rmax8.5_IRmin2.5_IRmax6.0_60x60x120_BF4_L1.1e-5'
+     tom_file = 'x_LascoC2pB_April-2024_Rmin2.5_Rmax8.5_IRmin2.5_IRmax6.0_60x60x120_BF4_L1.1e-5'
      instr    = 'lascoc2'
      nr       = 60
      nt       = 60
@@ -85,7 +88,7 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
      Irmin    = 2.5
      Irmax    = 6.0
      tom_trace,instr=instr,tom_dir=tom_dir,tom_file=tom_file,fl_dir=fl_dir,fl_list=fl_list,$
-               nr=nr,nt=nt,np=np,rmin=rmin,rmax=rmax,Irmin=Irmin,Irmax=Irmax,/csv,trace_Bs=trace_Bs
+               nr=nr,nt=nt,np=np,rmin=rmin,rmax=rmax,Irmin=Irmin,Irmax=Irmax,trace_Bs=trace_Bs
   endif
 
   if keyword_set(kcor_mk4) then begin

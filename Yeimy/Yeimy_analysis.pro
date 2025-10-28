@@ -250,13 +250,13 @@ if keyword_set(aia) then begin
    loadct,0
    unit           = 1.e8        ; cm-3
    unit_power_str =   '8'
-   xrange = [1.02,1.2]
+   xrange = [1.02,1.25]
    yrflag = -1
    r    = rad_fit_aia_A
    f    = Ne_fit_aia_Avg/unit
    miny = min(f(where(f gt 0. and r le max(xrange))))
    maxy = max(f(where(f gt 0. and r le max(xrange))))
-   yrange = [miny,maxy]
+   yrange = [miny*0.5,maxy*2.0]
    yrflag = +1
    plot,rad_fit_AiA_A,Ne_fit_AIA_A(0,*)/unit,charsize=csz,font=0,$
         title='<N!De!N(r)>   Solid: AIA',$
@@ -318,11 +318,12 @@ endif
 
 loadct,0
 color = 0
-if keyword_set(lascoc2) and n_elements(ifl_A) gt 1  then oplot,rad_fit_c2_A  ,Ne_fit_c2_Avg  /unit,color=color,th=8
+if keyword_set(aia)     and n_elements(ifl_A) gt 1  then oplot,rad_fit_aia_A  ,Ne_fit_aia_Avg  /unit,color=color,th=8
+if keyword_set(lascoc2) and n_elements(ifl_A) gt 1  then oplot,rad_fit_c2_A  ,Ne_fit_c2_Avg    /unit,color=color,th=8
 loadct,0
 
 if keyword_set(aia) then begin
-yrange = [min(Tm_fit_aia_Avg)/1.e6,max(Tm_fit_aia_Avg)/1.e6]
+yrange = [min(Tm_fit_aia_Avg)/1.e6*0.5,max(Tm_fit_aia_Avg)/1.e6*2.]
 plot,rad_fit_AiA_A,Tm_fit_AIA_A(0,*)/unit,charsize=csz,font=0,$
      title='<T!Dm!N(r)>   Solid: AIA',$
      ytitle = 'Tm(r) [MK]',yr=yrange,ystyle=1,$
@@ -348,7 +349,7 @@ endif
 
 loadct,0
 color =0
-if keyword_set(aia) and  n_elements(ifl_A) gt 1 then oplot,rad_fit_aia_A  ,Tm_fit_aia_Avg/1.e6,color=color,th=2
+if keyword_set(aia) and  n_elements(ifl_A) gt 1 then oplot,rad_fit_aia_A  ,Tm_fit_aia_Avg/1.e6,color=color,th=6
 loadct,0
 
 
