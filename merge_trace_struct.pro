@@ -534,7 +534,7 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
         if indsamp[0] ne -1 then begin
            Nl_samp                  = n_elements(indsamp)
            Npt_c2    (i_fl)         = Nl_samp        
-           Ne_c2_A   (i_fl,0:Nl_samp-1) = Ne_c2_l
+           Ne_c2_A   (i_fl,0:Nl_samp-1) = Ne_c2_l(indsamp)
            rad_c2_A  (i_fl,0:Nl_samp-1) = rad_l(indsamp)
            lat_c2_A  (i_fl,0:Nl_samp-1) = lat_l(indsamp)
            lon_c2_A  (i_fl,0:Nl_samp-1) = lon_l(indsamp)
