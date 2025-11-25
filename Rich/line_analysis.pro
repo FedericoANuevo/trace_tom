@@ -1,0 +1,102 @@
+
+pro line_analysis, bin = bin
+  
+;===============================================================================================
+; Select the project to analyze:
+  PROJECT_NAME = 'April24'
+  
+; Select structure to read:
+  structure_filename='Bfield_AWSoM_April24.ubdat_fline-filenames_list.txt-tracing-structure-merge_aia_lascoc2_sampled.sav'
+  
+; Select dir where the structure is located (labeled after the selection of starting points)
+  field_line_geometry_suffix_dir = '_equatorial-ring/'
+;===============================================================================================
+
+  dir = '/data1/DATA/trace_tom_files/'+PROJECT_NAME+'/field_lines_geometry'+field_line_geometry_suffix_dir
+  
+  PRINT,'RESTORING THE POINTER-STRUCTURE'  
+  restore, FILENAME = dir + structure_filename
+  PRINT,'RESTORE COMPLETED'
+
+  
+  N_fl        = *trace_data.N_fl
+  fitflag_aia = *trace_data.FITFLAG_AIA
+  scN_fit_aia = *trace_data.scN_fit_aia
+  scT_fit_aia = *trace_data.scT_fit_aia
+  fitflag_c2  = *trace_data.FITFLAG_c2
+  scN_fit_c2  = *trace_data.scN_fit_c2
+
+
+; Criterio 1). Que hayan pasado test-coverage  
+  i_aia_cov = where(fitflag_aia eq 1.)
+  i_c2_cov  = where(fitflag_c2  eq 1.)  
+  i_cov     = intersect(i_aia_cov,i_c2_cov)
+  i_cov_test= where(fitflag_aia eq 1. and fitflag_c2 eq 1.)
+
+; Criterio 2). Low chi^2 en los ajustes   
+  scN_crit = 0.25
+  scT_crit = 0.25
+  i_aia_fit = where(fitflag_aia eq 1. and scN_fit_aia lt scN_crit and scT_fit_aia lt  scT_crit)  
+  i_c2_fit  = where(fitflag_c2  eq 1. and scN_fit_c2  lt scN_crit                             )  
+  i_fit = intersect(i_aia_fit,i_c2_fit)
+
+; Criterio 3) Que la field-line no atraviese ninguna celda
+; no-recontruida (ZDA o AEV).
+  
+  tag_clean     = fltarr(N_fl)
+  tag_clean_aia = fltarr(N_fl) + 1.
+  tag_clean_c2  = fltarr(N_fl) + 1.
+  for ifl=0,N_fl-1 do begin
+     Nsamp   = (*trace_data.Npt_aia)(ifl)
+     radsamp = reform((*trace_data.rad_aia)(ifl,0:Nsamp-1))
+     Nesamp  = reform((*trace_data.Ne_aia) (ifl,0:Nsamp-1))
+     Tmsamp  = reform((*trace_data.Tm_aia) (ifl,0:Nsamp-1))
+     rad_fit_aia = *trace_data.rad_fit_aia
+     rad_grid = 1.02 + findgen(24)*0.01
+     for ir = 0, 24-2 do begin
+        index = where( radsamp gt rad_grid(ir) and radsamp lt rad_grid(ir+1))
+        if index(0) eq -1 then tag_clean_aia(ifl) = 0.
+     endfor
+  endfor
+  for ifl=0,N_fl-1 do begin
+     Nsamp   = (*trace_data.Npt_c2)(ifl)
+     radsamp = reform((*trace_data.rad_c2)(ifl,0:Nsamp-1))
+     Nesamp  = reform((*trace_data.Ne_c2)(ifl,0:Nsamp-1))
+     rad_fit_c2 = *trace_data.rad_fit_c2
+     rad_grid = 2.5 + findgen(36)*0.1
+     for ir = 0, 36-2 do begin
+        index = where( radsamp gt rad_grid(ir) and radsamp lt rad_grid(ir+1))
+        if index(0) eq -1 then tag_clean_c2(ifl) = 0.
+     endfor
+  endfor
+  i_aia_clean = where(tag_clean_aia eq 1.)
+  i_c2_clean  = where(tag_clean_c2  eq 1.)
+  i_clean = intersect(i_aia_clean,i_c2_clean)
+  tag_clean(i_clean) = 1.
+
+; Analisis por bin de starting-point en long.
+  stlon = *trace_data.termpoint_lon
+  stlon_clean = stlon(i_clean)
+  stlon_fit   = stlon(i_fit)
+  if not keyword_set(bin) then bin = 2.
+  Nlon= 360/bin
+  lon_grid = findgen(Nlon+1)*bin
+  tag_bin_clean = fltarr(Nlon) + 1.
+  tag_bin_fit   = fltarr(Nlon) + 1.
+  for i=0,Nlon-1 do begin
+;    Destagueas donde no se cumple que haya al menos una linea que
+;    cumple los criterios.     
+     index_clean = where(stlon_clean ge lon_grid(i) and stlon_clean lt lon_grid(i+1))
+     if index_clean(0) eq -1 then tag_bin_clean(i) = 0.
+     index_fit = where(stlon_fit ge   lon_grid(i) and stlon_fit   lt lon_grid(i+1))
+     if index_fit(0) eq -1 then tag_bin_fit(i) = 0
+  endfor
+  i_bin_clean = where(tag_bin_clean eq 1.)
+  i_bin_fit   = where(tag_bin_fit   eq 1.)
+  print
+; help,i_bin_clean,i_bin_fit
+  print,bin,Nlon,n_elements(i_bin_clean),n_elements(i_bin_clean)*1./Nlon  
+  STOP
+  return
+end
+
