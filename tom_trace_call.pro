@@ -4,10 +4,10 @@
 ; to read the tomographic producs to be traced.
 ;
 ; CALLING SEQUENCE EXAMPLES:
-; tom_trace_call, /demt , /trace_Bs
-; tom_trace_call, /ucomp, /trace_Bs
-; tom_trace_call, /kcor , /trace_Bs
-; tom_trace_call, /lasco, /trace_Bs
+; tom_trace_call, /demt    `, /trace_Bs
+; tom_trace_call, /ucomp    , /trace_Bs
+; tom_trace_call, /kcor_mk4 , /trace_Bs
+; tom_trace_call, /lasco    , /trace_Bs
 ;
 ; HISTORY: V1.0 FAN & AMV, CLaSP, October 2023.
 ;          V1.1 AMV, CLaSP, May-2025, centralized and clearer dir structure.
@@ -96,12 +96,18 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
   endif
 
   if keyword_set(kcor_mk4) then begin
-     tom_file = 'x_Mk4_CR2099_shifted_Rmin1.15_Rmax1.85_IRmin1.15_IRmax1.50_70x90x180_BF2_L5.e-6' & instr = 'mk4'
-     if PROJECT_NAME eq 'CR2254' then $
+     if PROJECT_NAME eq 'CR2099' then begin
+        tom_file = 'x_Mk4_CR2099_shifted_Rmin1.15_Rmax1.85_IRmin1.15_IRmax1.50_70x90x180_BF2_L5.e-6'
+        instr = 'mk4'
+     endif
+     if PROJECT_NAME eq 'CR2254' then begin
         tom_file = 'x_kcor_2022_Feb-Mar_segment2_Rmin1.09_Rmax1.75_IRmin1.09_IRmax1.50_66x60x120_BF2_L2.6e-5_CORRECT-FACT-0.79'
-     if PROJECT_NAME eq 'CR2261' then $
+        instr    = 'kcor'
+     endif     
+     if PROJECT_NAME eq 'CR2261' then begin
         tom_file = 'x_kcor_20220823-20220905_Rmin1.09_Rmax1.75_IRmin1.09_IRmax1.50_66x60x120_BF2_L2.5e-5_CORRECT-FACT-0.79'
-     instr    = 'kcor'
+        instr    = 'kcor'
+     endif
      nr       = 70 ;66
      nt       = 90 ;60 
      np       = 2*nt
