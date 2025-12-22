@@ -45,8 +45,8 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
 ; Set  FL_DIR, where the field-lines geometry files should be located,
 ; and TOM_DIR, where the 3D tomography products to trace should be located.
   base_dir = '/data1/'
-  if keyword_set(nfs1) then base_dir = '/data/Data1/data1/'
-  if keyword_set(nfs2) then base_dir = '/data/Data2/data1/'
+  if keyword_set(nfs1) then base_dir = '/media/Data1/data1/'
+  if keyword_set(nfs2) then base_dir = '/media/Data2/data1/'
   if not keyword_set(field_line_geometry_suffix_dir) then field_line_geometry_suffix_dir='/'
    fl_dir = base_dir+'DATA/trace_tom_files/'+PROJECT_NAME+'/field_lines_geometry'+field_line_geometry_suffix_dir
   tom_dir = base_dir+'DATA/trace_tom_files/'+PROJECT_NAME+'/tomography_3Dproducts/' 
