@@ -24,13 +24,17 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
 ; PROJECT_NAME = 'CR2254'
 ; PROJECT_NAME = 'CR2261'
 ; PROJECT_NAME = 'April24'
+; PROJECT_NAME = 'CR2082'
   PROJECT_NAME = 'CR2099'
   
+; map_suffix = 'map1'
+  map_suffix = 'map7'
+
 ; Define field_line_geometry_suffix_dir
 ; field_line_geometry_suffix_dir='_aunifgrid_multirad-6h_3x3deg_HMI-PolFil/'
 ; field_line_geometry_suffix_dir='_aunifgrid_2.50Rs_0.5x0.5deg_HMI-PolFil/'
 ; field_line_geometry_suffix_dir='_equatorial-ring/'
-  field_line_geometry_suffix_dir='_map7/'
+  field_line_geometry_suffix_dir='_'+map_suffix +'/'
   
 ; Provide FL_LIST, the file which informs the number of field lines and the
 ; filenames of the ASCII files containing the geometry of each line.
@@ -38,7 +42,7 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
 ; fl_list = 'fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2254_prep.ubdat_fline-filenames_list.txt'
 ; fl_list = 'fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2261_prep.ubdat_fline-filenames_list.txt'
 ; fl_list = 'Bfield_AWSoM_April24.ubdat_fline-filenames_list.txt'
-  fl_list = 'list.map7.new.txt'
+  fl_list = 'list.'+map_suffix+'.new.txt'
 ;===============================================================================================
 
 ; --------------------This block should not require edits.---------------------------
@@ -58,16 +62,21 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
 ; Then call tom_trace.
    
   if keyword_set(demt) then begin
-    ;tom_file = 'CR2082_HOLLOW_compound2.dat' & instr = 'euvia'
-    ;tom_file = 'LDEM.CR2099_aia_Hollow_3Bands_gauss1_lin_Norm-median_singlStart' & instr = 'aia'
-    ;tom_file = 'CR2099_AIA_compound1.dat'    & instr = 'aia'
-     tom_file = 'CR2099_AIA_compound2.dat'    & instr = 'aia'
-    ;tom_file = 'LDEM.April-2024_aia_Hollow_3Bands_gauss1_lin_Norm-median_singlStart'
-     if PROJECT_NAME eq 'CR2254' then $
+     tom_file = 'LDEM.April-2024_aia_Hollow_3Bands_gauss1_lin_Norm-median_singlStart' & instr = 'aia'
+     if PROJECT_NAME EQ 'CR2082' then begin
+        tom_file = 'CR2082_HOLLOW_compound2.dat' & instr = 'euvia'
+     endif
+     if PROJECT_NAME eq 'CR2099' then  begin  
+        tom_file = 'CR2099_AIA_compound2.dat' & instr = 'aia'
+     endif
+     if PROJECT_NAME eq 'CR2254' then begin
         tom_file = 'LDEM.feb-mar_2022_segment2_aia_Hollow_3Bands_ucomp_comparison_gauss1_lin_Norm-median_singlStart'
-     if PROJECT_NAME eq 'CR2261' then $
+        instr    = 'aia'
+     endif
+     if PROJECT_NAME eq 'CR2261' then begin
         tom_file = 'LDEM.chip07_aia_Hollow_3Bands_ucomp_comparison_exp2_gauss1_lin_Norm-median_singlStart'
-     instr    = 'aia'
+        instr    = 'aia'
+     endif
      nr       = 30   ;21   
      nt       = 90   ;60  
      np       = 2*nt
@@ -80,9 +89,11 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
   endif
 
   if keyword_set(lasco) then begin
-     tom_file = 'x_LascoC2pB_CR2099_shifted_std-grid_Rmin2.5_Rmax8.5_IRmin2.5_IRmax6.0_60x60x120_BF4_L6.e-6'
-    ;tom_file = 'x_LascoC2pB_CR2082_Rmin2.5_Rmax8.5_IRmin2.5_IRmax6.0_60x60x120_BF4_L8.2e-6'
-    ;tom_file = 'x_LascoC2pB_April-2024_Rmin2.5_Rmax8.5_IRmin2.5_IRmax6.0_60x60x120_BF4_L1.1e-5'
+     tom_file = 'x_LascoC2pB_April-2024_Rmin2.5_Rmax8.5_IRmin2.5_IRmax6.0_60x60x120_BF4_L1.1e-5'
+     if PROJECT_NAME EQ 'CR2082' then $
+        tom_file = 'x_LascoC2pB_CR2082_Rmin2.5_Rmax8.5_IRmin2.5_IRmax6.0_60x60x120_BF4_L8.2e-6'   
+     if PROJECT_NAME EQ 'CR2099' then $
+        tom_file = 'x_LascoC2pB_CR2099_shifted_std-grid_Rmin2.5_Rmax8.5_IRmin2.5_IRmax6.0_60x60x120_BF4_L6.e-6'
      instr    = 'lascoc2'
      nr       = 60
      nt       = 60
