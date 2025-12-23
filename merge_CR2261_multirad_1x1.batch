@@ -1,0 +1,18 @@
+;===============================================================================================
+; Define PROJECT_NAME, a string suffix to construct the full PATHS to the required files.
+  PROJECT_NAME = 'CR2261'
+; Define field_line_geometry_suffix_dir 
+  field_line_geometry_suffix_dir = '_aunifgrid_multirad_1x1deg_HMI-PolFil/'                                    
+; Provide FL_LIST, the file which informs the number of field lines and the
+; filenames of the ASCII files containing the geometry of each line.
+  fl_list = 'fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2261_prep.ubdat_fline-filenames_list.txt'
+;===============================================================================================
+
+; --------------------This block should not require edits.---------------------------
+; Set  FL_DIR, where the field-lines geometry files should be located,
+; and TOM_DIR, where the 3D tomography products to trace should be located.
+  base_dir = '/data1/'
+  fl_dir = base_dir+'DATA/trace_tom_files/'+PROJECT_NAME+'/field_lines_geometry'+field_line_geometry_suffix_dir
+;------------------------------------------------------------------------------------
+   merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, /trace_Bs, /aia, /kcor, /ucomp
+   

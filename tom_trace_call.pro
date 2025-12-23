@@ -24,8 +24,8 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
 ; PROJECT_NAME = 'CR2254'
 ; PROJECT_NAME = 'CR2261'
 ; PROJECT_NAME = 'April24'
-; PROJECT_NAME = 'CR2082'
-  PROJECT_NAME = 'CR2099'
+  PROJECT_NAME = 'CR2082'
+; PROJECT_NAME = 'CR2099'
   
 ; map_suffix = 'map1'
   map_suffix = 'map7'
