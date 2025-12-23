@@ -112,12 +112,15 @@ ps2
   ctbl = 40                     ; color table to use for individual field lines
 
   if keyword_set(aia) then begin
-   ; AIA Ne
+   
      rad_fit_aia_A = *trace_data.rad_fit_aia
      Ne_fit_aia_A  = *trace_data.Ne_fit_aia
      scN_fit_aia_A = *trace_data.scN_fit_aia
      fitflag_AIA_A = *trace_data.fitflag_AIA
+     Tm_fit_aia_A  = *trace_data.Tm_fit_aia
+     scT_fit_aia_A = *trace_data.scT_fit_aia
      
+   ; AIA Ne 
      Ne_fit_aia_groupavg = fltarr(Ngroups,n_elements(rad_fit_aia_A))
 ;---- Tag field lines for which the fit is positive at all heights ----
      tag_pos = fltarr(N_fl)
@@ -171,7 +174,7 @@ for ig=0,Ngroups-1 do begin
    skip_group_aia_geo:
 endfor
 ps2
-STOP
+
 
 ; AIA Te
 Tm_fit_aia_groupavg = fltarr(Ngroups,n_elements(rad_fit_aia_A))
@@ -201,10 +204,11 @@ for ig=0,Ngroups-1 do begin
    loadct,ctbl
    color_index_step = fix(256./n_elements(ifl))
    for index=0,n_elements(ifl)-1 do begin
-      tmp = reform(index_sampling_aia_A(ifl(index),*))
-      ind_samp_aia = where(tmp eq 1)
+      Nsamp = (*trace_data.Npt_aia)(ifl(index))
+      rad_aia = (*trace_data.rad_aia)(ifl(index),0:Nsamp-1)
+      Tm_aia  = (*trace_data.Tm_aia) (ifl(index),0:Nsamp-1)
       oplot,rad_fit_aia_A                 ,Tm_fit_aia_A(ifl(index),*)       ,color=(index)*color_index_step
-      oplot,rad_A(ifl(index),ind_samp_aia),Tm_aia_A(ifl(index),ind_samp_aia),color=(index)*color_index_step,psym=4
+      oplot,rad_aia,Tm_aia,color=(index)*color_index_step,psym=4
    endfor
    loadct,0
    oplot,rad_fit_aia_A,Tm_fit_aia_groupavg(ig,*),th=4
@@ -221,15 +225,17 @@ for ig=0,Ngroups-1 do begin
    loadct,ctbl
    color_index_step = fix(256./n_elements(ifl))
    for index=0,n_elements(ifl)-1 do begin
-      tmp = reform(index_sampling_aia_A(ifl(index),*))
-      ind_samp_aia = where(tmp eq 1)
-      oplot,lon_A(ifl(index),ind_samp_aia),rad_A(ifl(index),ind_samp_aia),color=(index)*color_index_step
+      Nsamp = (*trace_data.Npt_aia)(ifl(index))
+      rad_aia = (*trace_data.rad_aia)(ifl(index),0:Nsamp-1)
+      lon_aia = (*trace_data.lon_aia)(ifl(index),0:Nsamp-1)
+      oplot,lon_aia,rad_aia,color=(index)*color_index_step
    endfor
    loadct,0
    skip_group_aia_geoT:
 endfor
 ps2
 endif
+  STOP
 
 if keyword_set(euvia) then begin
 ; EUVI-A Ne
