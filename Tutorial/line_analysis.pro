@@ -483,6 +483,36 @@ ps2
 endif
 
 STOP
+
+for i_fl =0, N_fl-1 do begin
+
+   if keyword_set(aia) then begin
+      Nsamp   = (*trace_data.Npt_aia)(i_fl)
+      rad_aia = reform((*trace_data.rad_aia)(i_fl,0:Nsamp-1))
+      Ne_aia  = reform((*trace_data.Ne_aia) (i_fl,0:Nsamp-1))
+      rad_concat = rad_aia
+      NE_concat  = Ne_aia
+   endif
+   if keyword_set(mk4) then begin
+      Nsamp   = (*trace_data.Npt_mk4)(i_fl)
+      rad_mk4 = reform((*trace_data.rad_mk4)(i_fl,0:Nsamp-1))
+      Ne_mk4  = reform((*trace_data.Ne_mk4) (i_fl,0:Nsamp-1))
+      rad_concat = [rad_concat,rad_mk4]
+      Ne_concat  = [Ne_concat,Ne_mk4]
+   endif
+   if keyword_set(lascoc2) then begin
+      Nsamp   = (*trace_data.Npt_c2)(i_fl)
+      rad_c2  = reform((*trace_data.rad_c2)(i_fl,0:Nsamp-1))
+      Ne_c2   = reform((*trace_data.Ne_c2) (i_fl,0:Nsamp-1))
+      rad_concat = [rad_concat,rad_c2]
+      Ne_concat  = [Ne_concat,Ne_c2]
+   endif
+  
+   plot,rad_concat,Ne_concat,psym=4,/ylog
+   STOP
+endfor
+
+
   return
 end
  
