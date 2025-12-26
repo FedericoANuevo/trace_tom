@@ -481,7 +481,7 @@ ps2
 endif
 
 for i_fl =0, N_fl-1 do begin
-
+ 
    if keyword_set(aia) then begin
       Nsamp   = (*trace_data.Npt_aia)(i_fl)
       rad_aia = reform((*trace_data.rad_aia)(i_fl,0:Nsamp-1))
@@ -489,6 +489,7 @@ for i_fl =0, N_fl-1 do begin
       rad_concat = rad_aia
       NE_concat  = Ne_aia
       inst_concat = 'aia' + strarr(n_elements(rad_aia))
+      Inst_list   = ['aia']
    endif
    if keyword_set(mk4) then begin
       Nsamp   = (*trace_data.Npt_mk4)(i_fl)
@@ -497,6 +498,7 @@ for i_fl =0, N_fl-1 do begin
       rad_concat = [rad_concat,rad_mk4]
       Ne_concat  = [Ne_concat,Ne_mk4]
       inst_concat = [inst_concat , 'mk4' + strarr(n_elements(rad_mk4))]
+      if not keyword_set(Inst_list) then Inst_list=['mk4'] else Inst_list=[Inst_list,'mk4']
    endif
    if keyword_set(lascoc2) then begin
       Nsamp   = (*trace_data.Npt_c2)(i_fl)
@@ -505,6 +507,7 @@ for i_fl =0, N_fl-1 do begin
       rad_concat = [rad_concat,rad_c2]
       Ne_concat  = [Ne_concat,Ne_c2]
       inst_concat = [inst_concat , 'c2' + strarr(n_elements(rad_c2))]
+      if not keyword_set(Inst_list) then Inst_list=['mk4'] else Inst_list=[Inst_list,'c2']
    endif
 
    ps1,'line'+string(i_fl)+'.eps'
@@ -513,12 +516,13 @@ for i_fl =0, N_fl-1 do begin
    loadct,39
    color = fltarr(n_elements(Ne_concat))
    index = where(inst_concat eq 'aia')
+   xpos = 0.5
    ypos = 0.8
 
    if index(0) ne -1 then begin
       color = 100
       oplot,rad_concat(index),Ne_concat(index),psym=4,color=color
-      xyouts,[0.8],[ypos],['AIA'],color=color,/normal
+      xyouts,[xpos],[ypos],['AIA'],color=color,/normal
    endif
    
    index = where(inst_concat eq 'mk4')
@@ -526,7 +530,7 @@ for i_fl =0, N_fl-1 do begin
       ypos = ypos - 0.05
       color = 200
       oplot,rad_concat(index),Ne_concat(index),psym=4,color=color
-      xyouts,[0.8],[ypos],['Mk4'],color=color,/normal
+      xyouts,[xpos],[ypos],['Mk4'],color=color,/normal
    endif
 
    index = where(inst_concat eq 'c2' )
@@ -534,10 +538,27 @@ for i_fl =0, N_fl-1 do begin
       ypos = ypos - 0.05
       color = 250
       oplot,rad_concat(index),Ne_concat(index),psym=4,color=color
-      xyouts,[0.8],[ypos],['C2'],color=color,/normal
+      xyouts,[xpos],[ypos],['C2'],color=color,/normal
    endif
 
    if index(0) ne -1 then oplot,rad_concat(index),Ne_concat(index),psym=4,color=250
+
+   power_concat_fit, Inst_list, rad_concat, Ne_concat, inst_concat, A, chisq, /weighted
+
+   loadct,0
+   Nrad_fit = 100
+   rad_concat_fit = min(rad_concat) + (max(rad_concat)-min(rad_concat)) * findgen(Nrad_fit)/float(Nrad_fit-1)
+   if n_elements(Inst_list) eq 1 then $
+   oplot, rad_concat_fit, A[0] / rad_concat_fit^A[1] ,th=2
+   if n_elements(Inst_list) eq 2 then $
+   oplot, rad_concat_fit, A[0] / rad_concat_fit^A[1] + A[2] / rad_concat_fit^A[3],th=2
+   if n_elements(Inst_list) eq 3 then $
+   oplot, rad_concat_fit, A[0] / rad_concat_fit^A[1] + A[2] / rad_concat_fit^A[3] + A[4] / rad_concat_fit^A[5], th=2
+
+   ypos = ypos -0.05
+   xyouts,[xpos],[ypos],['Sqrt(Chisq)/Mean(Ne)='+strmid(string(sqrt(chisq)/mean(Ne_concat)),6,5)],/normal
+   
+   print,A
    ps2
    STOP
 endfor
