@@ -70,35 +70,35 @@ pro line_analysis, rel_sqrt_chisqr_crit=rel_sqrt_chisqr_crit,$
 
 ;
 ; Tag groups of field lines by means of user-defined ranges of terminal Longitudes.
- Ngroups     = n_elements(CritTermLon)-1
+  Ngroups     = n_elements(CritTermLon)-1
 ; Tag each field line (ifl) with the group number (ig) to which it belongs: 
- line_groupID  = intarr(N_FL)
- for ig=0,Ngroups-1 do begin
-    ifl_A = where(Terminal_Lon gt CritTermLon(ig) AND Terminal_Lon lt CritTermLon(ig+1))
-    line_groupID(ifl_A) = ig
- endfor
+  line_groupID  = intarr(N_FL)
+  for ig=0,Ngroups-1 do begin
+     ifl_A = where(Terminal_Lon gt CritTermLon(ig) AND Terminal_Lon lt CritTermLon(ig+1))
+     line_groupID(ifl_A) = ig
+  endfor
 ;;
 
 ; Lat/Lon plots of FootPoint and TerminalPoint
-ps1,'./'+structure_filename+'_connectivity-map.eps'
-np=1000
-!p.multi=[0,1,2]
-loadct,0
-!p.color=0
-!p.background=255
-csz=1
-plot,footpoint_lon,footpoint_lat,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=csz,title=strmid(structure_filename,0,17)+'  r = 1.0 Rs',ytitle='Carrington Latitude [deg]'
-ctbl = 12 ; 16-LEVEL
-colors = 16 + 190 * (indgen(Ngroups))/float(Ngroups-1)
-loadct,ctbl
-for ifl=0,N_FL-1 do oplot,[Footpoint_Lon(ifl)],[Footpoint_Lat(ifl)],psym=4,color=colors(line_groupID(ifl)),th=2
-loadct,0
-plot,footpoint_lon,footpoint_lat,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=csz,xtitle='Carrington Longitude [deg]',title='r = 23.68 Rs',ytitle='Carrington Latitude [deg]'
-loadct,ctbl
-for ifl=0,N_FL-1 do oplot,[Terminal_Lon(ifl)],[Terminal_Lat(ifl)],psym=4,color=colors(line_groupID(ifl)),th=2
-loadct,0
-!p.multi=0
-ps2
+  ps1,'./'+structure_filename+'_connectivity-map.eps'
+  np=1000
+  !p.multi=[0,1,2]
+  loadct,0
+  !p.color=0
+  !p.background=255
+  csz=1
+  plot,footpoint_lon,footpoint_lat,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=csz,title=strmid(structure_filename,0,17)+'  r = 1.0 Rs',ytitle='Carrington Latitude [deg]'
+  ctbl = 12                     ; 16-LEVEL
+  colors = 16 + 190 * (indgen(Ngroups))/float(Ngroups-1)
+  loadct,ctbl
+  for ifl=0,N_FL-1 do oplot,[Footpoint_Lon(ifl)],[Footpoint_Lat(ifl)],psym=4,color=colors(line_groupID(ifl)),th=2
+  loadct,0
+  plot,footpoint_lon,footpoint_lat,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=csz,xtitle='Carrington Longitude [deg]',title='r = 23.68 Rs',ytitle='Carrington Latitude [deg]'
+  loadct,ctbl
+  for ifl=0,N_FL-1 do oplot,[Terminal_Lon(ifl)],[Terminal_Lat(ifl)],psym=4,color=colors(line_groupID(ifl)),th=2
+  loadct,0
+  !p.multi=0
+  ps2
 
 
 ;;
@@ -112,11 +112,11 @@ ps2
   ctbl = 40                     ; color table to use for individual field lines
 
   if keyword_set(aia) then begin
-; -----------------------   
+; -----------------------
+     fitflag_AIA_A = *trace_data.fitflag_AIA
      rad_fit_aia_A = *trace_data.rad_fit_aia
      Ne_fit_aia_A  = *trace_data.Ne_fit_aia
      scN_fit_aia_A = *trace_data.scN_fit_aia
-     fitflag_AIA_A = *trace_data.fitflag_AIA
      Tm_fit_aia_A  = *trace_data.Tm_fit_aia
      scT_fit_aia_A = *trace_data.scT_fit_aia
 ; -----------------------        
@@ -239,7 +239,7 @@ for ig=0,Ngroups-1 do begin
 endfor
 ps2
 endif
-  STOP
+ 
 
 if keyword_set(euvia) then begin
 ; EUVI-A Ne
@@ -352,6 +352,12 @@ ps2
 endif
 
 if keyword_set(mk4) then begin
+; -----------------------
+     fitflag_mk4_A = *trace_data.fitflag_mk4
+     rad_fit_mk4_A = *trace_data.rad_fit_mk4
+     Ne_fit_mk4_A  = *trace_data.Ne_fit_mk4
+     scN_fit_mk4_A = *trace_data.scN_fit_mk4
+; -----------------------        
 ; Mk4 Ne
 Ne_fit_mk4_groupavg = fltarr(Ngroups,n_elements(rad_fit_mk4_A))
 ;---- Tag field lines for which the fit is positive at all heights ----
@@ -375,10 +381,13 @@ for ig=0,Ngroups-1 do begin
    loadct,ctbl
    color_index_step = fix(256./n_elements(ifl))
    for index=0,n_elements(ifl)-1 do begin
-      tmp = reform(index_sampling_mk4_A(ifl(index),*))
-      ind_samp_mk4 = where(tmp eq 1)
-      oplot,rad_fit_mk4_A                 ,Ne_fit_mk4_A(ifl(index),*)       ,color=(index)*color_index_step
-      oplot,rad_A(ifl(index),ind_samp_mk4),Ne_mk4_A(ifl(index),ind_samp_mk4),color=(index)*color_index_step,psym=4
+ ; ---------------------------------     
+      Nsamp   = (*trace_data.Npt_mk4)(ifl(index))
+      rad_mk4 = (*trace_data.rad_mk4)(ifl(index),0:Nsamp-1)
+      Ne_mk4  = (*trace_data.Ne_mk4) (ifl(index),0:Nsamp-1)
+      oplot,rad_fit_mk4_A                 ,Ne_fit_mk4_A(ifl(index),*),color=(index)*color_index_step
+      oplot,rad_mk4,Ne_mk4,color=(index)*color_index_step,psym=4
+ ; ---------------------------------     
    endfor
    loadct,0
    oplot,rad_fit_mk4_A,Ne_fit_mk4_groupavg(ig,*),th=4
@@ -395,9 +404,12 @@ for ig=0,Ngroups-1 do begin
    loadct,ctbl
    color_index_step = fix(256./n_elements(ifl))
    for index=0,n_elements(ifl)-1 do begin
-      tmp = reform(index_sampling_mk4_A(ifl(index),*))
-      ind_samp_mk4 = where(tmp eq 1)
-      oplot,lon_A(ifl(index),ind_samp_mk4),rad_A(ifl(index),ind_samp_mk4),color=(index)*color_index_step
+  ; ---------------------------------     
+      Nsamp =   (*trace_data.Npt_mk4)(ifl(index))
+      rad_mk4 = (*trace_data.rad_mk4)(ifl(index),0:Nsamp-1)
+      lon_mk4 = (*trace_data.lon_mk4)(ifl(index),0:Nsamp-1)
+      oplot,lon_mk4,rad_mk4,color=(index)*color_index_step
+   ; ---------------------------------        
    endfor
    loadct,0
    skip_group_mk4_geo:
@@ -405,7 +417,14 @@ endfor
 ps2
 endif
 
+
 if keyword_set(lascoc2) then begin
+; -----------------------
+   fitflag_c2_A = *trace_data.fitflag_c2
+   rad_fit_c2_A = *trace_data.rad_fit_c2
+   Ne_fit_c2_A  = *trace_data.Ne_fit_c2
+   scN_fit_c2_A = *trace_data.scN_fit_c2
+; -----------------------        
 ; C2 Ne
 Ne_fit_c2_groupavg = fltarr(Ngroups,n_elements(rad_fit_c2_A))
 ;---- Tag field lines for which the fit is positive at all heights ----
@@ -429,10 +448,12 @@ for ig=0,Ngroups-1 do begin
    loadct,ctbl
    color_index_step = fix(256./n_elements(ifl))
    for index=0,n_elements(ifl)-1 do begin
-      tmp = reform(index_sampling_c2_A(ifl(index),*))
-      ind_samp_c2 = where(tmp eq 1)
-      oplot,rad_fit_c2_A                 ,Ne_fit_c2_A(ifl(index),*)      ,color=(index)*color_index_step
-      oplot,rad_A(ifl(index),ind_samp_c2),Ne_c2_A(ifl(index),ind_samp_c2),color=(index)*color_index_step,psym=4
+      Nsamp   = (*trace_data.Npt_c2)(ifl(index))
+      rad_c2 = (*trace_data.rad_c2)(ifl(index),0:Nsamp-1)
+      Ne_c2  = (*trace_data.Ne_c2) (ifl(index),0:Nsamp-1)
+      oplot,rad_fit_c2_A                 ,Ne_fit_c2_A(ifl(index),*),color=(index)*color_index_step
+      oplot,rad_c2,Ne_c2,color=(index)*color_index_step,psym=4
+ 
    endfor
    loadct,0
    oplot,rad_fit_c2_A,Ne_fit_c2_groupavg(ig,*),th=4
@@ -449,9 +470,11 @@ for ig=0,Ngroups-1 do begin
    loadct,ctbl
    color_index_step = fix(256./n_elements(ifl))
    for index=0,n_elements(ifl)-1 do begin
-      tmp = reform(index_sampling_c2_A(ifl(index),*))
-      ind_samp_c2 = where(tmp eq 1)
-      oplot,lon_A(ifl(index),ind_samp_c2),rad_A(ifl(index),ind_samp_c2),color=(index)*color_index_step
+      Nsamp   = (*trace_data.Npt_c2)(ifl(index))
+      rad_c2 = (*trace_data.rad_c2)(ifl(index),0:Nsamp-1)
+      lon_c2 = (*trace_data.lon_c2)(ifl(index),0:Nsamp-1)
+      oplot,lon_c2,rad_c2,color=(index)*color_index_step
+
    endfor
    loadct,0
    skip_group_c2_geo:
