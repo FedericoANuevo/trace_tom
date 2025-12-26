@@ -12,7 +12,6 @@ pro line_analysis, rel_sqrt_chisqr_crit=rel_sqrt_chisqr_crit,$
                    map_number=map_number, cr_number=cr_number, $
                    aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                    mk4 = mk4, kcor = kcor, lascoc2 = lascoc2
-  
 
 ; 0) Set a default value for rel_sqrt_chisqr_crit
   if not keyword_set(rel_sqrt_chisqr_crit) then rel_sqrt_chisqr_crit = 0.2
@@ -37,7 +36,7 @@ pro line_analysis, rel_sqrt_chisqr_crit=rel_sqrt_chisqr_crit,$
   if cr_number eq 2099 then begin
      if map_number eq 1 then begin
        ;structure_filename = 'CR2099_AWSoM-map1_tracing-structure-merge_aia_mk4_lascoc2.sav'
-        dir                = '/data1/DATA/trace_tom_files/CR2099/field_lines_geometry_map1'
+        dir                = '/data1/DATA/trace_tom_files/CR2099/field_lines_geometry_map1/'
         structure_filename = 'list.map1.new.txt-tracing-structure-merge_aia_mk4_lascoc2_sampled.sav'
         CritTermLon = [0.,100.,180.,270.,360.]
      endif  
@@ -65,21 +64,20 @@ pro line_analysis, rel_sqrt_chisqr_crit=rel_sqrt_chisqr_crit,$
 ; 1D Arrays: Footpoint and Terminalpoint Lon and Lat for each field line:
   Footpoint_Lon = *trace_data.FOOTPOINT_Lon
   Footpoint_Lat = *trace_data.FOOTPOINT_Lat
-  Terminal_Lon  = *trace_data.TERMPOINT_Lon
-  Terminal_Lat  = *trace_data.TERMPOINT_Lat
+  Termpoint_Lon = *trace_data.TERMPOINT_Lon
+  Termpoint_Lat = *trace_data.TERMPOINT_Lat
 
-;
 ; Tag groups of field lines by means of user-defined ranges of terminal Longitudes.
   Ngroups     = n_elements(CritTermLon)-1
 ; Tag each field line (ifl) with the group number (ig) to which it belongs: 
   line_groupID  = intarr(N_FL)
   for ig=0,Ngroups-1 do begin
-     ifl_A = where(Terminal_Lon gt CritTermLon(ig) AND Terminal_Lon lt CritTermLon(ig+1))
+     ifl_A = where(Termpoint_Lon gt CritTermLon(ig) AND Termpoint_Lon lt CritTermLon(ig+1))
      line_groupID(ifl_A) = ig
   endfor
 ;;
 
-; Lat/Lon plots of FootPoint and TerminalPoint
+; Lat/Lon plots of FootPoint and TermPoint
   ps1,'./'+structure_filename+'_connectivity-map.eps'
   np=1000
   !p.multi=[0,1,2]
@@ -95,7 +93,7 @@ pro line_analysis, rel_sqrt_chisqr_crit=rel_sqrt_chisqr_crit,$
   loadct,0
   plot,footpoint_lon,footpoint_lat,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=csz,xtitle='Carrington Longitude [deg]',title='r = 23.68 Rs',ytitle='Carrington Latitude [deg]'
   loadct,ctbl
-  for ifl=0,N_FL-1 do oplot,[Terminal_Lon(ifl)],[Terminal_Lat(ifl)],psym=4,color=colors(line_groupID(ifl)),th=2
+  for ifl=0,N_FL-1 do oplot,[Termpoint_Lon(ifl)],[Termpoint_Lat(ifl)],psym=4,color=colors(line_groupID(ifl)),th=2
   loadct,0
   !p.multi=0
   ps2
@@ -112,14 +110,14 @@ pro line_analysis, rel_sqrt_chisqr_crit=rel_sqrt_chisqr_crit,$
   ctbl = 40                     ; color table to use for individual field lines
 
   if keyword_set(aia) then begin
-; -----------------------
+; -------------------------------------------
      fitflag_AIA_A = *trace_data.fitflag_AIA
      rad_fit_aia_A = *trace_data.rad_fit_aia
-     Ne_fit_aia_A  = *trace_data.Ne_fit_aia
+      Ne_fit_aia_A = *trace_data. Ne_fit_aia
      scN_fit_aia_A = *trace_data.scN_fit_aia
-     Tm_fit_aia_A  = *trace_data.Tm_fit_aia
+      Tm_fit_aia_A = *trace_data. Tm_fit_aia
      scT_fit_aia_A = *trace_data.scT_fit_aia
-; -----------------------        
+; -------------------------------------------
    ; AIA Ne 
      Ne_fit_aia_groupavg = fltarr(Ngroups,n_elements(rad_fit_aia_A))
 ;---- Tag field lines for which the fit is positive at all heights ----
@@ -144,9 +142,9 @@ pro line_analysis, rel_sqrt_chisqr_crit=rel_sqrt_chisqr_crit,$
    color_index_step = fix(256./n_elements(ifl))
    for index=0,n_elements(ifl)-1 do begin
  ; ---------------------------------     
-      Nsamp = (*trace_data.Npt_aia)(ifl(index))
+      Nsamp   = (*trace_data.Npt_aia)(ifl(index))
       rad_aia = (*trace_data.rad_aia)(ifl(index),0:Nsamp-1)
-      Ne_aia  = (*trace_data.Ne_aia) (ifl(index),0:Nsamp-1)
+       Ne_aia = (*trace_data. Ne_aia)(ifl(index),0:Nsamp-1)
       oplot,rad_fit_aia_A                 ,Ne_fit_aia_A(ifl(index),*)       ,color=(index)*color_index_step
       oplot,rad_aia,Ne_aia,color=(index)*color_index_step,psym=4
  ; ---------------------------------     
@@ -482,8 +480,6 @@ endfor
 ps2
 endif
 
-STOP
-
 for i_fl =0, N_fl-1 do begin
 
    if keyword_set(aia) then begin
@@ -492,6 +488,7 @@ for i_fl =0, N_fl-1 do begin
       Ne_aia  = reform((*trace_data.Ne_aia) (i_fl,0:Nsamp-1))
       rad_concat = rad_aia
       NE_concat  = Ne_aia
+      inst_concat = 'aia' + strarr(n_elements(rad_aia))
    endif
    if keyword_set(mk4) then begin
       Nsamp   = (*trace_data.Npt_mk4)(i_fl)
@@ -499,6 +496,7 @@ for i_fl =0, N_fl-1 do begin
       Ne_mk4  = reform((*trace_data.Ne_mk4) (i_fl,0:Nsamp-1))
       rad_concat = [rad_concat,rad_mk4]
       Ne_concat  = [Ne_concat,Ne_mk4]
+      inst_concat = [inst_concat , 'mk4' + strarr(n_elements(rad_mk4))]
    endif
    if keyword_set(lascoc2) then begin
       Nsamp   = (*trace_data.Npt_c2)(i_fl)
@@ -506,9 +504,41 @@ for i_fl =0, N_fl-1 do begin
       Ne_c2   = reform((*trace_data.Ne_c2) (i_fl,0:Nsamp-1))
       rad_concat = [rad_concat,rad_c2]
       Ne_concat  = [Ne_concat,Ne_c2]
+      inst_concat = [inst_concat , 'c2' + strarr(n_elements(rad_c2))]
    endif
-  
-   plot,rad_concat,Ne_concat,psym=4,/ylog
+
+   ps1,'line'+string(i_fl)+'.eps'
+   loadct,0   
+   plot,rad_concat,Ne_concat,/ylog,/nodata,title='Field line #'+string(i_fl),xtitle='rad [Rsun]',ytitle='log!d10!N(Ne [cm!U-3!N] )'
+   loadct,39
+   color = fltarr(n_elements(Ne_concat))
+   index = where(inst_concat eq 'aia')
+   ypos = 0.8
+
+   if index(0) ne -1 then begin
+      color = 100
+      oplot,rad_concat(index),Ne_concat(index),psym=4,color=color
+      xyouts,[0.8],[ypos],['AIA'],color=color,/normal
+   endif
+   
+   index = where(inst_concat eq 'mk4')
+   if index(0) ne -1 then begin
+      ypos = ypos - 0.05
+      color = 200
+      oplot,rad_concat(index),Ne_concat(index),psym=4,color=color
+      xyouts,[0.8],[ypos],['Mk4'],color=color,/normal
+   endif
+
+   index = where(inst_concat eq 'c2' )
+   if index(0) ne -1 then begin
+      ypos = ypos - 0.05
+      color = 250
+      oplot,rad_concat(index),Ne_concat(index),psym=4,color=color
+      xyouts,[0.8],[ypos],['C2'],color=color,/normal
+   endif
+
+   if index(0) ne -1 then oplot,rad_concat(index),Ne_concat(index),psym=4,color=250
+   ps2
    STOP
 endfor
 
