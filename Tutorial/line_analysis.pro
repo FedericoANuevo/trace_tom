@@ -10,7 +10,8 @@
 pro line_analysis, rel_sqrt_chisqr_crit=rel_sqrt_chisqr_crit,$
                    map_number=map_number, cr_number=cr_number, $
                    aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
-                   mk4 = mk4, kcor = kcor, lascoc2 = lascoc2
+                   mk4 = mk4, kcor = kcor, lascoc2 = lascoc2,$
+                   npower = npower, dpower = dpower
 
 ; 0) Set a default value for rel_sqrt_chisqr_crit
   if not keyword_set(rel_sqrt_chisqr_crit) then rel_sqrt_chisqr_crit = 0.2
@@ -522,8 +523,8 @@ for i_fl =0, N_fl-1 do begin
    loadct,39
    color = fltarr(n_elements(Ne_concat))
    index = where(inst_concat eq 'aia')
-   xpos = 0.5
-   ypos = 0.8
+   xpos = 0.2
+   ypos = 0.9
 
    if index(0) ne -1 then begin
       color = 100
@@ -533,7 +534,7 @@ for i_fl =0, N_fl-1 do begin
    
    index = where(inst_concat eq 'mk4')
    if index(0) ne -1 then begin
-      ypos = ypos - 0.05
+      ypos = ypos - 0.03
       color = 200
       oplot,rad_concat(index),Ne_concat(index),psym=4,color=color
       xyouts,[xpos],[ypos],['Mk4'],color=color,/normal
@@ -541,7 +542,7 @@ for i_fl =0, N_fl-1 do begin
 
    index = where(inst_concat eq 'c2' )
    if index(0) ne -1 then begin
-      ypos = ypos - 0.05
+      ypos = ypos - 0.03
       color = 250
       oplot,rad_concat(index),Ne_concat(index),psym=4,color=color
       xyouts,[xpos],[ypos],['C2'],color=color,/normal
@@ -549,24 +550,39 @@ for i_fl =0, N_fl-1 do begin
 
    if index(0) ne -1 then oplot,rad_concat(index),Ne_concat(index),psym=4,color=250
 
+   if keyword_set(npower) then $
    power_concat_fit, Inst_list, rad_concat, Ne_concat, inst_concat, A, chisq, /weighted
+   if keyword_set(dpower) then $
+   double_power_concat_fit, rad_concat, Ne_concat, inst_concat, A, chisq, /weighted
 
    loadct,0
    Nrad_fit = 100
    rad_concat_fit = min(rad_concat) + (max(rad_concat)-min(rad_concat)) * findgen(Nrad_fit)/float(Nrad_fit-1)
-   if n_elements(Inst_list) eq 1 then $
-   oplot, rad_concat_fit, A[0] / rad_concat_fit^A[1] ,th=2
-   if n_elements(Inst_list) eq 2 then $
-   oplot, rad_concat_fit, A[0] / rad_concat_fit^A[1] + A[2] / rad_concat_fit^A[3],th=2
-   if n_elements(Inst_list) eq 3 then $
-   oplot, rad_concat_fit, A[0] / rad_concat_fit^A[1] + A[2] / rad_concat_fit^A[3] + A[4] / rad_concat_fit^A[5], th=2
 
-   ypos = ypos -0.05
+   ypos = ypos -0.03
    xyouts,[xpos],[ypos],['Sqrt(Chisq)/Mean(Ne)='+strmid(string(sqrt(chisq)/mean(Ne_concat)),6,5)],/normal
-   
-   print,A
+
+  if keyword_set(npower) then begin
+     if n_elements(Inst_list) eq 1 then $
+        oplot, rad_concat_fit, A[0] / rad_concat_fit^A[1] ,th=2
+     if n_elements(Inst_list) eq 2 then $
+        oplot, rad_concat_fit, A[0] / rad_concat_fit^A[1] + A[2] / rad_concat_fit^A[3],th=2
+     if n_elements(Inst_list) eq 3 then $
+        oplot, rad_concat_fit, A[0] / rad_concat_fit^A[1] + A[2] / rad_concat_fit^A[3] + A[4] / rad_concat_fit^A[5], th=2
+     ypos   = ypos -0.03
+     xyouts, [xpos],[ypos],['Coeffs [cm!U-3!N]: '+string(A[0])+string(A[2])+string(A[4])],/normal
+     ypos   = ypos -0.03
+     xyouts, [xpos],[ypos],['Powers: '+string(A[1])+string(A[3])+string(A[5]) ],/normal
+  endif
+
+  if keyword_set(dpower) then begin
+     oplot, rad_concat_fit, A[0] / rad_concat_fit^A[1] + A[2] / rad_concat_fit^A[3],th=2
+     ypos   = ypos -0.03
+     xyouts, [xpos],[ypos],['Coeffs [cm!U-3!N]: '+string(A[0])+string(A[2])],/normal
+     ypos   = ypos -0.03
+     xyouts, [xpos],[ypos],['Powers: '+string(A[1])+string(A[3]) ],/normal
+  endif
    ps2
-   STOP
 endfor
 
 

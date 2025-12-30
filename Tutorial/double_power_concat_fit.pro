@@ -25,7 +25,10 @@ pro double_power_concat_fit, rad_concat, Ne_concat, inst_concat, A, chisq, weigh
 
 ; Set weights:
   if NOT keyword_set(weighted) then weights = 0.*Ne_concat + 1.
-  if     keyword_set(weighted) then weights =    Ne_concat / mean(Ne_concat)
+  if     keyword_set(weighted) then weights = 1./(Ne_concat / mean(Ne_concat))^2
+; Do not consider data points above Rmax_fit
+  Rmax_fit = 5.5
+  index = where(rad_concat ge Rmax_fit) & if index(0) ne -1 then weights(index)=0.
 
 ; Fit:
   yfit_func = CURVEFIT(rad_concat, Ne_concat, weights, A, SIGMA,$

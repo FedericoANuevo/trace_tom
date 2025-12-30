@@ -1,5 +1,6 @@
 pro power_concat_fit, Inst_list, rad_concat, Ne_concat, inst_concat, A, chisq, weighted=weighted
 
+; Compute an initial set of values for the fit parameters.
   Ninst = n_elements(Inst_list)
   A     = fltarr(2*Ninst)
   for inst = 0,Ninst-1 do begin
@@ -14,7 +15,10 @@ pro power_concat_fit, Inst_list, rad_concat, Ne_concat, inst_concat, A, chisq, w
 ; Set weights:
   if NOT keyword_set(weighted) then weights = 0.*Ne_concat + 1.
   if     keyword_set(weighted) then weights =  1./  (Ne_concat / mean(Ne_concat))^2
-
+; Do not consider data points above Rmax_fit
+  Rmax_fit = 5.5
+  index = where(rad_concat ge Rmax_fit) & if index(0) ne -1 then weights(index)=0.
+  
 ; Fit:
   yfit_func = CURVEFIT(rad_concat, Ne_concat, weights, A, SIGMA,$
                        function_name='function_power_law',$
