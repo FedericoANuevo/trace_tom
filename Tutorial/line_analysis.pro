@@ -1,4 +1,3 @@
-
 ;;
 ; Calling sequence examples:
 ;
@@ -481,7 +480,14 @@ ps2
 endif
 
 for i_fl =0, N_fl-1 do begin
+
+
+   if i_fl lt     10                     then ifl_str = '00' + strmid(string(long(i_fl)),11,1)
+   if i_fl ge     10 and i_fl lt     100 then ifl_str = '0'  + strmid(string(long(i_fl)),10,2)
+   if i_fl ge    100 and i_fl lt    1000 then ifl_str = ''   + strmid(string(long(i_fl)), 9,3)
+
  
+   
    if keyword_set(aia) then begin
       Nsamp   = (*trace_data.Npt_aia)(i_fl)
       rad_aia = reform((*trace_data.rad_aia)(i_fl,0:Nsamp-1))
@@ -510,7 +516,7 @@ for i_fl =0, N_fl-1 do begin
       if not keyword_set(Inst_list) then Inst_list=['mk4'] else Inst_list=[Inst_list,'c2']
    endif
 
-   ps1,'line'+string(i_fl)+'.eps'
+   ps1,'line_'+ifl_str+'.eps'
    loadct,0   
    plot,rad_concat,Ne_concat,/ylog,/nodata,title='Field line #'+string(i_fl),xtitle='rad [Rsun]',ytitle='log!d10!N(Ne [cm!U-3!N] )'
    loadct,39
