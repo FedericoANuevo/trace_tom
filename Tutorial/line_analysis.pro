@@ -11,7 +11,7 @@ pro line_analysis, rel_sqrt_chisqr_crit=rel_sqrt_chisqr_crit,$
                    map_number=map_number, cr_number=cr_number, $
                    aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                    mk4 = mk4, kcor = kcor, lascoc2 = lascoc2,$
-                   npower = npower, dpower = dpower
+                   npower = npower, dpower = dpower, linfit = linfit
 
 ; 0) Set a default value for rel_sqrt_chisqr_crit
   if not keyword_set(rel_sqrt_chisqr_crit) then rel_sqrt_chisqr_crit = 0.2
@@ -554,7 +554,10 @@ for i_fl =0, N_fl-1 do begin
    power_concat_fit, Inst_list, rad_concat, Ne_concat, inst_concat, A, chisq, /weighted
    if keyword_set(dpower) then $
    double_power_concat_fit, rad_concat, Ne_concat, inst_concat, A, chisq, /weighted
-
+   if keyword_set(linfit) then $
+      linear_fit, rad_concat, alog(Ne_concat), A, r2, chisqr = chisqr, /linfit_idl
+   
+   
    loadct,0
    Nrad_fit = 100
    rad_concat_fit = min(rad_concat) + (max(rad_concat)-min(rad_concat)) * findgen(Nrad_fit)/float(Nrad_fit-1)
