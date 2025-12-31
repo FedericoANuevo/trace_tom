@@ -480,6 +480,14 @@ endfor
 ps2
 endif
 
+
+; This module concatenate the densities of all instrument and fit it.
+
+
+if keyword_set(dpower) then suffix = '_dpow.eps'
+if keyword_set(npower) then suffix = '_npow.eps'
+if keyword_set(linfit) then suffix = '_linf.eps'
+
 for i_fl =0, N_fl-1 do begin
 
 
@@ -517,7 +525,7 @@ for i_fl =0, N_fl-1 do begin
       if not keyword_set(Inst_list) then Inst_list=['mk4'] else Inst_list=[Inst_list,'c2']
    endif
 
-   ps1,'line_'+ifl_str+'.eps'
+   ps1,'line_'+ifl_str+suffix
    loadct,0   
    plot,rad_concat,Ne_concat,/ylog,/nodata,title='Field line #'+string(i_fl),xtitle='rad [Rsun]',ytitle='log!d10!N(Ne [cm!U-3!N] )'
    loadct,39
@@ -554,17 +562,25 @@ for i_fl =0, N_fl-1 do begin
    power_concat_fit, Inst_list, rad_concat, Ne_concat, inst_concat, A, chisq, /weighted
    if keyword_set(dpower) then $
    double_power_concat_fit, rad_concat, Ne_concat, inst_concat, A, chisq, /weighted
-   if keyword_set(linfit) then $
-      linear_fit, rad_concat, alog(Ne_concat), A, r2, chisqr = chisqr, /linfit_idl
-   
+   if keyword_set(linfit) then begin
+      index = where(rad_concat lt 5.5) 
+      linear_fit, rad_concat(index)-1, alog10(Ne_concat(index)), A, r2, chisqr = chisq, /linfit_idl
+   endif
    
    loadct,0
    Nrad_fit = 100
    rad_concat_fit = min(rad_concat) + (max(rad_concat)-min(rad_concat)) * findgen(Nrad_fit)/float(Nrad_fit-1)
 
-   ypos = ypos -0.03
-   xyouts,[xpos],[ypos],['Sqrt(Chisq)/Mean(Ne)='+strmid(string(sqrt(chisq)/mean(Ne_concat)),6,5)],/normal
+   if keyword_set(npower) or keyword_set(dpower) then begin
+      ypos = ypos -0.03
+      xyouts,[xpos],[ypos],['Sqrt(Chisq)/Mean(Ne)='+strmid(string(sqrt(chisq)/mean(Ne_concat)),6,5)],/normal
+   endif
 
+   if keyword_set(linfit) then begin
+        ypos = ypos -0.03
+      xyouts,[xpos],[ypos],['r!u2!n='+strmid(string(r2),6,5)],/normal
+   endif
+   
   if keyword_set(npower) then begin
      if n_elements(Inst_list) eq 1 then $
         oplot, rad_concat_fit, A[0] / rad_concat_fit^A[1] ,th=2
@@ -585,7 +601,16 @@ for i_fl =0, N_fl-1 do begin
      ypos   = ypos -0.03
      xyouts, [xpos],[ypos],['Powers: '+string(A[1])+string(A[3]) ],/normal
   endif
-   ps2
+
+  if keyword_set(linfit) then begin
+     oplot, rad_concat_fit, 10.^(A[0] + (rad_concat_fit-1)*A[1]), th=2
+     ypos   = ypos -0.03
+     xyouts, [xpos],[ypos],['Coeffs: '+string(A[0])+string(A[1])],/normal
+  endif
+
+  
+  ps2
+  STOP
 endfor
 
 
