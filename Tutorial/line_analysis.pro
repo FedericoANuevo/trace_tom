@@ -11,7 +11,7 @@ pro line_analysis, rel_sqrt_chisqr_crit=rel_sqrt_chisqr_crit,$
                    map_number=map_number, cr_number=cr_number, $
                    aia = aia, euvia = euvia, euvib = euvib, eit = eit,$
                    mk4 = mk4, kcor = kcor, lascoc2 = lascoc2,$
-                   npower = npower, dpower = dpower, linfit = linfit
+                   npower = npower, dpower = dpower, linfit = linfit, ldpower = ldpower
 
 ; 0) Set a default value for rel_sqrt_chisqr_crit
   if not keyword_set(rel_sqrt_chisqr_crit) then rel_sqrt_chisqr_crit = 0.2
@@ -483,19 +483,16 @@ endif
 
 ; This module concatenate the densities of all instrument and fit it.
 
-
-if keyword_set(dpower) then suffix = '_dpow.eps'
-if keyword_set(npower) then suffix = '_npow.eps'
-if keyword_set(linfit) then suffix = '_linf.eps'
+if keyword_set(dpower)  then suffix = '_dpow.eps'
+if keyword_set(ldpower) then suffix = '_ldpow.eps'
+if keyword_set(npower)  then suffix = '_npow.eps'
+if keyword_set(linfit)  then suffix = '_linf.eps'
 
 for i_fl =0, N_fl-1 do begin
-
 
    if i_fl lt     10                     then ifl_str = '00' + strmid(string(long(i_fl)),11,1)
    if i_fl ge     10 and i_fl lt     100 then ifl_str = '0'  + strmid(string(long(i_fl)),10,2)
    if i_fl ge    100 and i_fl lt    1000 then ifl_str = ''   + strmid(string(long(i_fl)), 9,3)
-
- 
    
    if keyword_set(aia) then begin
       Nsamp   = (*trace_data.Npt_aia)(i_fl)
@@ -562,6 +559,8 @@ for i_fl =0, N_fl-1 do begin
    power_concat_fit, Inst_list, rad_concat, Ne_concat, inst_concat, A, chisq, /weighted
    if keyword_set(dpower) then $
    double_power_concat_fit, rad_concat, Ne_concat, inst_concat, A, chisq, /weighted
+   if keyword_set(ldpower) then $
+      double_power_concat_fit, rad_concat, alog10(Ne_concat), inst_concat, A, chisq, /weighted
    if keyword_set(linfit) then begin
       index = where(rad_concat lt 5.5) 
       linear_fit, rad_concat(index)-1, alog10(Ne_concat(index)), A, r2, chisqr = chisq, /linfit_idl
@@ -577,7 +576,7 @@ for i_fl =0, N_fl-1 do begin
    endif
 
    if keyword_set(linfit) then begin
-        ypos = ypos -0.03
+      ypos = ypos -0.03
       xyouts,[xpos],[ypos],['r!u2!n='+strmid(string(r2),6,5)],/normal
    endif
    
@@ -602,6 +601,15 @@ for i_fl =0, N_fl-1 do begin
      xyouts, [xpos],[ypos],['Powers: '+string(A[1])+string(A[3]) ],/normal
   endif
 
+  if keyword_set(ldpower) then begin
+    ;oplot, rad_concat_fit, 10.^( A[0] / rad_concat_fit^A[1] + A[2] / rad_concat_fit^A[3] ),th=2
+     oplot, rad_concat_fit, 10.^( A[0] / (rad_concat_fit-1.)^A[1] + A[2] / (rad_concat_fit-1.)^A[3] ),th=2
+     ypos   = ypos -0.03
+     xyouts, [xpos],[ypos],['Coeffs [log!D10!N(cm!U-3!N)]: '+string(A[0])+string(A[2])],/normal
+     ypos   = ypos -0.03
+     xyouts, [xpos],[ypos],['Powers: '+string(A[1])+string(A[3]) ],/normal
+  endif
+
   if keyword_set(linfit) then begin
      oplot, rad_concat_fit, 10.^(A[0] + (rad_concat_fit-1)*A[1]), th=2
      ypos   = ypos -0.03
@@ -610,7 +618,7 @@ for i_fl =0, N_fl-1 do begin
 
   
   ps2
-  STOP
+ ;STOP
 endfor
 
 
