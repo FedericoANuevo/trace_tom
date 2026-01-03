@@ -3,7 +3,7 @@
 ;
 ; line_analysis, cr_number = 2082, map_number = 1, /euvia, /lascoc2
 ; line_analysis, cr_number = 2082, map_number = 7, /euvia, /lascoc2
-; line_analysis, cr_number = 2099, map_number = 1, /aia  , /lascoc2, /mk4 ,/ldpower
+; line_analysis, cr_number = 2099, map_number = 1, /aia  , /lascoc2, /mk4
 ; line_analysis, cr_number = 2099, map_number = 7, /aia  , /lascoc2, /mk4
 ;;
 
@@ -37,7 +37,7 @@ pro line_analysis, rel_sqrt_chisqr_crit=rel_sqrt_chisqr_crit,$
      if map_number eq 1 then begin
        ;structure_filename = 'CR2099_AWSoM-map1_tracing-structure-merge_aia_mk4_lascoc2.sav'
         dir                = '/data1/DATA/trace_tom_files/CR2099/field_lines_geometry_map1/'
-        structure_filename = 'list.map1.new.txt-tracing-structure-merge_aia_mk4_lascoc2_sampled_ldpow.sav'
+        structure_filename = 'list.map1.new.txt-tracing-structure-merge_aia_mk4_lascoc2_sampled.sav'
         CritTermLon = [0.,100.,180.,270.,360.]
      endif  
      if map_number eq 7 then begin
@@ -555,7 +555,16 @@ for i_fl =0, N_fl-1 do begin
 
    if index(0) ne -1 then oplot,rad_concat(index),Ne_concat(index),psym=4,color=250
 
-   A = reform((*trace_data.fit_par)(i_fl,*))
+   if keyword_set(npower) then $
+   power_concat_fit, Inst_list, rad_concat, Ne_concat, inst_concat, A, chisq, /weighted
+   if keyword_set(dpower) then $
+   double_power_concat_fit, rad_concat, Ne_concat, inst_concat, A, chisq, /weighted
+   if keyword_set(ldpower) then $
+      double_power_concat_fit, rad_concat, alog10(Ne_concat), inst_concat, A, chisq, /weighted
+   if keyword_set(linfit) then begin
+      index = where(rad_concat lt 5.5) 
+      linear_fit, rad_concat(index)-1, alog10(Ne_concat(index)), A, r2, chisqr = chisq, /linfit_idl
+   endif
    
    loadct,0
    Nrad_fit = 100
@@ -593,7 +602,8 @@ for i_fl =0, N_fl-1 do begin
   endif
 
   if keyword_set(ldpower) then begin
-     oplot, rad_concat_fit, 10.^( A[0] / rad_concat_fit^A[1] + A[2] / rad_concat_fit^A[3] ),th=2
+    ;oplot, rad_concat_fit, 10.^( A[0] / rad_concat_fit^A[1] + A[2] / rad_concat_fit^A[3] ),th=2
+     oplot, rad_concat_fit, 10.^( A[0] / (rad_concat_fit)^A[1] + A[2] / (rad_concat_fit-1.)^A[3] ),th=2
      ypos   = ypos -0.03
      xyouts, [xpos],[ypos],['Coeffs [log!D10!N(cm!U-3!N)]: '+string(A[0])+string(A[2])],/normal
      ypos   = ypos -0.03
