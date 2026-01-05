@@ -54,6 +54,7 @@ pro expand_structure, map_number=map_number, cr_number=cr_number, $
   if keyword_set(npower)  then suffix = '_npow.sav'
   
   if keyword_set(aia)     then Inst_list   = ['aia']
+  if keyword_set(euvia)   then Inst_list   = ['euvia']
   if keyword_set(mk4)     then Inst_list   = [Inst_list,'mk4']
   if keyword_set(lascoc2) then Inst_list   = [Inst_list,'c2']
   
@@ -70,9 +71,17 @@ pro expand_structure, map_number=map_number, cr_number=cr_number, $
         rad_aia = reform((*trace_data.rad_aia)(i_fl,0:Nsamp-1))
         Ne_aia  = reform((*trace_data.Ne_aia) (i_fl,0:Nsamp-1))
         rad_concat = rad_aia
-        NE_concat  = Ne_aia
+        Ne_concat  = Ne_aia
         inst_concat = 'aia' + strarr(n_elements(rad_aia))
      endif
+     if keyword_set(euvia) then begin
+        Nsamp     = (*trace_data.Npt_euvia)(i_fl)
+        rad_euvia = reform((*trace_data.rad_euvia)(i_fl,0:Nsamp-1))
+        Ne_euvia  = reform((*trace_data.Ne_euvia) (i_fl,0:Nsamp-1))
+        rad_concat = rad_euvia
+        Ne_concat  = Ne_euvia
+        inst_concat = 'euvia' + strarr(n_elements(rad_euvia))
+     endif   
      if keyword_set(mk4) then begin
         Nsamp   = (*trace_data.Npt_mk4)(i_fl)
         rad_mk4 = reform((*trace_data.rad_mk4)(i_fl,0:Nsamp-1))

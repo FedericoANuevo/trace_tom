@@ -206,11 +206,13 @@ for ig=0,Ngroups-1 do begin
    loadct,ctbl
    color_index_step = fix(256./n_elements(ifl))
    for index=0,n_elements(ifl)-1 do begin
+     ; ------------------------ 
       Nsamp   = (*trace_data.Npt_aia)(ifl(index))
       rad_aia = (*trace_data.rad_aia)(ifl(index),0:Nsamp-1)
       Tm_aia  = (*trace_data.Tm_aia) (ifl(index),0:Nsamp-1)
       oplot,rad_fit_aia_A                 ,Tm_fit_aia_A(ifl(index),*)       ,color=(index)*color_index_step
       oplot,rad_aia,Tm_aia,color=(index)*color_index_step,psym=4
+     ; ------------------------ 
    endfor
    loadct,0
    oplot,rad_fit_aia_A,Tm_fit_aia_groupavg(ig,*),th=4
@@ -239,7 +241,15 @@ ps2
 endif
  
 
-if keyword_set(euvia) then begin
+  if keyword_set(euvia) then begin
+; -------------------------------------------
+     fitflag_euvia_A = *trace_data.fitflag_euvia
+     rad_fit_euvia_A = *trace_data.rad_fit_euvia
+      Ne_fit_euvia_A = *trace_data. Ne_fit_euvia
+     scN_fit_euvia_A = *trace_data.scN_fit_euvia
+      Tm_fit_euvia_A = *trace_data. Tm_fit_euvia
+     scT_fit_euvia_A = *trace_data.scT_fit_euvia
+; -------------------------------------------
 ; EUVI-A Ne
 Ne_fit_euvia_groupavg = fltarr(Ngroups,n_elements(rad_fit_euvia_A))
 ;---- Tag field lines for which the fit is positive at all heights ----
@@ -263,10 +273,13 @@ for ig=0,Ngroups-1 do begin
    loadct,ctbl
    color_index_step = fix(256./n_elements(ifl))
    for index=0,n_elements(ifl)-1 do begin
-      tmp = reform(index_sampling_euvia_A(ifl(index),*))
-      ind_samp_euvia = where(tmp eq 1)
+ ; ---------------------------------     
+      Nsamp     = (*trace_data.Npt_euvia)(ifl(index))
+      rad_euvia = (*trace_data.rad_euvia)(ifl(index),0:Nsamp-1)
+      Ne_euvia  = (*trace_data. Ne_euvia)(ifl(index),0:Nsamp-1)
       oplot,rad_fit_euvia_A                 ,Ne_fit_euvia_A(ifl(index),*)       ,color=(index)*color_index_step
-      oplot,rad_A(ifl(index),ind_samp_euvia),Ne_euvia_A(ifl(index),ind_samp_euvia),color=(index)*color_index_step,psym=4
+      oplot,rad_euvia,Ne_euvia,color=(index)*color_index_step,psym=4
+ ; ---------------------------------     
    endfor
    loadct,0
    oplot,rad_fit_euvia_A,Ne_fit_euvia_groupavg(ig,*),th=4
@@ -283,9 +296,10 @@ for ig=0,Ngroups-1 do begin
    loadct,ctbl
    color_index_step = fix(256./n_elements(ifl))
    for index=0,n_elements(ifl)-1 do begin
-      tmp = reform(index_sampling_euvia_A(ifl(index),*))
-      ind_samp_euvia = where(tmp eq 1)
-      oplot,lon_A(ifl(index),ind_samp_euvia),rad_A(ifl(index),ind_samp_euvia),color=(index)*color_index_step
+      Nsamp   =   (*trace_data.Npt_euvia)(ifl(index))
+      rad_euvia = (*trace_data.rad_euvia)(ifl(index),0:Nsamp-1)
+      lon_euvia = (*trace_data.lon_euvia)(ifl(index),0:Nsamp-1)
+      oplot,lon_euvia,rad_euvia,color=(index)*color_index_step
    endfor
    loadct,0
    skip_group_euvia_geo:
@@ -319,10 +333,13 @@ for ig=0,Ngroups-1 do begin
    loadct,ctbl
    color_index_step = fix(256./n_elements(ifl))
    for index=0,n_elements(ifl)-1 do begin
-      tmp = reform(index_sampling_euvia_A(ifl(index),*))
-      ind_samp_euvia = where(tmp eq 1)
+    ; ------------------------ 
+      Nsamp     = (*trace_data.Npt_euvia)(ifl(index))
+      rad_euvia = (*trace_data.rad_euvia)(ifl(index),0:Nsamp-1)
+      Tm_euvia  = (*trace_data.Tm_euvia) (ifl(index),0:Nsamp-1)
       oplot,rad_fit_euvia_A                 ,Tm_fit_euvia_A(ifl(index),*)       ,color=(index)*color_index_step
-      oplot,rad_A(ifl(index),ind_samp_euvia),Tm_euvia_A(ifl(index),ind_samp_euvia),color=(index)*color_index_step,psym=4
+      oplot,rad_euvia,Tm_euvia,color=(index)*color_index_step,psym=4
+    ; ------------------------ 
    endfor
    loadct,0
    oplot,rad_fit_euvia_A,Tm_fit_euvia_groupavg(ig,*),th=4
@@ -339,9 +356,10 @@ for ig=0,Ngroups-1 do begin
    loadct,ctbl
    color_index_step = fix(256./n_elements(ifl))
    for index=0,n_elements(ifl)-1 do begin
-      tmp = reform(index_sampling_euvia_A(ifl(index),*))
-      ind_samp_euvia = where(tmp eq 1)
-      oplot,lon_A(ifl(index),ind_samp_euvia),rad_A(ifl(index),ind_samp_euvia),color=(index)*color_index_step
+      Nsamp     = (*trace_data.Npt_euvia)(ifl(index))
+      rad_euvia = (*trace_data.rad_euvia)(ifl(index),0:Nsamp-1)
+      lon_euvia = (*trace_data.lon_euvia)(ifl(index),0:Nsamp-1)
+      oplot,lon_euvia,rad_euvia,color=(index)*color_index_step
    endfor
    loadct,0
    skip_group_euvia_geoT:
@@ -499,10 +517,22 @@ for i_fl =0, N_fl-1 do begin
       rad_aia = reform((*trace_data.rad_aia)(i_fl,0:Nsamp-1))
       Ne_aia  = reform((*trace_data.Ne_aia) (i_fl,0:Nsamp-1))
       rad_concat = rad_aia
-      NE_concat  = Ne_aia
+      Ne_concat  = Ne_aia
       inst_concat = 'aia' + strarr(n_elements(rad_aia))
       Inst_list   = ['aia']
    endif
+   if keyword_set(euvia) then begin
+      Nsamp     = (*trace_data.Npt_)(i_fl)
+      rad_euvia = reform((*trace_data.rad_euvia)(i_fl,0:Nsamp-1))
+      Ne_euvia  = reform((*trace_data.Ne_euvia) (i_fl,0:Nsamp-1))
+      rad_concat = rad_euvia
+      Ne_concat  = Ne_euvia
+      inst_concat = 'euvia' + strarr(n_elements(rad_euvia))
+      Inst_list   = ['euvia']
+   endif
+
+
+   
    if keyword_set(mk4) then begin
       Nsamp   = (*trace_data.Npt_mk4)(i_fl)
       rad_mk4 = reform((*trace_data.rad_mk4)(i_fl,0:Nsamp-1))
@@ -527,15 +557,22 @@ for i_fl =0, N_fl-1 do begin
    plot,rad_concat,Ne_concat,/ylog,/nodata,title='Field line #'+string(i_fl),xtitle='rad [Rsun]',ytitle='log!d10!N(Ne [cm!U-3!N] )'
    loadct,39
    color = fltarr(n_elements(Ne_concat))
-   index = where(inst_concat eq 'aia')
    xpos = 0.2
    ypos = 0.9
 
+   index = where(inst_concat eq 'aia')
    if index(0) ne -1 then begin
       color = 100
       oplot,rad_concat(index),Ne_concat(index),psym=4,color=color
       xyouts,[xpos],[ypos],['AIA'],color=color,/normal
    endif
+   index = where(inst_concat eq 'euvia')
+   if index(0) ne -1 then begin
+      color = 100
+      oplot,rad_concat(index),Ne_concat(index),psym=4,color=color
+      xyouts,[xpos],[ypos],['EUVIA'],color=color,/normal
+   endif
+
    
    index = where(inst_concat eq 'mk4')
    if index(0) ne -1 then begin
