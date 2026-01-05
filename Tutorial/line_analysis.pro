@@ -1,7 +1,7 @@
 ;;
 ; Calling sequence examples:
 ;
-; line_analysis, cr_number = 2082, map_number = 1, /euvia, /lascoc2
+; line_analysis, cr_number = 2082, map_number = 1, /euvia, /lascoc2, /ldpower
 ; line_analysis, cr_number = 2082, map_number = 7, /euvia, /lascoc2
 ; line_analysis, cr_number = 2099, map_number = 1, /aia  , /lascoc2, /mk4 ,/ldpower
 ; line_analysis, cr_number = 2099, map_number = 7, /aia  , /lascoc2, /mk4
@@ -23,7 +23,7 @@ pro line_analysis, rel_sqrt_chisqr_crit=rel_sqrt_chisqr_crit,$
      if map_number eq 1 then begin
        ;structure_filename = 'CR2082_AWSoM-map1-tracing-structure-merge_euvia_lascoc2.sav'
         dir                = '/data1/DATA/trace_tom_files/CR2082/field_lines_geometry_map1/'
-        structure_filename = 'list.map1.new.txt-tracing-structure-merge_euvia_lascoc2_sampled.sav'
+        structure_filename = 'list.map1.new.txt-tracing-structure-merge_euvia_lascoc2_sampled_ldpow.sav'
         CritTermLon = [0.,100.,180.,270.,360.]
      endif  
      if map_number eq 7 then begin
@@ -522,7 +522,7 @@ for i_fl =0, N_fl-1 do begin
       Inst_list   = ['aia']
    endif
    if keyword_set(euvia) then begin
-      Nsamp     = (*trace_data.Npt_)(i_fl)
+      Nsamp     = (*trace_data.Npt_euvia)(i_fl)
       rad_euvia = reform((*trace_data.rad_euvia)(i_fl,0:Nsamp-1))
       Ne_euvia  = reform((*trace_data.Ne_euvia) (i_fl,0:Nsamp-1))
       rad_concat = rad_euvia
