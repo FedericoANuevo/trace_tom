@@ -2,9 +2,9 @@
 ; Calling sequence examples:
 ;
 ; line_analysis, cr_number = 2082, map_number = 1, /euvia, /lascoc2, /ldpower
-; line_analysis, cr_number = 2082, map_number = 7, /euvia, /lascoc2
+; line_analysis, cr_number = 2082, map_number = 7, /euvia, /lascoc2, /ldpower
 ; line_analysis, cr_number = 2099, map_number = 1, /aia  , /lascoc2, /mk4 ,/ldpower
-; line_analysis, cr_number = 2099, map_number = 7, /aia  , /lascoc2, /mk4
+; line_analysis, cr_number = 2099, map_number = 7, /aia  , /lascoc2, /mk4 , /ldpower
 ;;
 
 pro line_analysis, rel_sqrt_chisqr_crit=rel_sqrt_chisqr_crit,$
@@ -29,7 +29,7 @@ pro line_analysis, rel_sqrt_chisqr_crit=rel_sqrt_chisqr_crit,$
      if map_number eq 7 then begin
        ;structure_filename = 'CR2082_AWSoM-map7-tracing-structure-merge_euvia_lascoc2.sav'
         dir                = '/data1/DATA/trace_tom_files/CR2082/field_lines_geometry_map7/'
-        structure_filename = 'list.map7.new.txt-tracing-structure-merge_euvia_lascoc2_sampled.sav'
+        structure_filename = 'list.map7.new.txt-tracing-structure-merge_euvia_lascoc2_sampled_ldpow.sav'
         CritTermLon = [0.,100.,180.,270.,360.]
      endif
   endif
@@ -43,7 +43,7 @@ pro line_analysis, rel_sqrt_chisqr_crit=rel_sqrt_chisqr_crit,$
      if map_number eq 7 then begin
        ;structure_filename = 'CR2099_AWSoM-map7_tracing-structure-merge_aia_mk4_lascoc2.sav'
         dir                = '/data1/DATA/trace_tom_files/CR2099/field_lines_geometry_map7/'
-        structure_filename = 'list.map7.new.txt-tracing-structure-merge_aia_mk4_lascoc2_sampled.sav'
+        structure_filename = 'list.map7.new.txt-tracing-structure-merge_aia_mk4_lascoc2_sampled_ldpow.sav'
         CritTermLon = [0.,100.,180.,270.,310.,360.]
      endif
   endif
@@ -514,12 +514,17 @@ for i_fl =0, N_fl-1 do begin
    
    if keyword_set(aia) then begin
       Nsamp   = (*trace_data.Npt_aia)(i_fl)
-      rad_aia = reform((*trace_data.rad_aia)(i_fl,0:Nsamp-1))
-      Ne_aia  = reform((*trace_data.Ne_aia) (i_fl,0:Nsamp-1))
-      rad_concat = rad_aia
-      Ne_concat  = Ne_aia
-      inst_concat = 'aia' + strarr(n_elements(rad_aia))
-      Inst_list   = ['aia']
+      ini = 'yes'
+      if Nsamp gt 0 then begin
+         rad_aia = reform((*trace_data.rad_aia)(i_fl,0:Nsamp-1))
+         Ne_aia  = reform((*trace_data.Ne_aia) (i_fl,0:Nsamp-1))
+         rad_concat = rad_aia
+         Ne_concat  = Ne_aia
+         inst_concat = 'aia' + strarr(n_elements(rad_aia))
+         Inst_list   = ['aia']
+      endif else begin
+         ini = 'no'
+      endelse
    endif
    if keyword_set(euvia) then begin
       Nsamp     = (*trace_data.Npt_euvia)(i_fl)
@@ -537,10 +542,17 @@ for i_fl =0, N_fl-1 do begin
       Nsamp   = (*trace_data.Npt_mk4)(i_fl)
       rad_mk4 = reform((*trace_data.rad_mk4)(i_fl,0:Nsamp-1))
       Ne_mk4  = reform((*trace_data.Ne_mk4) (i_fl,0:Nsamp-1))
-      rad_concat = [rad_concat,rad_mk4]
-      Ne_concat  = [Ne_concat,Ne_mk4]
-      inst_concat = [inst_concat , 'mk4' + strarr(n_elements(rad_mk4))]
-      if not keyword_set(Inst_list) then Inst_list=['mk4'] else Inst_list=[Inst_list,'mk4']
+      if ini eq 'yes' then begin
+         rad_concat = [rad_concat,rad_mk4]
+         Ne_concat  = [Ne_concat,Ne_mk4]   
+         inst_concat = [inst_concat , 'mk4' + strarr(n_elements(rad_mk4))]
+         if not keyword_set(Inst_list) then Inst_list=['mk4'] else Inst_list=[Inst_list,'mk4']
+      endif else begin
+         rad_concat  = rad_mk4
+         Ne_concat   = Ne_mk4   
+         inst_concat = 'mk4' + strarr(n_elements(rad_mk4))
+         ini = 'yes'
+      endelse
    endif
    if keyword_set(lascoc2) then begin
       Nsamp   = (*trace_data.Npt_c2)(i_fl)

@@ -2,9 +2,9 @@
 ; Calling sequence examples:
 ;
 ; expand_structure, cr_number = 2082, map_number = 1, /euvia, /lascoc2, /ldpower
-; expand_structure, cr_number = 2082, map_number = 7, /euvia, /lascoc2
+; expand_structure, cr_number = 2082, map_number = 7, /euvia, /lascoc2, /ldpower
 ; expand_structure, cr_number = 2099, map_number = 1, /aia  , /lascoc2, /mk4, /ldpower
-; expand_structure, cr_number = 2099, map_number = 7, /aia  , /lascoc2, /mk4
+; expand_structure, cr_number = 2099, map_number = 7, /aia  , /lascoc2, /mk4, /ldpower 
 ;;
 
 pro expand_structure, map_number=map_number, cr_number=cr_number, $
@@ -68,11 +68,16 @@ pro expand_structure, map_number=map_number, cr_number=cr_number, $
 ; This module concatenate the densities of all instrument and fit it.
      if keyword_set(aia) then begin
         Nsamp   = (*trace_data.Npt_aia)(i_fl)
-        rad_aia = reform((*trace_data.rad_aia)(i_fl,0:Nsamp-1))
-        Ne_aia  = reform((*trace_data.Ne_aia) (i_fl,0:Nsamp-1))
-        rad_concat = rad_aia
-        Ne_concat  = Ne_aia
-        inst_concat = 'aia' + strarr(n_elements(rad_aia))
+        ini     = 'yes'
+        if Nsamp gt 0 then begin
+           rad_aia = reform((*trace_data.rad_aia)(i_fl,0:Nsamp-1))
+           Ne_aia  = reform((*trace_data.Ne_aia) (i_fl,0:Nsamp-1))
+           rad_concat = rad_aia
+           Ne_concat  = Ne_aia
+           inst_concat = 'aia' + strarr(n_elements(rad_aia))
+        endif else begin
+           ini  = 'no'
+        endelse
      endif
      if keyword_set(euvia) then begin
         Nsamp     = (*trace_data.Npt_euvia)(i_fl)
@@ -86,9 +91,16 @@ pro expand_structure, map_number=map_number, cr_number=cr_number, $
         Nsamp   = (*trace_data.Npt_mk4)(i_fl)
         rad_mk4 = reform((*trace_data.rad_mk4)(i_fl,0:Nsamp-1))
         Ne_mk4  = reform((*trace_data.Ne_mk4) (i_fl,0:Nsamp-1))
-        rad_concat = [rad_concat,rad_mk4]
-        Ne_concat  = [Ne_concat,Ne_mk4]
-        inst_concat = [inst_concat , 'mk4' + strarr(n_elements(rad_mk4))]
+        if ini eq 'yes' then begin 
+           rad_concat  = [rad_concat,rad_mk4]
+           Ne_concat   = [Ne_concat,Ne_mk4]
+           inst_concat = [inst_concat , 'mk4' + strarr(n_elements(rad_mk4))]
+        endif else begin
+           rad_concat = rad_mk4
+           Ne_concat  = Ne_mk4
+           inst_concat= 'mk4' + strarr(n_elements(rad_mk4))
+           ini = 'yes'
+        endelse
      endif
      if keyword_set(lascoc2) then begin
         Nsamp   = (*trace_data.Npt_c2)(i_fl)
@@ -123,7 +135,7 @@ pro expand_structure, map_number=map_number, cr_number=cr_number, $
 ; Save expanded structure 
   save, trace_data, filename = dir + structure_filename_expand
   
-  STOP
+
   return
 end
  
