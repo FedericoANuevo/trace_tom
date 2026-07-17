@@ -53,7 +53,7 @@ pro merge_trace_struct_call, nfs1=nfs1, nfs2=nfs2, trace_Bs=trace_Bs
   IF PROJECT_NAME eq 'CR2082' then $
      merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, /euvia, /lascoc2, structure_filename=structure_filename
   IF PROJECT_NAME EQ 'CR2223' THEN $
-     merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, /euvia, /aia, structure_filename=structure_filename
+     merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, /euvia, /aia, structure_filename=structure_filename, trace_Bs = trace_Bs
 
   return
 end

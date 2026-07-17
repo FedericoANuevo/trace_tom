@@ -58,9 +58,9 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
 ; NOTE: for an instrument that varies its FoV a lot, like Metis, we
 ; will need a formula such as: Npt_max = 1.5 * (Irmax-Irmin)/dr.
   Npt_max_aia     =  50 ;40
-  Npt_max_euvia   =  40
-  Npt_max_euvib   =  40
-  Npt_max_eit     =  40
+  Npt_max_euvia   =  50
+  Npt_max_euvib   =  50
+  Npt_max_eit     =  50
   Npt_max_mk4     =  80
   Npt_max_kcor    = 150 ;80
   Npt_max_ucomp   =  50 ;40
