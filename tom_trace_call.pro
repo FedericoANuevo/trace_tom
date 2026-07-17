@@ -4,7 +4,7 @@
 ; to read the tomographic producs to be traced.
 ;
 ; CALLING SEQUENCE EXAMPLES:
-; tom_trace_call, /demt    `, /trace_Bs
+; tom_trace_call, /demt     , /trace_Bs
 ; tom_trace_call, /ucomp    , /trace_Bs
 ; tom_trace_call, /kcor_mk4 , /trace_Bs
 ; tom_trace_call, /lasco    , /trace_Bs
@@ -80,10 +80,10 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
         instr    = 'aia'
      endif
      if PROJECT_NAME eq 'CR2223' then begin
-        tom_file = 'LDEM.CR2223_AIA_Hollow_3Bands_gauss1_lin_Norm-median_singlStart'
-        ;tom_file = 'LDEM.CR2223_euviA_Hollow_3Bands_gauss1_lin_Norm-median_singlStart'
-        instr    = 'aia'
-        ;instr    = 'euvia'
+        ;tom_file = 'LDEM.CR2223_AIA_Hollow_3Bands_gauss1_lin_Norm-median_singlStart'
+        tom_file = 'LDEM.CR2223_euviA_Hollow_3Bands_gauss1_lin_Norm-median_singlStart'
+        ;instr    = 'aia'
+        instr    = 'euvia'
      endif
      nr       = 30   ;21   
      nt       = 90   ;60  
