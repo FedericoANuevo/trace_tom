@@ -24,17 +24,18 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
 ; PROJECT_NAME = 'CR2254'
 ; PROJECT_NAME = 'CR2261'
 ; PROJECT_NAME = 'April24'
-  PROJECT_NAME = 'CR2082'
+; PROJECT_NAME = 'CR2082'
 ; PROJECT_NAME = 'CR2099'
-  
+  PROJECT_NAME = 'CR2223'
 ; map_suffix = 'map1'
-  map_suffix = 'map7'
+; map_suffix = 'map7'
 
 ; Define field_line_geometry_suffix_dir
 ; field_line_geometry_suffix_dir='_aunifgrid_multirad-6h_3x3deg_HMI-PolFil/'
 ; field_line_geometry_suffix_dir='_aunifgrid_2.50Rs_0.5x0.5deg_HMI-PolFil/'
 ; field_line_geometry_suffix_dir='_equatorial-ring/'
-  field_line_geometry_suffix_dir='_'+map_suffix +'/'
+; field_line_geometry_suffix_dir='_'+map_suffix +'/'
+  field_line_geometry_suffix_dir='_aunifgrid_multirad-6h_2x2deg_HMI-PolFil/'
   
 ; Provide FL_LIST, the file which informs the number of field lines and the
 ; filenames of the ASCII files containing the geometry of each line.
@@ -42,7 +43,8 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
 ; fl_list = 'fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2254_prep.ubdat_fline-filenames_list.txt'
 ; fl_list = 'fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2261_prep.ubdat_fline-filenames_list.txt'
 ; fl_list = 'Bfield_AWSoM_April24.ubdat_fline-filenames_list.txt'
-  fl_list = 'list.'+map_suffix+'.new.txt'
+; fl_list = 'list.'+map_suffix+'.new.txt'
+  fl_list = 'fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2223_prep.ubdat_fline-filenames_list.txt'
 ;===============================================================================================
 
 ; --------------------This block should not require edits.---------------------------
@@ -76,6 +78,12 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
      if PROJECT_NAME eq 'CR2261' then begin
         tom_file = 'LDEM.chip07_aia_Hollow_3Bands_ucomp_comparison_exp2_gauss1_lin_Norm-median_singlStart'
         instr    = 'aia'
+     endif
+     if PROJECT_NAME eq 'CR2223' then begin
+        tom_file = 'LDEM.CR2223_AIA_Hollow_3Bands_gauss1_lin_Norm-median_singlStart'
+        ;tom_file = 'LDEM.CR2223_euviA_Hollow_3Bands_gauss1_lin_Norm-median_singlStart'
+        instr    = 'aia'
+        ;instr    = 'euvia'
      endif
      nr       = 30   ;21   
      nt       = 90   ;60  
