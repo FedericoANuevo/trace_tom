@@ -86,10 +86,10 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
         instr    = 'euvia'
      endif
      if PROJECT_NAME eq 'CR2200' then begin
-        tom_file = 'LDEM.CR2200_AIA_Hollow_3Bands_gauss1_lin_Norm-median_singlStart'
-       ;tom_file = 'LDEM.CR2200_euviA_Hollow_3Bands_gauss1_lin_Norm-median_singlStart'
-        instr    = 'aia'
-       ;instr    = 'euvia'
+       ;tom_file = 'LDEM.CR2200_AIA_Hollow_3Bands_gauss1_lin_Norm-median_singlStart'
+        tom_file = 'LDEM.CR2200_euviA_Hollow_3Bands_gauss1_lin_Norm-median_singlStart'
+       ;instr    = 'aia'
+        instr    = 'euvia'
      endif
        if PROJECT_NAME eq 'CR2235' then begin
         tom_file = 'LDEM.CR2235_AIA_Hollow_3Bands_gauss1_lin_Norm-median_singlStart'
