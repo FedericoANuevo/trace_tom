@@ -26,7 +26,7 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
 ; PROJECT_NAME = 'April24'
 ; PROJECT_NAME = 'CR2082'
 ; PROJECT_NAME = 'CR2099'
-  PROJECT_NAME = 'CR2200'
+  PROJECT_NAME = 'CR2235'
 ; map_suffix = 'map1'
 ; map_suffix = 'map7'
 
@@ -44,7 +44,7 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
 ; fl_list = 'fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2261_prep.ubdat_fline-filenames_list.txt'
 ; fl_list = 'Bfield_AWSoM_April24.ubdat_fline-filenames_list.txt'
 ; fl_list = 'list.'+map_suffix+'.new.txt'
-  fl_list = 'fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2200_prep.ubdat_fline-filenames_list.txt'
+  fl_list = 'fdips_field_150X180X360_hmi.Synoptic_Mr_polfil.2235_prep.ubdat_fline-filenames_list.txt'
 ;===============================================================================================
 
 ; --------------------This block should not require edits.---------------------------
@@ -92,10 +92,10 @@ pro tom_trace_call,demt=demt,lasco=lasco,kcor_mk4=kcor_mk4,ucomp=ucomp,$
         instr    = 'euvia'
      endif
        if PROJECT_NAME eq 'CR2235' then begin
-        tom_file = 'LDEM.CR2235_AIA_Hollow_3Bands_gauss1_lin_Norm-median_singlStart'
-       ;tom_file = 'LDEM.CR2235_euviA_Hollow_3Bands_gauss1_lin_Norm-median_singlStart'
-        instr    = 'aia'
-       ;instr    = 'euvia'
+       ;tom_file = 'LDEM.CR2235_AIA_Hollow_3Bands_gauss1_lin_Norm-median_singlStart'
+        tom_file = 'LDEM.CR2235_euviA_Hollow_3Bands_gauss1_lin_Norm-median_singlStart'
+       ;instr    = 'aia'
+        instr    = 'euvia'
      endif
      
      nr       = 30   ;21   
