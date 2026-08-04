@@ -78,6 +78,7 @@ pro merge_trace_struct, fl_dir=fl_dir, fl_list=fl_list, $
   Termpoint_Lon_A = fltarr(N_fl)
   Termpoint_Lat_A = fltarr(N_fl)
 
+
 ; 2nd Tomography Products: 
   if keyword_set(aia) then begin
      Npt_aia              = intarr(N_fl)             + default

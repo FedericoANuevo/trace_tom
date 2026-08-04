@@ -37,25 +37,40 @@ pro up_down_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
   N_fl = *trace_data.N_fl
 
 
+  tag_small_large_A          = fltarr(N_fl)
+  i_small                    = where(*trace_data.termpoint_rad le 1.25)
+  i_large                    = where(*trace_data.termpoint_rad gt 1.25)
+  tag_small_large_A(i_small) = 1.
+  tag_small_large_A(i_large) = 2.
   
-  midpoint_rad = fltarr(N_fl) -678.
-  midpoint_lat = fltarr(N_fl) -678.
-  midpoint_lon = fltarr(N_fl) -678.
-; Calculate mid-point (~ 1.105 Rsun) of fieldlines  
+  midpoint_rad  = fltarr(N_fl) -678.
+  midpoint_lat  = fltarr(N_fl) -678.
+  midpoint_lon  = fltarr(N_fl) -678.
+  rho_Tm_r_aia  = fltarr(N_fl) 
+  rho_Tm_r_euvi = fltarr(N_fl) 
+; Calculate mid-point (~ 1.105 Rsun) and rho(T,r) for each field-line 
   for ifl = 0L, N_fl-1 do begin
      Nsamp   = (*trace_data.Npt_aia)(ifl)
      if Nsamp ne -678. then begin
         radsamp = (*trace_data.rad_aia)(ifl,0:Nsamp-1)
         latsamp = (*trace_data.lat_aia)(ifl,0:Nsamp-1)
         lonsamp = (*trace_data.lon_aia)(ifl,0:Nsamp-1)
+        Tm_samp = (*trace_data.Tm_aia) (ifl,0:Nsamp-1)
+        rho_Tm_r_aia(ifl) = correlate(radsamp,Tm_samp)
         index = where(radsamp gt 1.10 and radsamp lt 1.11)
         if index(0) ne -1 then begin
            midpoint_rad(ifl) = radsamp(index)
            midpoint_lat(ifl) = latsamp(index)
            midpoint_lon(ifl) = lonsamp(index)
-        endif
+        endif       
      endif
-  endfor
+      Nsamp   = (*trace_data.Npt_euvia)(ifl)
+      if Nsamp ne -678. then begin
+         radsamp = (*trace_data.rad_euvia)(ifl,0:Nsamp-1)
+         Tm_samp = (*trace_data.Tm_euvia) (ifl,0:Nsamp-1)
+         rho_Tm_r_euvi(ifl) = correlate(radsamp,Tm_samp)
+      endif
+   endfor
   
 
   
@@ -121,9 +136,9 @@ pro up_down_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
         indpositparam_aia   = where(tag_posfit_aia_A   eq +1)  &  ifl_aia_A   = intersect(ifl_aia_A  ,indpositparam_aia  ) 
      endif
      tag_gradT_aia_A   = fltarr(N_Fl)
-     index          = where(*trace_data.fitflag_aia  eq +1 and *trace_data.dTdr_fit_aia gt 0.)
+     index          = where(*trace_data.fitflag_aia  eq +1 and *trace_data.dTdr_fit_aia gt 0. and  abs(rho_Tm_r_aia) gt 0.5)
      tag_gradT_aia_A(index)   = +1
-     index          = where(*trace_data.fitflag_aia  eq +1 and *trace_data.dTdr_fit_aia lt 0.)
+     index          = where(*trace_data.fitflag_aia  eq +1 and *trace_data.dTdr_fit_aia lt 0. and  abs(rho_Tm_r_aia) gt 0.5)
      tag_gradT_aia_A(index)   = -1
      if keyword_Set(only_loops) then begin
         ifl=0L
@@ -155,9 +170,9 @@ pro up_down_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
         indpositparam_euvia   = where(tag_posfit_euvia_A   eq +1)  &  ifl_euvi_A   = intersect(ifl_euvi_A  ,indpositparam_euvia  ) 
      endif
      tag_gradT_euvi_A   = fltarr(N_Fl)
-     index          = where(*trace_data.fitflag_euvia  eq +1 and *trace_data.dTdr_fit_euvia gt 0.)
+     index          = where(*trace_data.fitflag_euvia  eq +1 and *trace_data.dTdr_fit_euvia gt 0. and  abs(rho_Tm_r_euvi) gt 0.5)
      tag_gradT_euvi_A(index)   = +1
-     index          = where(*trace_data.fitflag_euvia  eq +1 and *trace_data.dTdr_fit_euvia lt 0.)
+     index          = where(*trace_data.fitflag_euvia  eq +1 and *trace_data.dTdr_fit_euvia lt 0. and  abs(rho_Tm_r_euvi) gt 0.5)
      tag_gradT_euvi_A(index)   = -1
      if keyword_Set(only_loops) then begin
         ifl=0L
@@ -178,10 +193,18 @@ pro up_down_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
   
 ;-----------------PLOTS SECTION--------------------------------------------------------------
 ; Define a few color codes.
+  coltb = 12
   blue  = 100
   red   = 200
   green =  16
 
+  coltb = 33
+  blue=fix(256/3.3)
+  dblue=10
+  red=200
+  dred=250
+
+  
 ; Lat/Lon plots of FootPoints
   fig_dir = './'
 ; fig_dir = '~/Downloads/'
@@ -214,24 +237,34 @@ pro up_down_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
   ifl_pos_A = where(tag_gradT_aia_A   eq +1.)
   ifl_neg_A = where(tag_gradT_aia_A   eq -1.)
 
-  loadct,12
+  
+  
+
+  loadct,coltb
 ; Color-highlight all footpoints indicated by ifl_A accordind to their
-; polarity / or UP AND DOWN
-  indxpos_A = intersect(ifl_A,ifl_pos_A)
-  indxneg_A = intersect(ifl_A,ifl_neg_A)
-  if n_elements(indxpos_A) gt 1 then $
-     oplot,midpoint_lon(indxpos_A),midpoint_lat(indxpos_A),psym=3,th=2,color=red
-  if n_elements(indxneg_A) gt 1 then $
-     oplot,midpoint_lon(indxneg_A),midpoint_lat(indxneg_A),psym=3,th=2,color=blue 
+; UP AND DOWN beheavior
+  indxpos_A   = intersect(ifl_A,ifl_pos_A)
+  indxneg_A   = intersect(ifl_A,ifl_neg_A)
+; Separo en small y large  
+  ismall_up   = intersect(indxpos_A,i_small)
+  ismall_down = intersect(indxneg_A,i_small)
+  ilarge_up   = intersect(indxpos_A,i_large)
+  ilarge_down = intersect(indxneg_A,i_large)
+
+
+  oplot,midpoint_lon(ismall_up),midpoint_lat(ismall_up),psym=3,th=2,color=red
+  oplot,midpoint_lon(ismall_down),midpoint_lat(ismall_down),psym=3,th=2,color=blue
+  oplot,midpoint_lon(ilarge_up),midpoint_lat(ilarge_up),psym=3,th=2,color=dred
+  oplot,midpoint_lon(ilarge_down),midpoint_lat(ilarge_down),psym=3,th=2,color=dblue
   loadct,0
   print,'AIA'
   print,'fraction of Up   loops:',n_elements(indxpos_A)*1./( n_elements(indxpos_A)+n_elements(indxneg_A))
   print,'fraction of Down loops:',n_elements(indxneg_A)*1./( n_elements(indxpos_A)+n_elements(indxneg_A))
 
 ; Calculate a 1D vector with dTm/dr for histogram  
-  index = where(abs(tag_gradT_aia_A) eq 1 and abs(*trace_data.dTdr_fit_aia)/1.e6 gt 0.5)
-  index = intersect(index,ifl_A)
-  gradT_aia = (*trace_data.dTdr_fit_aia)(index)/1.e6
+  gradT_aia            = (*trace_data.dTdr_fit_aia)*0.-999.
+  gradT_aia(indxpos_A) = (*trace_data.dTdr_fit_aia)(indxpos_A)/1.e6
+  gradT_aia(indxneg_A) = (*trace_data.dTdr_fit_aia)(indxneg_A)/1.e6
   
   ; Second plot
   title = 'EUVI: Physical location of leg at 1.105 Rsun'
@@ -251,26 +284,34 @@ pro up_down_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
   ifl_pos_A = where(tag_gradT_euvi_A   eq +1.)
   ifl_neg_A = where(tag_gradT_euvi_A   eq -1.)
 
-  loadct,12
+  loadct,coltb
 ; Color-highlight all footpoints indicated by ifl_A accordind to their
 ; polarity / or UP AND DOWN
   indxpos_A = intersect(ifl_A,ifl_pos_A)
   indxneg_A = intersect(ifl_A,ifl_neg_A)
-  if n_elements(indxpos_A) gt 1 then $
-     oplot,midpoint_lon(indxpos_A),midpoint_lat(indxpos_A),psym=3,th=2,color=red
-  if n_elements(indxneg_A) gt 1 then $
-     oplot,midpoint_lon(indxneg_A),midpoint_lat(indxneg_A),psym=3,th=2,color=blue 
+; Separo en small y large  
+  ismall_up   = intersect(indxpos_A,i_small)
+  ismall_down = intersect(indxneg_A,i_small)
+  ilarge_up   = intersect(indxpos_A,i_large)
+  ilarge_down = intersect(indxneg_A,i_large)
+
+  oplot,midpoint_lon(ismall_up),midpoint_lat(ismall_up),psym=3,th=2,color=red
+  oplot,midpoint_lon(ismall_down),midpoint_lat(ismall_down),psym=3,th=2,color=blue
+  oplot,midpoint_lon(ilarge_up),midpoint_lat(ilarge_up),psym=3,th=2,color=dred
+  oplot,midpoint_lon(ilarge_down),midpoint_lat(ilarge_down),psym=3,th=2,color=dblue
+  
   loadct,0
   print,'EUVI'
   print,'fraction of Up   loops:',n_elements(indxpos_A)*1./( n_elements(indxpos_A)+n_elements(indxneg_A))
   print,'fraction of Down loops:',n_elements(indxneg_A)*1./( n_elements(indxpos_A)+n_elements(indxneg_A))
   !p.multi=0
 ; Calculate a 1D vector with dTm/dr for histogram    
-  index = where(abs(tag_gradT_euvi_A) eq 1 and abs(*trace_data.dTdr_fit_euvia)/1.e6 gt 0.5)
-  index = intersect(index,ifl_A)
-  gradT_euvi = (*trace_data.dTdr_fit_euvia)(index)/1.e6
+  gradT_euvi            = (*trace_data.dTdr_fit_euvia)*0.-999.
+  gradT_euvi(indxpos_A) = (*trace_data.dTdr_fit_euvia)(indxpos_A)/1.e6
+  gradT_euvi(indxneg_A) = (*trace_data.dTdr_fit_euvia)(indxneg_A)/1.e6
 
-  
+  index = where(gradT_aia  ne -999.) & gradT_aia  = gradT_aia (index) 
+  index = where(gradT_euvi ne -999.) & gradT_euvi = gradT_euvi(index) 
 
 ; Histograms of dTm/dr  
   xhisto2,gradT_aia ,comp_suffix='GradT_aia' ,sufijo=plot_filename_suffix, histo_x_tit='dTm/dr [MK/Rsun]',Nvals =50, dir_fig ='./',mini=-8.,maxi=8.,tit='AIA'
@@ -353,7 +394,7 @@ pro xhisto2,vector,comp_suffix=comp_suffix,sufijo=sufijo,tit=tit,histo_x_tit=his
   name_fig   =  (STRJOIN(STRSPLIT(name_fig, /EXTRACT,'.'), '_'))
   ps1,dir_fig+name_fig+'.eps'
 
-  plot,xval,histo_vector ,font=0,xtitle=histo_x_tit,title=tit,linestyle=8,psym=10,thick=4,charsize=2.2,xrange=[mini-0.1,maxi+0.1],xstyle=1,yrange=[0.,0.16],ystyle=1
+  plot,xval,histo_vector ,font=0,xtitle=histo_x_tit,title=tit,linestyle=8,psym=10,thick=4,charsize=2.2,xrange=[mini-0.1,maxi+0.1],xstyle=1
 ; xyouts,0.7*[1,1,1,1],0.98-[0.18,0.25,0.32,0.38],['m='+med_str,'','!9s!3='+stdv_str,''],/normal,charthick=1,Font=0,charsize=2.2
   !p.multi = 0
      
