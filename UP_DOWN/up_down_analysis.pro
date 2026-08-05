@@ -1,21 +1,13 @@
 
 pro up_down_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
                       plot_filename_suffix=plot_filename_suffix,$
-                      aia=aia, euvi=euvi,$
-                      open=open,closed=closed,$
-                      positparam=positparam,$
-                      only_loops=only_loops, loadstruct=loadstruct,$
-                      histo = histo, tit = tit
+                      aia=aia, euvi=euvi, open=open,closed=closed,$
+                      positparam=positparam, only_loops=only_loops,$
+                      loadstruct=loadstruct
+                 
 
-  
   common datastructure, trace_data
-  
-  
-; Create custom made symbol (psym=8) for scatter plots
-  N=25
-  A = FINDGEN(N) * (!PI*2/float(N-1))
-  f=2.
-  USERSYM, COS(A)/f, SIN(A)/f,/FILL 
+    
 ;===============================================================================================
 ; Select the project to analyze:
   PROJECT_NAME = 'CR2223'
@@ -24,31 +16,33 @@ pro up_down_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
 ; Select dir where the structure is located (labeled after the selection of starting points)
   field_line_geometry_suffix_dir = '_aunifgrid_multirad-6h_2x2deg_HMI-PolFil/'
 ;===============================================================================================
-  
+
+; Create the directory-name where is the sav file with the structure  
   dir = '/data1/DATA/trace_tom_files/'+PROJECT_NAME+'/field_lines_geometry'+field_line_geometry_suffix_dir
-  
+
 ; Load structure if so requested:
   if keyword_Set(loadstruct) then begin
      PRINT,'RESTORING THE POINTER-STRUCTURE'  
      restore, FILENAME = dir + structure_filename
      PRINT,'RESTORE COMPLETED'
   endif
-  
+
+; Number of field-lines  
   N_fl = *trace_data.N_fl
-
-
-  tag_small_large_A          = fltarr(N_fl)
-  i_small                    = where(*trace_data.termpoint_rad le 1.25)
-  i_large                    = where(*trace_data.termpoint_rad gt 1.25)
-  tag_small_large_A(i_small) = 1.
-  tag_small_large_A(i_large) = 2.
   
+; Tag the small/large legs (small = 1, large = 2)
+  tag_small_large_A            = fltarr(N_fl)
+  ifl_small                    = where(*trace_data.termpoint_rad le 1.25)
+  ifl_large                    = where(*trace_data.termpoint_rad gt 1.25)
+  tag_small_large_A(ifl_small) = 1.
+  tag_small_large_A(ifl_large) = 2.
+
+; Calculate mid-point (~ 1.105 Rsun) and rho(T,r) for each field-line   
   midpoint_rad  = fltarr(N_fl) -678.
   midpoint_lat  = fltarr(N_fl) -678.
   midpoint_lon  = fltarr(N_fl) -678.
   rho_Tm_r_aia  = fltarr(N_fl) 
   rho_Tm_r_euvi = fltarr(N_fl) 
-; Calculate mid-point (~ 1.105 Rsun) and rho(T,r) for each field-line 
   for ifl = 0L, N_fl-1 do begin
      Nsamp   = (*trace_data.Npt_aia)(ifl)
      if Nsamp ne -678. then begin
@@ -64,22 +58,18 @@ pro up_down_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
            midpoint_lon(ifl) = lonsamp(index)
         endif       
      endif
-      Nsamp   = (*trace_data.Npt_euvia)(ifl)
-      if Nsamp ne -678. then begin
-         radsamp = (*trace_data.rad_euvia)(ifl,0:Nsamp-1)
-         Tm_samp = (*trace_data.Tm_euvia) (ifl,0:Nsamp-1)
-         rho_Tm_r_euvi(ifl) = correlate(radsamp,Tm_samp)
-      endif
-   endfor
-  
-
+     Nsamp   = (*trace_data.Npt_euvia)(ifl)
+     if Nsamp ne -678. then begin
+        radsamp = (*trace_data.rad_euvia)(ifl,0:Nsamp-1)
+        Tm_samp = (*trace_data.Tm_euvia) (ifl,0:Nsamp-1)
+        rho_Tm_r_euvi(ifl) = correlate(radsamp,Tm_samp)
+     endif
+  endfor
   
 ; Define plot filename suffix
   if not keyword_set(plot_filename_suffix) then plot_filename_suffix='footpoints-map'
-; Default index line step and connect step, for plots only, this does
 
-
-; Define box of footpoint Lat/Lot to analyze
+; Define box of footpoint Lat/Lon to analyze
   if not keyword_set(LonLimits) then LonLimits = [  0., 360.]
   if not keyword_set(LatLimits) then LatLimits = [-90.,+ 90.]
 
@@ -87,13 +77,13 @@ pro up_down_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
   tag_polarity_A = reform((*trace_data.leg_footBfield)(*,0)/abs((*trace_data.leg_footBfield)(*,0)))
   if ( where(finite(tag_polarity_A) eq 0) )(0) ne -1 then STOP ; assumes foot-Br is not ZERO
   
-; Tag field lines with footpoints within the BOX., either open or closed.
+; Tag field lines with footpoints within the BOX, either open or closed.
   tag_box_A = fltarr(N_fl)
-  index_box = where( (*trace_data.Footpoint_Lon ge LonLimits(0) AND *trace_data.Footpoint_Lon le LonLimits(1)) AND $
+  index_box = where(   (*trace_data.Footpoint_Lon ge LonLimits(0) AND *trace_data.Footpoint_Lon le LonLimits(1)) AND $
                        (*trace_data.Footpoint_Lat ge LatLimits(0) AND *trace_data.Footpoint_Lat le LatLimits(1)) )
   tag_box_A(index_box) = +1.
 
-; Now, UNTAG CLOSED field lines whose other leg's footpoint is NOT wihin the BOX,
+; Now, UNTAG CLOSED field lines whose other leg's footpoint is NOT within the BOX,
 ; as well as CLOSED field lines that do NOT comply with opposite polarity.
   if keyword_Set(only_loops) then begin
      ifl=0L
@@ -122,33 +112,36 @@ pro up_down_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
   scN_crit = 0.10
   scT_crit = 0.10
   IF keyword_set(aia) then begin
-; Independently for each instrument, tag field lines for which their
-; DPL Ne-fit has all parameters positive     
+;    Tag field lines for which their
+;    DPL Ne-fit has all parameters positive     
      tag_posfit_aia_A = fltarr(N_Fl)
      index            = where(*trace_data.N1_fit_aia gt 0. AND *trace_data.N2_fit_aia gt 0. AND *trace_data.p1_fit_aia gt 0. AND *trace_data.p2_fit_aia gt 0.)
      tag_posfit_aia_A(index) = +1
-; Independently for each instrument, index lines that:
-; 1) are in the box, 2) have a fit, and 3) have a low chisq fit to Ne and Tm
+;    Index lines that:
+;    1) are in the box, 2) have a fit, and 3) have a low chisq fit to Ne and Tm
      ifl_aia_A   = where(tag_box_A eq +1 AND *trace_data.fitflag_aia  eq +1 AND *trace_data.scN_fit_aia  le scN_crit AND *trace_data.scT_fit_aia  le scT_crit)
-; Also independently for each instrument,
-; filter OUT lines for which NOT all their DPL Ne-fit parameters are positive
+;    Filter OUT lines for which NOT all their DPL Ne-fit parameters are positive
      if keyword_set(positparam) then begin
         indpositparam_aia   = where(tag_posfit_aia_A   eq +1)  &  ifl_aia_A   = intersect(ifl_aia_A  ,indpositparam_aia  ) 
      endif
+;    Tag field lines with positive/negative dTm/dr (UP/DOWN legs)      
      tag_gradT_aia_A   = fltarr(N_Fl)
      index          = where(*trace_data.fitflag_aia  eq +1 and *trace_data.dTdr_fit_aia gt 0. and  abs(rho_Tm_r_aia) gt 0.5)
+     index          = intersect(ifl_aia_A,index)
      tag_gradT_aia_A(index)   = +1
      index          = where(*trace_data.fitflag_aia  eq +1 and *trace_data.dTdr_fit_aia lt 0. and  abs(rho_Tm_r_aia) gt 0.5)
+     index    	    = intersect(ifl_aia_A,index)
      tag_gradT_aia_A(index)   = -1
+
+;    Use to consider loops instead legs
      if keyword_Set(only_loops) then begin
         ifl=0L
         while ifl le N_fl-2 do begin
            if (*trace_data.leg_label)(ifl) eq 0. then begin
               ifl=ifl+1
            endif else begin
-              IF (*trace_data.fitflag_aia)(ifl) eq +1 and (*trace_data.fitflag_aia)(ifl+1) AND $
-                 (*trace_data.dTdr_fit_aia)(ifl)*(*trace_data.dTdr_fit_aia)(ifl+1) lt 0.  then $
-                    tag_gradT_aia_A(ifl:ifl+1)=0
+              IF tag_gradT_aia_A(ifl)*tag_gradT_aia_A(ifl+1) le 0. then $
+                 tag_gradT_aia_A(ifl:ifl+1)=0
               ifl=ifl+2
            endelse
         endwhile
@@ -156,61 +149,56 @@ pro up_down_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
   endif
 
   IF keyword_set(euvi) then begin
-; Independently for each instrument, tag field lines for which their
-; DPL Ne-fit has all parameters positive     
-     tag_posfit_euvia_A = fltarr(N_Fl)
+;    Tag field lines for which their
+;    DPL Ne-fit has all parameters positive     
+     tag_posfit_euvi_A = fltarr(N_Fl)
      index            = where(*trace_data.N1_fit_euvia gt 0. AND *trace_data.N2_fit_euvia gt 0. AND *trace_data.p1_fit_euvia gt 0. AND *trace_data.p2_fit_euvia gt 0.)
-     tag_posfit_euvia_A(index) = +1
-; Independently for each instrument, index lines that:
-; 1) are in the box, 2) have a fit, and 3) have a low chisq fit to Ne and Tm
+     tag_posfit_euvi_A(index) = +1
+;    Index lines that:
+;    1) are in the box, 2) have a fit, and 3) have a low chisq fit to Ne and Tm
      ifl_euvi_A   = where(tag_box_A eq +1 AND *trace_data.fitflag_euvia  eq +1 AND *trace_data.scN_fit_euvia  le scN_crit AND *trace_data.scT_fit_euvia  le scT_crit)
-; Also independently for each instrument,
-; filter OUT lines for which NOT all their DPL Ne-fit parameters are positive
+;    Filter OUT lines for which NOT all their DPL Ne-fit parameters are positive
      if keyword_set(positparam) then begin
-        indpositparam_euvia   = where(tag_posfit_euvia_A   eq +1)  &  ifl_euvi_A   = intersect(ifl_euvi_A  ,indpositparam_euvia  ) 
+        indpositparam_euvi   = where(tag_posfit_euvi_A   eq +1)  &  ifl_euvi_A   = intersect(ifl_euiv_A  ,indpositparam_euvi  ) 
      endif
+;    Tag field lines with positive/negative dTm/dr (UP/DOWN legs)      
      tag_gradT_euvi_A   = fltarr(N_Fl)
      index          = where(*trace_data.fitflag_euvia  eq +1 and *trace_data.dTdr_fit_euvia gt 0. and  abs(rho_Tm_r_euvi) gt 0.5)
+     index          = intersect(ifl_euvi_A,index)
      tag_gradT_euvi_A(index)   = +1
      index          = where(*trace_data.fitflag_euvia  eq +1 and *trace_data.dTdr_fit_euvia lt 0. and  abs(rho_Tm_r_euvi) gt 0.5)
+     index    	    = intersect(ifl_euvi_A,index)
      tag_gradT_euvi_A(index)   = -1
+
+;    Use to consider loops instead legs
      if keyword_Set(only_loops) then begin
         ifl=0L
         while ifl le N_fl-2 do begin
            if (*trace_data.leg_label)(ifl) eq 0. then begin
               ifl=ifl+1
            endif else begin
-              IF (*trace_data.fitflag_euvia)(ifl) eq +1 and (*trace_data.fitflag_euvia)(ifl+1) AND $
-                 (*trace_data.dTdr_fit_euvia)(ifl)*(*trace_data.dTdr_fit_euvia)(ifl+1) lt 0.  then $
-                    tag_gradT_euvi_A(ifl:ifl+1)=0
+              IF tag_gradT_euvi_A(ifl)*tag_gradT_euvi_A(ifl+1) le 0. then $
+                 tag_gradT_euvi_A(ifl:ifl+1)=0
               ifl=ifl+2
            endelse
         endwhile
      endif
-  endif
+  ENDIF
 
 
-  
+
 ;-----------------PLOTS SECTION--------------------------------------------------------------
-; Define a few color codes.
-  coltb = 12
-  blue  = 100
-  red   = 200
-  green =  16
 
+; Color-codes from Nuevo et al. (2013)  
   coltb = 33
   blue=fix(256/3.3)
   dblue=10
   red=200
   dred=250
 
-  
-; Lat/Lon plots of FootPoints
+
   fig_dir = './'
-; fig_dir = '~/Downloads/'
-; fig_dir = dir 
   ps1,fig_dir+structure_filename+'_'+plot_filename_suffix+'.eps'
-  np=1000
   !p.multi=[0,1,2]
   loadct,0
   !p.color=0
@@ -219,7 +207,8 @@ pro up_down_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
   
 
 
-; First plot
+; FIRST PLOT: AIA
+; Lat/Lon plots of Mid-Points  
   title = 'AIA: Physical location of leg at 1.105 Rsun'
   plot,*trace_data.Footpoint_lon,*trace_data.Footpoint_lat,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=csz,$
        title=title,ytitle='Carrington Latitude [deg]',xtitle='Carrington Longitude [deg]',font=0
@@ -227,95 +216,92 @@ pro up_down_analysis, LonLimits=LonLimits, LatLimits=LatLimits, $
   if     keyword_set(open)                             then oplot,midpoint_Lon(ifl_open_A)  ,midpoint_Lat(ifl_open_A)  ,psym=3
   if                               keyword_set(closed) then oplot,midpoint_Lon(ifl_closed_A),midpoint_Lat(ifl_closed_A),psym=3
 
-; Make an index array with the common elements of all ifl_INSTRUMENT_A
-  ifl_A = indgen(N_fl,/LONG)    ; start index with ALL lines
-  if keyword_set(aia)    then ifl_A = intersect(ifl_A,ifl_aia_A  )
+; Start index with ALL field-lines
+  ifl_A   = indgen(N_fl,/LONG)
 ; Intersect with CLOSED or OPEN, if so requested
   if keyword_set(closed) then ifl_A = intersect(ifl_A,ifl_closed_A)
   if keyword_set(open)   then ifl_A = intersect(ifl_A,ifl_open_A  )
-; Create index arrays for positive/negative footpoint Brad lines
-  ifl_pos_A = where(tag_gradT_aia_A   eq +1.)
-  ifl_neg_A = where(tag_gradT_aia_A   eq -1.)
 
-  
-  
-
-  loadct,coltb
-; Color-highlight all footpoints indicated by ifl_A accordind to their
-; UP AND DOWN beheavior
-  indxpos_A   = intersect(ifl_A,ifl_pos_A)
-  indxneg_A   = intersect(ifl_A,ifl_neg_A)
-; Separo en small y large  
-  ismall_up   = intersect(indxpos_A,i_small)
-  ismall_down = intersect(indxneg_A,i_small)
-  ilarge_up   = intersect(indxpos_A,i_large)
-  ilarge_down = intersect(indxneg_A,i_large)
-
-
-  oplot,midpoint_lon(ismall_up),midpoint_lat(ismall_up),psym=3,th=2,color=red
-  oplot,midpoint_lon(ismall_down),midpoint_lat(ismall_down),psym=3,th=2,color=blue
-  oplot,midpoint_lon(ilarge_up),midpoint_lat(ilarge_up),psym=3,th=2,color=dred
-  oplot,midpoint_lon(ilarge_down),midpoint_lat(ilarge_down),psym=3,th=2,color=dblue
-  loadct,0
-  print,'AIA'
-  print,'fraction of Up   loops:',n_elements(indxpos_A)*1./( n_elements(indxpos_A)+n_elements(indxneg_A))
-  print,'fraction of Down loops:',n_elements(indxneg_A)*1./( n_elements(indxpos_A)+n_elements(indxneg_A))
-
-; Calculate a 1D vector with dTm/dr for histogram  
-  gradT_aia            = (*trace_data.dTdr_fit_aia)*0.-999.
-  gradT_aia(indxpos_A) = (*trace_data.dTdr_fit_aia)(indxpos_A)/1.e6
-  gradT_aia(indxneg_A) = (*trace_data.dTdr_fit_aia)(indxneg_A)/1.e6
-  
-  ; Second plot
-  title = 'EUVI: Physical location of leg at 1.105 Rsun'
+  if keyword_set(aia) then begin
+;    Create index arrays for positive/negative dTm/dr (UP/DOWN legs)
+     ifl_up_A   = where(tag_gradT_aia_A   eq +1.)
+     ifl_down_A = where(tag_gradT_aia_A   eq -1.)
+;    Intersect UP/DOWN legs with previous conditions
+     ifl_up_A   = intersect(ifl_A,ifl_up_A)
+     ifl_down_A = intersect(ifl_A,ifl_down_A)
+;    Separate in small and large legs
+     ismall_up   = intersect(ifl_small,ifl_up_A)
+     ismall_down = intersect(ifl_small,ifl_down_A)
+     ilarge_up   = intersect(ifl_large,ifl_up_A)
+     ilarge_down = intersect(ifl_large,ifl_down_A)
+     loadct,coltb
+     oplot,midpoint_lon(ismall_up)  ,midpoint_lat(ismall_up)  ,psym=3,th=2,color=red
+     oplot,midpoint_lon(ismall_down),midpoint_lat(ismall_down),psym=3,th=2,color=blue
+     oplot,midpoint_lon(ilarge_up)  ,midpoint_lat(ilarge_up)  ,psym=3,th=2,color=dred
+     oplot,midpoint_lon(ilarge_down),midpoint_lat(ilarge_down),psym=3,th=2,color=dblue
+     loadct,0
+     print,'AIA'
+     print,'fraction of Up   loops:',n_elements(ifl_Up_A)*1.  /( n_elements(ifl_up_A)+n_elements(ifl_down_A))
+     print,'fraction of Down loops:',n_elements(ifl_Down_A)*1./( n_elements(ifl_up_A)+n_elements(ifl_down_A))
+;    Calculate a 1D vector with dTm/dr for histogram  
+     gradT_aia             = (*trace_data.dTdr_fit_aia)*0.-999.
+     gradT_aia(ifl_up_A )  = (*trace_data.dTdr_fit_aia)(ifl_up_A ) /1.e6
+     gradT_aia(ifl_down_A) = (*trace_data.dTdr_fit_aia)(ifl_down_A)/1.e6
+  endif
+     
+; Second plot: EUVI-A
+; Lat/Lon plots of Mid-Points  
+  title = 'EUVI-A: Physical location of leg at 1.105 Rsun'
   plot,*trace_data.Footpoint_lon,*trace_data.Footpoint_lat,xr=[0,360],yr=[-90,+90],xstyle=1,ystyle=1,/nodata,charsize=csz,$
        title=title,ytitle='Carrington Latitude [deg]',xtitle='Carrington Longitude [deg]',font=0
   if not keyword_set(open) and not keyword_set(closed) then oplot,midpoint_Lon              ,midpoint_Lat              ,psym=3
   if     keyword_set(open)                             then oplot,midpoint_Lon(ifl_open_A)  ,midpoint_Lat(ifl_open_A)  ,psym=3
   if                               keyword_set(closed) then oplot,midpoint_Lon(ifl_closed_A),midpoint_Lat(ifl_closed_A),psym=3
 
-; Make an index array with the common elements of all ifl_INSTRUMENT_A
-  ifl_A = indgen(N_fl,/LONG)    ; start index with ALL lines
-  if keyword_set(euvi)    then ifl_A = intersect(ifl_A,ifl_euvi_A  )
+; Start index with ALL field-lines
+  ifl_A   = indgen(N_fl,/LONG)
 ; Intersect with CLOSED or OPEN, if so requested
   if keyword_set(closed) then ifl_A = intersect(ifl_A,ifl_closed_A)
   if keyword_set(open)   then ifl_A = intersect(ifl_A,ifl_open_A  )
-; Create index arrays for positive/negative footpoint Brad lines
-  ifl_pos_A = where(tag_gradT_euvi_A   eq +1.)
-  ifl_neg_A = where(tag_gradT_euvi_A   eq -1.)
+  if keyword_set(euvi) then begin
+;    Create index arrays for positive/negative dTm/dr (UP/DOWN legs)
+     ifl_up_A   = where(tag_gradT_euvi_A   eq +1.)
+     ifl_down_A = where(tag_gradT_euvi_A   eq -1.)
+;    Intersect UP/DOWN legs with previous conditions
+     ifl_up_A   = intersect(ifl_A,ifl_up_A)
+     ifl_down_A = intersect(ifl_A,ifl_down_A)
+;    Separate in small and large legs
+     ismall_up   = intersect(ifl_small,ifl_up_A)
+     ismall_down = intersect(ifl_small,ifl_down_A)
+     ilarge_up   = intersect(ifl_large,ifl_up_A)
+     ilarge_down = intersect(ifl_large,ifl_down_A)
+     loadct,coltb
+     oplot,midpoint_lon(ismall_up)  ,midpoint_lat(ismall_up)  ,psym=3,th=2,color=red
+     oplot,midpoint_lon(ismall_down),midpoint_lat(ismall_down),psym=3,th=2,color=blue
+     oplot,midpoint_lon(ilarge_up)  ,midpoint_lat(ilarge_up)  ,psym=3,th=2,color=dred
+     oplot,midpoint_lon(ilarge_down),midpoint_lat(ilarge_down),psym=3,th=2,color=dblue
+     loadct,0
+     print,'EUVI-A'
+     print,'fraction of Up   loops:',n_elements(ifl_Up_A)*1.  /( n_elements(ifl_up_A)+n_elements(ifl_down_A))
+     print,'fraction of Down loops:',n_elements(ifl_Down_A)*1./( n_elements(ifl_up_A)+n_elements(ifl_down_A))
+;    Calculate a 1D vector with dTm/dr for histogram  
+     gradT_euvi             = (*trace_data.dTdr_fit_euvia)*0.-999.
+     gradT_euvi(ifl_up_A )  = (*trace_data.dTdr_fit_euvia)(ifl_up_A ) /1.e6
+     gradT_euvi(ifl_down_A) = (*trace_data.dTdr_fit_euvia)(ifl_down_A)/1.e6
+  endif
 
-  loadct,coltb
-; Color-highlight all footpoints indicated by ifl_A accordind to their
-; polarity / or UP AND DOWN
-  indxpos_A = intersect(ifl_A,ifl_pos_A)
-  indxneg_A = intersect(ifl_A,ifl_neg_A)
-; Separo en small y large  
-  ismall_up   = intersect(indxpos_A,i_small)
-  ismall_down = intersect(indxneg_A,i_small)
-  ilarge_up   = intersect(indxpos_A,i_large)
-  ilarge_down = intersect(indxneg_A,i_large)
 
-  oplot,midpoint_lon(ismall_up),midpoint_lat(ismall_up),psym=3,th=2,color=red
-  oplot,midpoint_lon(ismall_down),midpoint_lat(ismall_down),psym=3,th=2,color=blue
-  oplot,midpoint_lon(ilarge_up),midpoint_lat(ilarge_up),psym=3,th=2,color=dred
-  oplot,midpoint_lon(ilarge_down),midpoint_lat(ilarge_down),psym=3,th=2,color=dblue
-  
-  loadct,0
-  print,'EUVI'
-  print,'fraction of Up   loops:',n_elements(indxpos_A)*1./( n_elements(indxpos_A)+n_elements(indxneg_A))
-  print,'fraction of Down loops:',n_elements(indxneg_A)*1./( n_elements(indxpos_A)+n_elements(indxneg_A))
   !p.multi=0
-; Calculate a 1D vector with dTm/dr for histogram    
-  gradT_euvi            = (*trace_data.dTdr_fit_euvia)*0.-999.
-  gradT_euvi(indxpos_A) = (*trace_data.dTdr_fit_euvia)(indxpos_A)/1.e6
-  gradT_euvi(indxneg_A) = (*trace_data.dTdr_fit_euvia)(indxneg_A)/1.e6
-
-  index = where(gradT_aia  ne -999.) & gradT_aia  = gradT_aia (index) 
-  index = where(gradT_euvi ne -999.) & gradT_euvi = gradT_euvi(index) 
-
-; Histograms of dTm/dr  
-  xhisto2,gradT_aia ,comp_suffix='GradT_aia' ,sufijo=plot_filename_suffix, histo_x_tit='dTm/dr [MK/Rsun]',Nvals =50, dir_fig ='./',mini=-8.,maxi=8.,tit='AIA'
-  xhisto2,gradT_euvi,comp_suffix='GradT_euvi',sufijo=plot_filename_suffix, histo_x_tit='dTm/dr [MK/Rsun]',Nvals =50, dir_fig ='./',mini=-8.,maxi=8.,tit='EUVI-A'
+  
+; Plot histogram of dTm/dr    
+  if keyword_set(aia) then begin
+     index = where(gradT_aia  ne -999.) & gradT_aia  = gradT_aia (index) 
+     xhisto2,gradT_aia ,comp_suffix='GradT_aia' ,sufijo=plot_filename_suffix, histo_x_tit='dTm/dr [MK/Rsun]', mini=-8.,maxi=8.,tit='AIA'
+  endif
+  if keyword_set(euvi) then begin
+     index = where(gradT_euvi ne -999.) & gradT_euvi = gradT_euvi(index)
+     xhisto2,gradT_euvi,comp_suffix='GradT_euvi',sufijo=plot_filename_suffix, histo_x_tit='dTm/dr [MK/Rsun]', mini=-8.,maxi=8.,tit='EUVI-A'
+  endif
   
   PS2
   stop
@@ -338,8 +324,8 @@ end
 
 pro xhisto2,vector,comp_suffix=comp_suffix,sufijo=sufijo,tit=tit,histo_x_tit=histo_x_tit,Nvals=Nvals,cleanstat=cleanstat,dir_fig=dir_fig,mini=mini,maxi=maxi
 
-  if not keyword_set(dir_fig) then dir_fig = '/data1/tomography/SolarTom_idl/Figures/'
-
+  if not keyword_set(dir_fig) then dir_fig = './'
+  if not keyword_set(Nvals)   then Nvals = 50
 
   if not keyword_set(mini) then mini = min(vector)
   if not keyword_set(maxi) then maxi = max(vector)
@@ -374,10 +360,10 @@ pro xhisto2,vector,comp_suffix=comp_suffix,sufijo=sufijo,tit=tit,histo_x_tit=his
      stdev_frac =  stdev(v_cut)/abs(avg) 
   endif
 
-  print,'uncut - cut'
-  print,'mean',mean(vector), mean(v_cut)
-  print,'median',median(vector),median(v_cut)
-  print,'st. dev.',stdev(vector),stdev(v_cut)
+;  print,'uncut - cut'
+;  print,'mean',mean(vector), mean(v_cut)
+;  print,'median',median(vector),median(v_cut)
+;  print,'st. dev.',stdev(vector),stdev(v_cut)
 
   
 ; redondeo de med y stdv a dos cifras decimales
